@@ -12,7 +12,8 @@ namespace sth1edwv
         public uint address;
         public uint blockCount;
         public List<byte[]> blocks;
-        public BlockMapping(uint _address)
+        
+        public BlockMapping(uint _address, byte solidityIndex)
         {
             address = _address;
             switch (address)
@@ -45,11 +46,16 @@ namespace sth1edwv
             MemoryStream m = new MemoryStream();
             m.Write(Cartridge.memory, (int)address, (int)blockCount * 16);
             m.Seek(0, 0);
+            MemoryStream m2 = new MemoryStream();
+            ushort offset = BitConverter.ToUInt16(Cartridge.memory, 0x3A65 + solidityIndex * 2);
+            m2.Write(Cartridge.memory, offset, (int)blockCount);
+            m2.Seek(0, 0);
             blocks = new List<byte[]>();
             for (int i = 0; i < blockCount; i++)
             {
-                byte[] block = new byte[16];
+                byte[] block = new byte[17];
                 m.Read(block, 0, 16);
+                block[16] = (byte)m2.ReadByte();
                 blocks.Add(block);
             }
         }

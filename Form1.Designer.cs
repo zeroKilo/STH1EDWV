@@ -66,6 +66,8 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.pbar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -342,9 +344,11 @@
             // splitContainer4.Panel2
             // 
             this.splitContainer4.Panel2.AutoScroll = true;
+            this.splitContainer4.Panel2.Controls.Add(this.button1);
+            this.splitContainer4.Panel2.Controls.Add(this.textBox1);
             this.splitContainer4.Panel2.Controls.Add(this.pb4);
             this.splitContainer4.Size = new System.Drawing.Size(712, 499);
-            this.splitContainer4.SplitterDistance = 354;
+            this.splitContainer4.SplitterDistance = 439;
             this.splitContainer4.TabIndex = 2;
             // 
             // listBox5
@@ -356,13 +360,13 @@
             this.listBox5.ItemHeight = 14;
             this.listBox5.Location = new System.Drawing.Point(0, 0);
             this.listBox5.Name = "listBox5";
-            this.listBox5.Size = new System.Drawing.Size(354, 499);
+            this.listBox5.Size = new System.Drawing.Size(439, 499);
             this.listBox5.TabIndex = 1;
             this.listBox5.SelectedIndexChanged += new System.EventHandler(this.listBox5_SelectedIndexChanged);
             // 
             // pb4
             // 
-            this.pb4.Location = new System.Drawing.Point(2, 0);
+            this.pb4.Location = new System.Drawing.Point(2, 29);
             this.pb4.Name = "pb4";
             this.pb4.Size = new System.Drawing.Size(36, 36);
             this.pb4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -525,6 +529,24 @@
             this.pbar1.Name = "pbar1";
             this.pbar1.Size = new System.Drawing.Size(100, 16);
             // 
+            // textBox1
+            // 
+            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox1.Location = new System.Drawing.Point(2, 3);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(36, 20);
+            this.textBox1.TabIndex = 4;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(44, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(37, 20);
+            this.button1.TabIndex = 5;
+            this.button1.Text = "Set";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -620,6 +642,8 @@
         private System.Windows.Forms.PictureBox pb4;
         private System.Windows.Forms.ToolStripMenuItem dontRenderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveROMToolStripMenuItem;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

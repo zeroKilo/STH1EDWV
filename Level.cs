@@ -14,6 +14,7 @@ namespace sth1edwv
         //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
         //   SR UW TL 00  MU
         public byte[] header;
+        public byte   solidityIndex;
         public uint   address;
         public ushort floorWidth;
         public ushort floorHeight;
@@ -38,6 +39,7 @@ namespace sth1edwv
             header = new byte[37];
             for (int i = 0; i < 37; i++)
                 header[i] = Cartridge.memory[address + i + 0x15580];
+            solidityIndex = header[0];
             floorWidth = BitConverter.ToUInt16(header, 1);
             floorHeight = BitConverter.ToUInt16(header, 3);
             if (address == 666)
@@ -55,7 +57,7 @@ namespace sth1edwv
             Palettes.ReadPallettes(Cartridge.memory);
             tileset = new TileSet(offsetArt, Palettes.palettes[initPalette]);
             floor = new Floor(floorAddress, floorSize);
-            blockMapping = new BlockMapping(blockMappingAddress);
+            blockMapping = new BlockMapping(blockMappingAddress, solidityIndex);
         }
 
         public TreeNode ToNode()

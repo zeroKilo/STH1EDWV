@@ -23,3 +23,16 @@ D:\CODE\c#\sth1edwv\obj\Debug\sth1edwv.Form1.resources
 D:\CODE\c#\sth1edwv\obj\Debug\sth1edwv.Properties.Resources.resources
 D:\CODE\c#\sth1edwv\obj\Debug\sth1edwv.csproj.GenerateResource.Cache
 D:\CODE\c#\sth1edwv\obj\Debug\sth1edwv.TileChooser.resources
+D:\CODE\GitHub\STH1EDWV\bin\Debug\sth1edwv.exe.config
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.exe
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.pdb
+D:\CODE\GitHub\STH1EDWV\bin\Debug\sth1edwv.exe
+D:\CODE\GitHub\STH1EDWV\bin\Debug\sth1edwv.pdb
+D:\CODE\GitHub\STH1EDWV\bin\Debug\Be.Windows.Forms.HexBox.dll
+D:\CODE\GitHub\STH1EDWV\bin\Debug\Be.Windows.Forms.HexBox.pdb
+D:\CODE\GitHub\STH1EDWV\bin\Debug\Be.Windows.Forms.HexBox.xml
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.csprojResolveAssemblyReference.cache
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.Form1.resources
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.Properties.Resources.resources
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.TileChooser.resources
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.csproj.GenerateResource.Cache

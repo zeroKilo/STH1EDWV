@@ -195,6 +195,22 @@ $01F9D Lightning Palette Control
 $01B8D "Sonic Has Passed" Screen Palette
 $02905 Credits Text (Text Format)
 $02AD6 Credits Screen Palette
+$03A65 Solidity Data 0 Pointer
+$03A67 Solidity Data 1 Pointer
+$03A69 Solidity Data 2 Pointer
+$03A6B Solidity Data 3 Pointer
+$03A6D Solidity Data 4 Pointer
+$03A6F Solidity Data 5 Pointer
+$03A71 Solidity Data 6 Pointer
+$03A73 Solidity Data 7 Pointer
+$03A75 Solidity Data 0
+$03B2D Solidity Data 1
+$03BBD Solidity Data 2
+$03C5D Solidity Data 3
+$03D0D Solidity Data 4
+$03DC8 Solidity Data 5
+$03EA8 Solidity Data 6
+$03F28 Solidity Data 7
 $0626C End Sign Sprite Palette
 $0627C Palette Pointers:
 $0627C Green Hill (=$629E)

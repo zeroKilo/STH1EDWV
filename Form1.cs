@@ -138,8 +138,12 @@ namespace sth1edwv
                 StringBuilder sb = new StringBuilder();
                 sb.Append(i.ToString("X2") + " : ");
                 byte[] blockdata = l.blockMapping.blocks[i];
+                int count = 0;
                 foreach (byte b in blockdata)
-                    sb.Append(b.ToString("X2"));
+                    if (count++ < 16)
+                        sb.Append(b.ToString("X2"));
+                sb.Append(" - ");
+                sb.Append(Convert.ToString(blockdata[16], 2).PadLeft(8, '0'));
                 listBox5.Items.Add(sb.ToString());
             }
         }
@@ -184,6 +188,7 @@ namespace sth1edwv
                             bmp.SetPixel(bx * 9 + x, by * 9 + y, tile[x, y]);
                 }
             pb4.Image = bmp;
+            textBox1.Text = blockdata[16].ToString("X2");
 
         }
 
@@ -248,6 +253,25 @@ namespace sth1edwv
                 File.WriteAllBytes(d.FileName, Cartridge.memory);
                 MessageBox.Show("Done");
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            int n = listBox4.SelectedIndex;
+            if (n == -1)
+                return;
+            int m = listBox5.SelectedIndex;
+            if (m == -1)
+                return;
+            Level l = Cartridge.level_list[n];
+            byte[] blockdata = l.blockMapping.blocks[m];
+            ushort offset = (ushort)(BitConverter.ToUInt16(Cartridge.memory, 0x3A65 + l.solidityIndex * 2) + m);
+            byte data = (byte)Convert.ToByte(textBox1.Text, 16);
+            Cartridge.memory[offset] = data;
+            Cartridge.ReadLevels();
+            RefreshAll();
+            listBox4.SelectedIndex = n;
+            listBox5.SelectedIndex = m;
         }
     }
 }
