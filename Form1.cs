@@ -26,6 +26,7 @@ namespace sth1edwv
             if (d.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 Cartridge.Load(d.FileName);
+                rtb1.Text = Cartridge.MakeSummary();
                 RefreshAll();
             }
         }
@@ -272,6 +273,44 @@ namespace sth1edwv
             RefreshAll();
             listBox4.SelectedIndex = n;
             listBox5.SelectedIndex = m;
+        }
+
+        private void pb3_MouseClick(object sender, MouseEventArgs e)
+        {
+            int n = listBox4.SelectedIndex;
+            if (n == -1)
+                return;
+            if (!blockGridToolStripMenuItem.Checked)
+            {
+                MessageBox.Show("Please select block as render mode to edit blocks");
+                return;
+            }
+            int x = e.X / 33;
+            int y = e.Y / 33;
+            Level l = Cartridge.level_list[n];
+            Blockchooser bc = new Blockchooser();
+            bc.levelIndex = n;
+            int selection = bc.selectedBlock = l.floor.data[x + y * l.floorWidth];
+            bc.ShowDialog();
+            if (bc.selectedBlock != selection)
+            {
+                l.floor.data[x + y * l.floorWidth] = (byte)bc.selectedBlock;
+                byte[] newData = l.floor.CompressData(l);
+                if (l.floorSize < newData.Length)
+                {
+                    MessageBox.Show("Cannot compress level enough to fit into ROM. Please make a few more same blocks in a row to save space");
+                    l.floor.data[x + y * l.floorWidth] = (byte)selection;
+                    return;
+                }
+                else
+                {
+                    for (int i = 0; i < newData.Length; i++)
+                        Cartridge.memory[l.floorAddress + i] = newData[i];
+                    Cartridge.ReadLevels();
+                    RefreshAll();
+                    listBox4.SelectedIndex = n;
+                }
+            }
         }
     }
 }

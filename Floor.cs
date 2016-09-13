@@ -48,5 +48,49 @@ namespace sth1edwv
             }
             data = result.ToArray();
         }
+
+        public byte[] CompressData(Level l)
+        {
+            MemoryStream m = new MemoryStream(data);
+            int len = (l.floorHeight * l.floorWidth) - 1;
+            MemoryStream result = new MemoryStream();
+            while (m.Position < len)            
+            {
+                int b1 = m.ReadByte();
+                int b2 = m.ReadByte();
+                if (b1 != b2 || b2 == -1 || b1 == -1)
+                {
+                    if (b1 != -1)
+                        result.WriteByte((byte)b1);
+                    if (b2 != -1)
+                        m.Seek(-1, SeekOrigin.Current);
+                }
+                else
+                {
+                    int count = 1;
+                    while (true)                    
+                    {
+                        int read = m.ReadByte();
+                        if (read == -1)
+                        {
+                            count++;
+                            break;
+                        }
+                        if (read != b1)
+                        {
+                            m.Seek(-1, SeekOrigin.Current);
+                            break;
+                        }
+                        count++;
+                        if (count == 256)
+                            break;
+                    }
+                    result.WriteByte((byte)b1);
+                    result.WriteByte((byte)b2);
+                    result.WriteByte((byte)count);
+                }
+            }
+            return result.ToArray();
+        }
     }
 }

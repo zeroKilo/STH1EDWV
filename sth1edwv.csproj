@@ -44,6 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Blockchooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Blockchooser.Designer.cs">
+      <DependentUpon>Blockchooser.cs</DependentUpon>
+    </Compile>
     <Compile Include="BlockMapping.cs" />
     <Compile Include="Cartridge.cs" />
     <Compile Include="Floor.cs" />
@@ -64,6 +70,9 @@
       <DependentUpon>TileChooser.cs</DependentUpon>
     </Compile>
     <Compile Include="TileSet.cs" />
+    <EmbeddedResource Include="Blockchooser.resx">
+      <DependentUpon>Blockchooser.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,7 +58,7 @@ namespace sth1edwv
             Palettes.ReadPallettes(Cartridge.memory);
             tileset = new TileSet(offsetArt, Palettes.palettes[initPalette]);
             floor = new Floor(floorAddress, floorSize);
-            blockMapping = new BlockMapping(blockMappingAddress, solidityIndex);
+            blockMapping = new BlockMapping(blockMappingAddress, solidityIndex, tileset);
         }
 
         public TreeNode ToNode()
@@ -70,6 +71,7 @@ namespace sth1edwv
             result.Nodes.Add("Extended Height = " + levelExtHeight);
             result.Nodes.Add("Offset Art      = 0x" + offsetArt.ToString("X8"));
             result.Nodes.Add("Initial Palette = " + initPalette);
+            result.Expand();
             return result;
         }
 
@@ -91,30 +93,57 @@ namespace sth1edwv
             }
             Bitmap result = new Bitmap(floorWidth * bs, floorHeight * bs);
             Graphics g = Graphics.FromImage(result);
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
             g.Clear(Color.White);
             byte block, tile;
             byte[] blockData;
             Color[,] tileData;
+            Font f = new Font("Courier New", 8, FontStyle.Bold);
             if (pb != null)
                 pb.Maximum = floorWidth;
-            for (int bx = 0; bx < floorWidth; bx++)
-            {
-                for (int by = 0; by < floorHeight; by++)
+            if (mode == 2)
+                for (int bx = 0; bx < floorWidth; bx++)
                 {
-                    block = floor.data[bx + by * floorWidth];
-                    blockData = blockMapping.blocks[block];
-                    for (int ty = 0; ty < 4; ty++)
-                        for (int tx = 0; tx < 4; tx++)
-                        {
-                            tile = blockData[tx + ty * 4];
-                            tileData = tileset.tiles[tile];
-                            for (int y = 0; y < 8; y++)
-                                for (int x = 0; x < 8; x++)
-                                    result.SetPixel(bx * bs + tx * ts + x, by * bs + ty * ts + y, tileData[x, y]);
-                        }
+                    for (int by = 0; by < floorHeight; by++)
+                    {
+                        block = floor.data[bx + by * floorWidth];
+                        blockData = blockMapping.blocks[block];
+                        for (int ty = 0; ty < 4; ty++)
+                            for (int tx = 0; tx < 4; tx++)
+                            {
+                                tile = blockData[tx + ty * 4];
+                                tileData = tileset.tiles[tile];
+                                for (int y = 0; y < 8; y++)
+                                    for (int x = 0; x < 8; x++)
+                                        result.SetPixel(bx * bs + tx * ts + x, by * bs + ty * ts + y, tileData[x, y]);
+                            }
+                    }
+                    pb.Value = bx;
                 }
-                pb.Value = bx;
-            }
+            else
+                for (int bx = 0; bx < floorWidth; bx++)
+                {
+                    for (int by = 0; by < floorHeight; by++)
+                    {
+                        block = floor.data[bx + by * floorWidth];
+                        tileData = blockMapping.imagedata[block];
+                        if (mode != 1)
+                            for (int y = 0; y < 32; y++)
+                                for (int x = 0; x < 32; x++)
+                                    result.SetPixel(bx * bs + x, by * bs + y, tileData[x, y]);
+                        if (mode == 1)
+                        {
+                            for (int y = 0; y < 32; y++)
+                                for (int x = 0; x < 32; x++)
+                                    if (y > 10 || x > 12)
+                                        result.SetPixel(bx * bs + x, by * bs + y, tileData[x, y]);
+                            g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
+                        }
+                    }
+                    pb.Value = bx;
+                }
             pb.Value = 0;
             return result;
         }

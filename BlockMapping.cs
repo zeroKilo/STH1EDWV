@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +13,9 @@ namespace sth1edwv
         public uint address;
         public uint blockCount;
         public List<byte[]> blocks;
+        public List<Color[,]> imagedata;
         
-        public BlockMapping(uint _address, byte solidityIndex)
+        public BlockMapping(uint _address, byte solidityIndex, TileSet tileSet)
         {
             address = _address;
             switch (address)
@@ -57,6 +59,17 @@ namespace sth1edwv
                 m.Read(block, 0, 16);
                 block[16] = (byte)m2.ReadByte();
                 blocks.Add(block);
+            }
+            imagedata = new List<Color[,]>();
+            for (int i = 0; i < blockCount; i++)
+            {
+                Color[,] data = new Color[32, 32];
+                for(int by =0;by<4;by++)
+                    for (int bx = 0; bx < 4; bx++)
+                        for (int ty = 0; ty < 8; ty++)
+                            for (int tx = 0; tx < 8; tx++)
+                                data[bx * 8 + tx, by * 8 + ty] = tileSet.tiles[blocks[i][bx + by * 4]][tx, ty];
+                imagedata.Add(data);
             }
         }
     }
