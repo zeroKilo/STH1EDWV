@@ -272,6 +272,7 @@
             this.tv1.Name = "tv1";
             this.tv1.Size = new System.Drawing.Size(712, 499);
             this.tv1.TabIndex = 1;
+            this.tv1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tv1_AfterSelect);
             // 
             // tabPage7
             // 

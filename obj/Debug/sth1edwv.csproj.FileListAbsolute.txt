@@ -51,3 +51,4 @@ D:\bernd\test\STH1EDWV-master\STH1EDWV-master\bin\Debug\Be.Windows.Forms.HexBox.
 D:\bernd\test\STH1EDWV-master\STH1EDWV-master\bin\Debug\Be.Windows.Forms.HexBox.xml
 D:\bernd\test\STH1EDWV-master\STH1EDWV-master\obj\Debug\sth1edwv.Blockchooser.resources
 D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.Blockchooser.resources
+D:\CODE\GitHub\STH1EDWV\obj\Debug\sth1edwv.ObjectChooser.resources

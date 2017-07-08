@@ -312,5 +312,50 @@ namespace sth1edwv
                 }
             }
         }
+
+        private void tv1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            TreeNode t = tv1.SelectedNode;
+            int n = listBox4.SelectedIndex;
+            if (t == null || t.Parent == null || t.Parent.Text != "Objects" || n == -1)
+                return;
+            ObjectChooser objc = new ObjectChooser();
+            objc.comboBox1.Items.Clear();
+            objc.comboBox1.Items.AddRange(LevelObjectSet.LevelObject.objNames.Values.ToArray());
+            LevelObjectSet.LevelObject obj = Cartridge.level_list[n].objSet.objs[t.Index];
+            if (LevelObjectSet.LevelObject.objNames.Keys.Contains(obj.type))
+            {
+                string s = LevelObjectSet.LevelObject.objNames[obj.type];
+                for(int i=0;i<objc.comboBox1.Items.Count;i++)
+                    if (objc.comboBox1.Items[i].ToString() == s)
+                    {
+                        objc.comboBox1.SelectedIndex = i;
+                        break;
+                    }
+            }
+            objc.textBox1.Text = obj.X.ToString();
+            objc.textBox2.Text = obj.Y.ToString();
+            objc.textBox3.Text = obj.type.ToString();
+            objc.ShowDialog();
+            if (objc._exit_ok)
+            {
+                int offset = Cartridge.level_list[n].offsetObjectLayout + 0x15581;
+                offset += t.Index * 3;
+                try
+                {
+                    byte x, y, tp;
+                    x = Convert.ToByte(objc.textBox1.Text);
+                    y = Convert.ToByte(objc.textBox2.Text);
+                    tp = Convert.ToByte(objc.textBox3.Text);
+                    Cartridge.memory[offset] = tp;
+                    Cartridge.memory[offset + 1] = x;
+                    Cartridge.memory[offset + 2] = y;
+                    Cartridge.ReadLevels();
+                    RefreshAll();
+                    listBox4.SelectedIndex = n;
+                }
+                catch { }
+            }
+        }
     }
 }

@@ -28,10 +28,13 @@ namespace sth1edwv
         public byte   levelExtHeight;
         public byte   levelHeight;
         public ushort offsetArt;
+        public ushort offsetObjectLayout;
         public byte   initPalette;
         public List<Color> palette;
         public TileSet tileset;
         public Floor floor;
+        public LevelObjectSet objSet;
+        
         public BlockMapping blockMapping;
 
         public Level(uint offset)
@@ -54,23 +57,27 @@ namespace sth1edwv
             levelExtHeight = header[11];
             levelHeight = header[12];
             offsetArt = BitConverter.ToUInt16(header, 21);
+            offsetObjectLayout = BitConverter.ToUInt16(header, 30);
             initPalette = header[26];
             Palettes.ReadPallettes(Cartridge.memory);
             tileset = new TileSet(offsetArt, Palettes.palettes[initPalette]);
             floor = new Floor(floorAddress, floorSize);
             blockMapping = new BlockMapping(blockMappingAddress, solidityIndex, tileset);
+            objSet = new LevelObjectSet(0x15580 + offsetObjectLayout);
         }
 
         public TreeNode ToNode()
         {
             TreeNode result = new TreeNode("Header");
-            result.Nodes.Add("Floor Size      = (" + floorWidth + " x " + floorHeight + ")");
-            result.Nodes.Add("Floor Data      = (@0x" + floorAddress.ToString("X") + " Size: 0x" + floorSize.ToString("X") + ")");
-            result.Nodes.Add("Level Size      = (" + levelWidth + " x " + levelHeight + ")");
-            result.Nodes.Add("Level Offset    = (dx:" + levelXOffset + " dy:" + levelYOffset + ")");
-            result.Nodes.Add("Extended Height = " + levelExtHeight);
-            result.Nodes.Add("Offset Art      = 0x" + offsetArt.ToString("X8"));
-            result.Nodes.Add("Initial Palette = " + initPalette);
+            result.Nodes.Add("Floor Size           = (" + floorWidth + " x " + floorHeight + ")");
+            result.Nodes.Add("Floor Data           = (@0x" + floorAddress.ToString("X") + " Size: 0x" + floorSize.ToString("X") + ")");
+            result.Nodes.Add("Level Size           = (" + levelWidth + " x " + levelHeight + ")");
+            result.Nodes.Add("Level Offset         = (dx:" + levelXOffset + " dy:" + levelYOffset + ")");
+            result.Nodes.Add("Extended Height      = " + levelExtHeight);
+            result.Nodes.Add("Offset Art           = 0x" + offsetArt.ToString("X8"));
+            result.Nodes.Add("Offset Object Layout = 0x" + offsetObjectLayout.ToString("X8"));
+            result.Nodes.Add("Initial Palette      = " + initPalette);
+            result.Nodes.Add(objSet.ToNode());
             result.Expand();
             return result;
         }
@@ -137,13 +144,32 @@ namespace sth1edwv
                         {
                             for (int y = 0; y < 32; y++)
                                 for (int x = 0; x < 32; x++)
-                                    if (y > 10 || x > 12)
+                                    if (y > 10 || x > 12)//white background keep free
                                         result.SetPixel(bx * bs + x, by * bs + y, tileData[x, y]);
                             g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
                         }
                     }
                     pb.Value = bx;
                 }
+            Pen pen = new Pen(Color.Black, 2);
+            pen.Width = 1;
+            g.SmoothingMode = SmoothingMode.None;
+            g.PixelOffsetMode = PixelOffsetMode.None;
+            g.InterpolationMode = InterpolationMode.Default;
+            foreach (LevelObjectSet.LevelObject obj in objSet.objs)
+            {
+                int a, b, c, d;
+                a = obj.X * bs - 1;
+                b = obj.Y * bs - 1;
+                c = a + bs;
+                d = b + bs;
+                g.DrawLine(pen, a, b, c, d);
+                g.DrawLine(pen, c, b, a, d);
+                g.DrawLine(pen, a, b, a, d);
+                g.DrawLine(pen, c, b, c, d);
+                g.DrawLine(pen, a, b, c, b);
+                g.DrawLine(pen, a, d, c, d);
+            }
             pb.Value = 0;
             return result;
         }
