@@ -23,6 +23,7 @@ namespace sth1edwv
         public static List<MemMapEntry> labels;
         public static List<MemMapEntry> levels;
         public static List<Level> level_list;
+        public static List<GameText> gameText;
 
         public static void Load(string path)
         {
@@ -30,6 +31,7 @@ namespace sth1edwv
             labels = ReadList(Properties.Resources.map);
             levels = ReadList(Properties.Resources.levels);
             ReadLevels();
+            ReadGameText();
         }
 
         public static void ReadLevels()
@@ -37,6 +39,23 @@ namespace sth1edwv
             level_list = new List<Level>();
             foreach (MemMapEntry e in levels)
                 level_list.Add(new Level(e.offset));
+        }
+
+        public static void ReadGameText()
+        {
+            gameText = new List<GameText>();
+            for (int i = 0; i < 6; i++)
+            {
+                MemoryStream m = new MemoryStream();
+                m.Write(memory, 0x122D + i * 0xF, 0xF);
+                gameText.Add(new GameText(m.ToArray(), i < 3));
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                MemoryStream m = new MemoryStream();
+                m.Write(memory, 0x197E + i * 0x10, 0x10);
+                gameText.Add(new GameText(m.ToArray(), true));
+            }
         }
 
         public static List<MemMapEntry> ReadList(string s)

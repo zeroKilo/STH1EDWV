@@ -43,6 +43,9 @@ namespace sth1edwv
             listBox3.Items.Clear();
             for (int i = 0; i < 8; i++)
                 listBox3.Items.Add(i);
+            listBox6.Items.Clear();
+            foreach (GameText text in Cartridge.gameText)
+                listBox6.Items.Add(text.text);
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -355,6 +358,65 @@ namespace sth1edwv
                     listBox4.SelectedIndex = n;
                 }
                 catch { }
+            }
+        }
+
+        private void listBox6_DoubleClick(object sender, EventArgs e)
+        {
+            int n = listBox6.SelectedIndex;
+            if (n == -1)
+                return;
+            GameText text = Cartridge.gameText[n];
+            string input = Microsoft.VisualBasic.Interaction.InputBox("Please enter new game text, format X;Y;TEXT\n(TEXT can be 'A'-'Z', ' ' and '©')", "Edit game text", text.X + ";" + text.Y + ";" + text.text);
+            if (input != "")
+            {
+                input = input.ToUpper();
+                string[] parts = input.Split(';');
+                if (parts.Length != 3)
+                {
+                    MessageBox.Show("Please check your input, there should be 3 parts seperated by a ';' !");
+                    return;
+                }
+                bool allOk = true;
+                foreach (char c in parts[2])
+                    if (!GameText.lowChars.ContainsValue(c))
+                    {
+                        allOk = false;
+                        break;
+                    }
+                if (!allOk)
+                {
+                    MessageBox.Show("Please check your input, there was an invalid character!");
+                    return;
+                }
+                if ((n < 6 && parts[2].Trim().Length > 12) ||
+                    (n >= 6 && parts[2].Trim().Length > 13)) 
+                {
+                    MessageBox.Show("Your input is too long!");
+                    return;
+                }
+                byte x, y;
+                try
+                {
+                    x = Convert.ToByte(parts[0].Trim());
+                    y = Convert.ToByte(parts[1].Trim());
+                }
+                catch
+                {
+                    MessageBox.Show("Your input has wrong coordinates!");
+                    return;
+                }
+                if (n < 6)
+                {
+                    text.WriteToMemory(0x122D + n * 0xF, x, y, parts[2].Trim());
+                }
+                else
+                {
+                    text.WriteToMemory(0x197E + (n - 6) * 0x10, x, y, parts[2].Trim(), 13);
+                }
+                Cartridge.ReadGameText();
+                Cartridge.ReadLevels();
+                RefreshAll();
             }
         }
     }

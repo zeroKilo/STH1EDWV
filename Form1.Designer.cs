@@ -68,8 +68,10 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.rtb1 = new System.Windows.Forms.RichTextBox();
+            this.tabPage9 = new System.Windows.Forms.TabPage();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.pbar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.listBox6 = new System.Windows.Forms.ListBox();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -105,6 +107,7 @@
             this.splitContainer1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage4.SuspendLayout();
+            this.tabPage9.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -166,7 +169,7 @@
             this.tileGridToolStripMenuItem,
             this.dontRenderToolStripMenuItem});
             this.renderToolStripMenuItem.Name = "renderToolStripMenuItem";
-            this.renderToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
+            this.renderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.renderToolStripMenuItem.Text = "Render";
             // 
             // seamlessToolStripMenuItem
@@ -529,6 +532,7 @@
             // 
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage9);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -561,6 +565,17 @@
             this.rtb1.Text = "";
             this.rtb1.WordWrap = false;
             // 
+            // tabPage9
+            // 
+            this.tabPage9.Controls.Add(this.listBox6);
+            this.tabPage9.Location = new System.Drawing.Point(4, 22);
+            this.tabPage9.Name = "tabPage9";
+            this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage9.Size = new System.Drawing.Size(954, 537);
+            this.tabPage9.TabIndex = 7;
+            this.tabPage9.Text = "Game Text";
+            this.tabPage9.UseVisualStyleBackColor = true;
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -575,6 +590,19 @@
             // 
             this.pbar1.Name = "pbar1";
             this.pbar1.Size = new System.Drawing.Size(100, 16);
+            // 
+            // listBox6
+            // 
+            this.listBox6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBox6.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBox6.FormattingEnabled = true;
+            this.listBox6.IntegralHeight = false;
+            this.listBox6.ItemHeight = 14;
+            this.listBox6.Location = new System.Drawing.Point(3, 3);
+            this.listBox6.Name = "listBox6";
+            this.listBox6.Size = new System.Drawing.Size(948, 531);
+            this.listBox6.TabIndex = 1;
+            this.listBox6.DoubleClick += new System.EventHandler(this.listBox6_DoubleClick);
             // 
             // Form1
             // 
@@ -625,6 +653,7 @@
             this.splitContainer1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
+            this.tabPage9.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -676,6 +705,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.RichTextBox rtb1;
+        private System.Windows.Forms.TabPage tabPage9;
+        private System.Windows.Forms.ListBox listBox6;
     }
 }
 
