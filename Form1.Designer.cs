@@ -69,9 +69,9 @@
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.rtb1 = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
+            this.listBox6 = new System.Windows.Forms.ListBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.pbar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.listBox6 = new System.Windows.Forms.ListBox();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -129,27 +129,27 @@
             this.saveROMToolStripMenuItem,
             this.saveFloorAsBitmapToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // openROMToolStripMenuItem
             // 
             this.openROMToolStripMenuItem.Name = "openROMToolStripMenuItem";
-            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.openROMToolStripMenuItem.Text = "Open ROM...";
             this.openROMToolStripMenuItem.Click += new System.EventHandler(this.openROMToolStripMenuItem_Click);
             // 
             // saveROMToolStripMenuItem
             // 
             this.saveROMToolStripMenuItem.Name = "saveROMToolStripMenuItem";
-            this.saveROMToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.saveROMToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveROMToolStripMenuItem.Text = "Save ROM...";
             this.saveROMToolStripMenuItem.Click += new System.EventHandler(this.saveROMToolStripMenuItem_Click);
             // 
             // saveFloorAsBitmapToolStripMenuItem
             // 
             this.saveFloorAsBitmapToolStripMenuItem.Name = "saveFloorAsBitmapToolStripMenuItem";
-            this.saveFloorAsBitmapToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.saveFloorAsBitmapToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
             this.saveFloorAsBitmapToolStripMenuItem.Text = "Save Floor as Bitmap...";
             this.saveFloorAsBitmapToolStripMenuItem.Click += new System.EventHandler(this.saveFloorAsBitmapToolStripMenuItem_Click);
             // 
@@ -158,7 +158,7 @@
             this.optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.renderToolStripMenuItem});
             this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
-            this.optionToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
+            this.optionToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
             this.optionToolStripMenuItem.Text = "Option";
             // 
             // renderToolStripMenuItem
@@ -169,27 +169,27 @@
             this.tileGridToolStripMenuItem,
             this.dontRenderToolStripMenuItem});
             this.renderToolStripMenuItem.Name = "renderToolStripMenuItem";
-            this.renderToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.renderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.renderToolStripMenuItem.Text = "Render";
             // 
             // seamlessToolStripMenuItem
             // 
             this.seamlessToolStripMenuItem.Name = "seamlessToolStripMenuItem";
-            this.seamlessToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
+            this.seamlessToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.seamlessToolStripMenuItem.Text = "Seamless";
             this.seamlessToolStripMenuItem.Click += new System.EventHandler(this.seamlessToolStripMenuItem_Click);
             // 
             // blockGridToolStripMenuItem
             // 
             this.blockGridToolStripMenuItem.Name = "blockGridToolStripMenuItem";
-            this.blockGridToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
+            this.blockGridToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.blockGridToolStripMenuItem.Text = "Block Grid";
             this.blockGridToolStripMenuItem.Click += new System.EventHandler(this.blockGridToolStripMenuItem_Click);
             // 
             // tileGridToolStripMenuItem
             // 
             this.tileGridToolStripMenuItem.Name = "tileGridToolStripMenuItem";
-            this.tileGridToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
+            this.tileGridToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.tileGridToolStripMenuItem.Text = "Tile Grid";
             this.tileGridToolStripMenuItem.Click += new System.EventHandler(this.tileGridToolStripMenuItem_Click);
             // 
@@ -198,7 +198,7 @@
             this.dontRenderToolStripMenuItem.Checked = true;
             this.dontRenderToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.dontRenderToolStripMenuItem.Name = "dontRenderToolStripMenuItem";
-            this.dontRenderToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
+            this.dontRenderToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.dontRenderToolStripMenuItem.Text = "Dont Render";
             this.dontRenderToolStripMenuItem.Click += new System.EventHandler(this.dontRenderToolStripMenuItem_Click);
             // 
@@ -419,7 +419,8 @@
             this.pb3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pb3.TabIndex = 2;
             this.pb3.TabStop = false;
-            this.pb3.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseClick);
+            this.pb3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseDown);
+            this.pb3.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseUp);
             // 
             // tabPage2
             // 
@@ -576,6 +577,19 @@
             this.tabPage9.Text = "Game Text";
             this.tabPage9.UseVisualStyleBackColor = true;
             // 
+            // listBox6
+            // 
+            this.listBox6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBox6.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBox6.FormattingEnabled = true;
+            this.listBox6.IntegralHeight = false;
+            this.listBox6.ItemHeight = 14;
+            this.listBox6.Location = new System.Drawing.Point(3, 3);
+            this.listBox6.Name = "listBox6";
+            this.listBox6.Size = new System.Drawing.Size(948, 531);
+            this.listBox6.TabIndex = 1;
+            this.listBox6.DoubleClick += new System.EventHandler(this.listBox6_DoubleClick);
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -590,19 +604,6 @@
             // 
             this.pbar1.Name = "pbar1";
             this.pbar1.Size = new System.Drawing.Size(100, 16);
-            // 
-            // listBox6
-            // 
-            this.listBox6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox6.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.listBox6.FormattingEnabled = true;
-            this.listBox6.IntegralHeight = false;
-            this.listBox6.ItemHeight = 14;
-            this.listBox6.Location = new System.Drawing.Point(3, 3);
-            this.listBox6.Name = "listBox6";
-            this.listBox6.Size = new System.Drawing.Size(948, 531);
-            this.listBox6.TabIndex = 1;
-            this.listBox6.DoubleClick += new System.EventHandler(this.listBox6_DoubleClick);
             // 
             // Form1
             // 

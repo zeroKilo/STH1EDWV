@@ -278,44 +278,6 @@ namespace sth1edwv
             listBox5.SelectedIndex = m;
         }
 
-        private void pb3_MouseClick(object sender, MouseEventArgs e)
-        {
-            int n = listBox4.SelectedIndex;
-            if (n == -1)
-                return;
-            if (!blockGridToolStripMenuItem.Checked)
-            {
-                MessageBox.Show("Please select block as render mode to edit blocks");
-                return;
-            }
-            int x = e.X / 33;
-            int y = e.Y / 33;
-            Level l = Cartridge.level_list[n];
-            Blockchooser bc = new Blockchooser();
-            bc.levelIndex = n;
-            int selection = bc.selectedBlock = l.floor.data[x + y * l.floorWidth];
-            bc.ShowDialog();
-            if (bc.selectedBlock != selection)
-            {
-                l.floor.data[x + y * l.floorWidth] = (byte)bc.selectedBlock;
-                byte[] newData = l.floor.CompressData(l);
-                if (l.floorSize < newData.Length)
-                {
-                    MessageBox.Show("Cannot compress level enough to fit into ROM. Please make a few more same blocks in a row to save space");
-                    l.floor.data[x + y * l.floorWidth] = (byte)selection;
-                    return;
-                }
-                else
-                {
-                    for (int i = 0; i < newData.Length; i++)
-                        Cartridge.memory[l.floorAddress + i] = newData[i];
-                    Cartridge.ReadLevels();
-                    RefreshAll();
-                    listBox4.SelectedIndex = n;
-                }
-            }
-        }
-
         private void tv1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             TreeNode t = tv1.SelectedNode;
@@ -417,6 +379,72 @@ namespace sth1edwv
                 Cartridge.ReadGameText();
                 Cartridge.ReadLevels();
                 RefreshAll();
+            }
+        }
+
+        int lastX, lastY;
+        private void pb3_MouseDown(object sender, MouseEventArgs e)
+        {
+
+            int n = listBox4.SelectedIndex;
+            if (n == -1)
+                return;
+            if (!blockGridToolStripMenuItem.Checked)
+            {
+                MessageBox.Show("Please select block as render mode to edit blocks");
+                return;
+            }
+            lastX = e.X / 33;
+            lastY = e.Y / 33;
+        }
+
+        private void pb3_MouseUp(object sender, MouseEventArgs e)
+        {
+            int n = listBox4.SelectedIndex;
+            if (n == -1)
+                return;
+            if (!blockGridToolStripMenuItem.Checked)
+            {
+                MessageBox.Show("Please select block as render mode to edit blocks");
+                return;
+            }
+            int x = e.X / 33;
+            int y = e.Y / 33;
+            int minX = x < lastX ? x : lastX;
+            int maxX = x > lastX ? x : lastX;
+            int minY = y < lastY ? y : lastY;
+            int maxY = y > lastY ? y : lastY;
+            Level l = Cartridge.level_list[n];
+            Blockchooser bc = new Blockchooser();
+            bc.levelIndex = n;
+            int selection = bc.selectedBlock = l.floor.data[x + y * l.floorWidth];
+            bc.ShowDialog();
+            byte[] temp = new byte[l.floor.data.Length];
+            for (int i = 0; i < temp.Length; i++)
+                temp[i] = l.floor.data[i];
+            if (bc.selectedBlock != selection)
+            {
+                for (int row = minY; row <= maxY; row++)
+                    for (int col = minX; col <= maxX; col++)
+                        l.floor.data[col + row * l.floorWidth] = (byte)bc.selectedBlock;
+                byte[] newData = l.floor.CompressData(l);
+                if (l.floorSize < newData.Length)
+                {
+                    MessageBox.Show("Cannot compress level enough to fit into ROM.");
+                    l.floor.data = temp;
+                    return;
+                }
+                else
+                {
+                    for (int i = 0; i < l.floorSize; i++)
+                        if (i < newData.Length)
+                            Cartridge.memory[l.floorAddress + i] = newData[i];
+                        else
+                            Cartridge.memory[l.floorAddress + i] = 1;
+                    Cartridge.ReadLevels();
+                    RefreshAll();
+                    listBox4.SelectedIndex = n;
+                }
             }
         }
     }
