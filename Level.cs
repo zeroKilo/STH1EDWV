@@ -16,7 +16,7 @@ namespace sth1edwv
         private readonly uint   _address;
         public readonly ushort floorWidth;
         public readonly ushort floorHeight;
-        public readonly uint   floorAddress;
+        public readonly int   floorAddress;
         public readonly ushort floorSize;
         public readonly uint   blockMappingAddress;
         private readonly ushort levelXOffset;
@@ -47,7 +47,7 @@ namespace sth1edwv
             floorHeight = BitConverter.ToUInt16(header, 3);
             if (_address == 666)
                 floorHeight /= 2;
-            floorAddress = BitConverter.ToUInt16(header, 15) + 0x14000u;
+            floorAddress = BitConverter.ToUInt16(header, 15) + 0x14000;
             floorSize = BitConverter.ToUInt16(header, 17);
             blockMappingAddress = BitConverter.ToUInt16(header, 19) + 0x10000u;
             levelXOffset = BitConverter.ToUInt16(header, 5);
@@ -61,12 +61,12 @@ namespace sth1edwv
             if (artBanksTableOffset > 0)
             {
                 var levelIndex = (offset - 0x15580) / 2;
-                var artBank = (uint)cartridge.Memory[artBanksTableOffset + levelIndex];
+                var artBank = cartridge.Memory[artBanksTableOffset + levelIndex];
                 tileset = new TileSet(cartridge, offsetArt + artBank * 0x4000, palettes[initPalette]);
             }
             else
             {
-                tileset = new TileSet(cartridge, offsetArt + 0x30000u, palettes[initPalette]);
+                tileset = new TileSet(cartridge, offsetArt + 0x30000, palettes[initPalette]);
             }
             floor = new Floor(cartridge, floorAddress, floorSize);
             blockMapping = new BlockMapping(cartridge, blockMappingAddress, solidityIndex, tileset);
@@ -94,7 +94,7 @@ namespace sth1edwv
             return result;
         }
 
-        public Color[,] GetTile(int index)
+        public Tile GetTile(int index)
         {            
             return tileset.Tiles[index];
         }
@@ -111,76 +111,80 @@ namespace sth1edwv
                 ts = 9;
             }
             Bitmap result = new Bitmap(floorWidth * bs, floorHeight * bs);
-            Graphics g = Graphics.FromImage(result);
-            g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.Clear(Color.White);
-            byte block, tile;
-            byte[] blockData;
-            Color[,] tileData;
-            Font f = new Font("Courier New", 8, FontStyle.Bold);
-            pb.Maximum = floorWidth;
-            if (mode == 2)
-                for (int bx = 0; bx < floorWidth; bx++)
+            using (Graphics g = Graphics.FromImage(result)) 
+            using (var f = new Font("Courier New", 8, FontStyle.Bold))
+            {
+                g.SmoothingMode = SmoothingMode.None;
+//            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+//            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.Clear(Color.White);
+                pb.Maximum = floorWidth;
+                if (mode == 2)
                 {
-                    for (int by = 0; by < floorHeight; by++)
+                    for (int bx = 0; bx < floorWidth; bx++)
                     {
-                        block = floor.data[bx + by * floorWidth];
-                        blockData = blockMapping.blocks[block];
-                        for (int ty = 0; ty < 4; ty++)
+                        for (int by = 0; by < floorHeight; by++)
+                        {
+                            var block = floor.data[bx + by * floorWidth];
+                            var blockData = blockMapping.blocks[block];
+                            for (int ty = 0; ty < 4; ty++)
                             for (int tx = 0; tx < 4; tx++)
                             {
-                                tile = blockData[tx + ty * 4];
-                                tileData = tileset.Tiles[tile];
-                                for (int y = 0; y < 8; y++)
-                                    for (int x = 0; x < 8; x++)
-                                        result.SetPixel(bx * bs + tx * ts + x, by * bs + ty * ts + y, tileData[x, y]);
+                                var tile = blockData[tx + ty * 4];
+                                var tileData = tileset.Tiles[tile];
+                                g.DrawImage(tileData.Image, new Point(bx * bs + tx * ts, by * bs + ty * ts));
                             }
+                        }
+                        pb.Value = bx;
                     }
-                    pb.Value = bx;
                 }
-            else
-                for (int bx = 0; bx < floorWidth; bx++)
+                else
                 {
-                    for (int by = 0; by < floorHeight; by++)
+                    for (int bx = 0; bx < floorWidth; bx++)
                     {
-                        block = floor.data[bx + by * floorWidth];
-                        tileData = blockMapping.imagedata[block];
-                        if (mode != 1)
-                            for (int y = 0; y < 32; y++)
+                        for (int by = 0; by < floorHeight; by++)
+                        {
+                            var block = floor.data[bx + by * floorWidth];
+                            var tileData = blockMapping.imagedata[block];
+                            if (mode != 1)
+                            {
+                                for (int y = 0; y < 32; y++)
                                 for (int x = 0; x < 32; x++)
                                     result.SetPixel(bx * bs + x, by * bs + y, tileData[x, y]);
-                        if (mode == 1)
-                        {
-                            for (int y = 0; y < 32; y++)
+                            }
+
+                            if (mode == 1)
+                            {
+                                for (int y = 0; y < 32; y++)
                                 for (int x = 0; x < 32; x++)
-                                    if (y > 10 || x > 12)//white background keep free
+                                    if (y > 10 || x > 12) //white background keep free
                                         result.SetPixel(bx * bs + x, by * bs + y, tileData[x, y]);
-                            g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
+                                g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
+                            }
                         }
+
+                        pb.Value = bx;
                     }
-                    pb.Value = bx;
                 }
-            Pen pen = new Pen(Color.Black, 2);
-            pen.Width = 1;
-            g.SmoothingMode = SmoothingMode.None;
-            g.PixelOffsetMode = PixelOffsetMode.None;
-            g.InterpolationMode = InterpolationMode.Default;
-            foreach (LevelObjectSet.LevelObject obj in objSet.objs)
-            {
-                int a, b, c, d;
-                a = obj.x * bs - 1;
-                b = obj.y * bs - 1;
-                c = a + bs;
-                d = b + bs;
-                g.DrawLine(pen, a, b, c, d);
-                g.DrawLine(pen, c, b, a, d);
-                g.DrawLine(pen, a, b, a, d);
-                g.DrawLine(pen, c, b, c, d);
-                g.DrawLine(pen, a, b, c, b);
-                g.DrawLine(pen, a, d, c, d);
+
+                using (var pen = new Pen(Color.Black, 1))
+                {
+                    foreach (var obj in objSet.objs)
+                    {
+                        var a = obj.x * bs - 1;
+                        var b = obj.y * bs - 1;
+                        var c = a + bs;
+                        var d = b + bs;
+                        g.DrawLine(pen, a, b, c, d);
+                        g.DrawLine(pen, c, b, a, d);
+                        g.DrawLine(pen, a, b, a, d);
+                        g.DrawLine(pen, c, b, c, d);
+                        g.DrawLine(pen, a, b, c, b);
+                        g.DrawLine(pen, a, d, c, d);
+                    }
+                }
             }
+
             pb.Value = 0;
             return result;
         }

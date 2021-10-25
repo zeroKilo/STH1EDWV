@@ -4,21 +4,21 @@ namespace sth1edwv
 {
     public class Floor
     {
-        public uint address;
-        public uint size;
+        private readonly int _address;
+        private readonly int _size;
         public byte[] data;
 
-        public Floor(Cartridge cartridge, uint address, uint size)
+        public Floor(Cartridge cartridge, int address, int size)
         {
-            this.address = address;
-            this.size = size;
+            _address = address;
+            _size = size;
             DecompressData(cartridge);
         }
 
         private void DecompressData(Cartridge cartridge)
         {
             MemoryStream m = new MemoryStream();
-            m.Write(cartridge.Memory, (int)address, (int)size);
+            m.Write(cartridge.Memory, (int)_address, (int)_size);
             int len = (int)m.Length - 1;
             m.Seek(0, 0);
             MemoryStream result = new MemoryStream();

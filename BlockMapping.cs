@@ -65,7 +65,7 @@ namespace sth1edwv
                     for (int bx = 0; bx < 4; bx++)
                         for (int ty = 0; ty < 8; ty++)
                             for (int tx = 0; tx < 8; tx++)
-                                data[bx * 8 + tx, by * 8 + ty] = tileSet.Tiles[blocks[i][bx + by * 4]][tx, ty];
+                                data[bx * 8 + tx, by * 8 + ty] = tileSet.Tiles[blocks[i][bx + by * 4]].getColor(tx, ty);
                 imagedata.Add(data);
             }
         }

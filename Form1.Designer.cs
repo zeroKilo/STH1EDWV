@@ -324,6 +324,7 @@
             this.pb1.Location = new System.Drawing.Point(0, 0);
             this.pb1.Name = "pb1";
             this.pb1.Size = new System.Drawing.Size(474, 499);
+            this.pb1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pb1.TabIndex = 0;
             this.pb1.TabStop = false;
             // 

@@ -40,7 +40,7 @@ namespace sth1edwv
             var symbolsFilePath = Path.ChangeExtension(path, "sym");
             if (File.Exists(symbolsFilePath))
             {
-                // As a hack, let'label read it in and find the ArtTilesTable label
+                // As a hack, let's read it in and find the ArtTilesTable label
                 var regex = new Regex("(?<bank>[0-9]{2}):(?<offset>[0-9]{4}) ArtTilesTable");
                 var line = File.ReadAllLines(symbolsFilePath)
                     .Select(x => regex.Match(x))
