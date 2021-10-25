@@ -37,7 +37,7 @@ namespace sth1edwv
         
         public BlockMapping blockMapping;
 
-        public Level(uint offset)
+        public Level(uint offset, uint artBanksTableOffset)
         {
             address = BitConverter.ToUInt16(Cartridge.memory, (int)offset);
             header = new byte[37];
@@ -60,7 +60,16 @@ namespace sth1edwv
             offsetObjectLayout = BitConverter.ToUInt16(header, 30);
             initPalette = header[26];
             Palettes.ReadPallettes(Cartridge.memory);
-            tileset = new TileSet(offsetArt, Palettes.palettes[initPalette]);
+            if (artBanksTableOffset > 0)
+            {
+                var levelIndex = (offset - 0x15580) / 2;
+                var artBank = (uint)Cartridge.memory[artBanksTableOffset + levelIndex];
+                tileset = new TileSet(offsetArt + artBank * 0x4000, Palettes.palettes[initPalette]);
+            }
+            else
+            {
+                tileset = new TileSet(offsetArt + 0x30000u, Palettes.palettes[initPalette]);
+            }
             floor = new Floor(floorAddress, floorSize);
             blockMapping = new BlockMapping(blockMappingAddress, solidityIndex, tileset);
             objSet = new LevelObjectSet(0x15580 + offsetObjectLayout);

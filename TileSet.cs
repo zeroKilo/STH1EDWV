@@ -21,7 +21,7 @@ namespace sth1edwv
 
         public TileSet(uint offset, Color[] pal)
         {
-            address = 0x30000 + offset;
+            address = offset;
             palette = pal;
             magic = BitConverter.ToUInt16(Cartridge.memory, (int)address);
             dupRows = BitConverter.ToUInt16(Cartridge.memory, (int)address + 2);

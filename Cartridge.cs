@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace sth1edwv
@@ -24,12 +25,30 @@ namespace sth1edwv
         public static List<MemMapEntry> levels;
         public static List<Level> level_list;
         public static List<GameText> gameText;
+        private static uint artBanksTableOffset;
 
         public static void Load(string path)
         {
             memory = File.ReadAllBytes(path);
             labels = ReadList(Properties.Resources.map);
             levels = ReadList(Properties.Resources.levels);
+
+            artBanksTableOffset = 0;
+            var symbolsFilePath = Path.ChangeExtension(path, "sym");
+            if (File.Exists(symbolsFilePath))
+            {
+                // As a hack, let's read it in and find the ArtTilesTable label
+                var regex = new Regex("(?<bank>[0-9]{2}):(?<offset>[0-9]{4}) ArtTilesTable");
+                var line = File.ReadAllLines(symbolsFilePath)
+                    .Select(x => regex.Match(x))
+                    .FirstOrDefault(x => x.Success);
+                if (line != null)
+                {
+                    // Compute the art banks table offset
+                    artBanksTableOffset = Convert.ToUInt32(line.Groups["bank"].Value, 16) * 0x4000 + Convert.ToUInt32(line.Groups["offset"].Value, 16) % 0x4000;
+                }
+            }
+
             ReadLevels();
             ReadGameText();
         }
@@ -38,7 +57,7 @@ namespace sth1edwv
         {
             level_list = new List<Level>();
             foreach (MemMapEntry e in levels)
-                level_list.Add(new Level(e.offset));
+                level_list.Add(new Level(e.offset, artBanksTableOffset));
         }
 
         public static void ReadGameText()
