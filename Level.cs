@@ -121,6 +121,7 @@ namespace sth1edwv
                 pb.Maximum = floorWidth;
                 if (mode == 2)
                 {
+                    // Tile-wise drawing
                     for (int bx = 0; bx < floorWidth; bx++)
                     {
                         for (int by = 0; by < floorHeight; by++)
@@ -132,7 +133,7 @@ namespace sth1edwv
                             {
                                 var tile = blockData[tx + ty * 4];
                                 var tileData = tileset.Tiles[tile];
-                                g.DrawImage(tileData.Image, new Point(bx * bs + tx * ts, by * bs + ty * ts));
+                                g.DrawImageUnscaled(tileData.Image, bx * bs + tx * ts, by * bs + ty * ts);
                             }
                         }
                         pb.Value = bx;
@@ -140,25 +141,20 @@ namespace sth1edwv
                 }
                 else
                 {
+                    // Block-wise drawing
                     for (int bx = 0; bx < floorWidth; bx++)
                     {
                         for (int by = 0; by < floorHeight; by++)
                         {
                             var block = floor.data[bx + by * floorWidth];
-                            var tileData = blockMapping.imagedata[block];
-                            if (mode != 1)
-                            {
-                                for (int y = 0; y < 32; y++)
-                                for (int x = 0; x < 32; x++)
-                                    result.SetPixel(bx * bs + x, by * bs + y, tileData[x, y]);
-                            }
+                            var tileData = blockMapping.Images[block];
+
+                            g.DrawImageUnscaled(tileData, bx * bs, by * bs);
 
                             if (mode == 1)
                             {
-                                for (int y = 0; y < 32; y++)
-                                for (int x = 0; x < 32; x++)
-                                    if (y > 10 || x > 12) //white background keep free
-                                        result.SetPixel(bx * bs + x, by * bs + y, tileData[x, y]);
+                                // Draw a rect over it for the label
+                                g.FillRectangle(Brushes.White, bx*bs, by*bs, 13, 11);
                                 g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
                             }
                         }

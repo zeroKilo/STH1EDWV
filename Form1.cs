@@ -131,15 +131,15 @@ namespace sth1edwv
             t.Expand();
             tv1.Nodes.Add(t);
             listBox5.Items.Clear();
-            for (int i = 0; i < l.blockMapping.blockCount; i++)
+            for (int i = 0; i < l.blockMapping.blocks.Count; i++)
             {
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
                 sb.Append($"{i:X2} : ");
                 byte[] blockdata = l.blockMapping.blocks[i];
-                int count = 0;
-                foreach (byte b in blockdata)
-                    if (count++ < 16)
-                        sb.Append(b.ToString("X2"));
+                foreach (var b in blockdata.Take(16))
+                {
+                    sb.Append(b.ToString("X2"));
+                }
                 sb.Append(" - ");
                 sb.Append(Convert.ToString(blockdata[16], 2).PadLeft(8, '0'));
                 listBox5.Items.Add(sb.ToString());
@@ -427,18 +427,17 @@ namespace sth1edwv
             int minY = y < _lastY ? y : _lastY;
             int maxY = y > _lastY ? y : _lastY;
             Level l = _cartridge.LevelList[n];
-            Blockchooser bc = new Blockchooser(_cartridge);
-            bc.levelIndex = n;
-            int selection = bc.selectedBlock = l.floor.data[x + y * l.floorWidth];
+            Blockchooser bc = new Blockchooser(l);
+            int selection = bc.SelectedBlock = l.floor.data[x + y * l.floorWidth];
             bc.ShowDialog(this);
             byte[] temp = new byte[l.floor.data.Length];
             for (int i = 0; i < temp.Length; i++)
                 temp[i] = l.floor.data[i];
-            if (bc.selectedBlock != selection)
+            if (bc.SelectedBlock != selection)
             {
                 for (int row = minY; row <= maxY; row++)
                 for (int col = minX; col <= maxX; col++)
-                    l.floor.data[col + row * l.floorWidth] = (byte)bc.selectedBlock;
+                    l.floor.data[col + row * l.floorWidth] = (byte)bc.SelectedBlock;
                 byte[] newData = l.floor.CompressData(l);
                 if (l.floorSize < newData.Length)
                 {

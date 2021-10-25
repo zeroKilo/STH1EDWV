@@ -1,51 +1,50 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace sth1edwv
 {
     public partial class Blockchooser : Form
     {
-        public int levelIndex;
-        public int selectedBlock;
-        private readonly Cartridge _cartridge;
+        public int SelectedBlock { get; set; }
+        private readonly Level _level;
 
-        public Blockchooser(Cartridge cartridge)
+        public Blockchooser(Level level)
         {
-            _cartridge = cartridge;
+            _level = level;
             InitializeComponent();
         }
 
         private void Blockchooser_Load(object sender, EventArgs e)
         {
-            Level l = _cartridge.LevelList[levelIndex];
             Bitmap bmp = new Bitmap(528, 528);
-            int index;
-            for(int by=0; by<16; by++)
-                for (int bx = 0; bx < 16; bx++)
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                for (int i = 0; i < _level.blockMapping.blocks.Count; ++i)
                 {
-                    index = bx + by * 16;
-                    if (index >= l.blockMapping.blockCount)
-                    {
-                        by = 16;
-                        break;
-                    }
-                    for (int y = 0; y < 32; y++)
-                        for (int x = 0; x < 32; x++)
-                            bmp.SetPixel(bx * 33 + x, by * 33 + y, l.blockMapping.imagedata[index][x, y]);
+                    var x = i % 16;
+                    var y = i / 16;
+                    g.DrawImageUnscaled(_level.blockMapping.Images[i], x*33, y*33);
                 }
+            }
+
             pb1.Image = bmp;
         }
 
         private void pb1_MouseClick(object sender, MouseEventArgs e)
         {
-            Level l = _cartridge.LevelList[levelIndex];
             int x = e.X / 33;
             int y = e.Y / 33;
             int index = x + y * 16;
-            if (index < l.blockMapping.blockCount)
-                selectedBlock = index;
-            this.Close();
+            if (index < _level.blockMapping.blocks.Count)
+            {
+                SelectedBlock = index;
+            }
+            Close();
         }
     }
 }
