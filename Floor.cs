@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace sth1edwv
 {
@@ -13,17 +8,17 @@ namespace sth1edwv
         public uint size;
         public byte[] data;
 
-        public Floor(uint _address, uint _size)
+        public Floor(Cartridge cartridge, uint address, uint size)
         {
-            address = _address;
-            size = _size;
-            DecompressData();
+            this.address = address;
+            this.size = size;
+            DecompressData(cartridge);
         }
 
-        private void DecompressData()
+        private void DecompressData(Cartridge cartridge)
         {
             MemoryStream m = new MemoryStream();
-            m.Write(Cartridge.memory, (int)address, (int)size);
+            m.Write(cartridge.Memory, (int)address, (int)size);
             int len = (int)m.Length - 1;
             m.Seek(0, 0);
             MemoryStream result = new MemoryStream();

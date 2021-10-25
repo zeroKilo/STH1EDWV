@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace Be.Windows.Forms
@@ -17,11 +16,11 @@ namespace Be.Windows.Forms
 		public static extern bool DestroyCaret();
 
 		[DllImport("user32.dll", SetLastError=true)]
-		public static extern bool SetCaretPos(int X, int Y);
+		public static extern bool SetCaretPos(int x, int y);
 
 		// Key definitions
-		public const int WM_KEYDOWN = 0x100;
-		public const int WM_KEYUP = 0x101;
-		public const int WM_CHAR = 0x102;
+		public const int WmKeydown = 0x100;
+		public const int WmKeyup = 0x101;
+		public const int WmChar = 0x102;
 	}
 }

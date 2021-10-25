@@ -77,7 +77,7 @@ namespace Be.Windows.Forms
             {
                 _fileOffset = prefixFileOffset;
                 _length = prefixLength;
-                _map.AddAfter(this, new FileDataBlock(suffixFileOffset, suffixLength));
+                map.AddAfter(this, new FileDataBlock(suffixFileOffset, suffixLength));
                 return;
             }
 

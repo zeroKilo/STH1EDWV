@@ -15,7 +15,7 @@ namespace Be.Windows.Forms
 		/// <summary>
 		/// Contains a byte collection.
 		/// </summary>
-		List<byte> _bytes;
+        readonly List<byte> _bytes;
 
 		/// <summary>
 		/// Initializes a new instance of the DynamicByteProvider class.
@@ -116,9 +116,9 @@ namespace Be.Windows.Forms
 		/// <param name="length">the length of bytes to delete.</param>
 		public void DeleteBytes(long index, long length)
 		{ 
-			int internal_index = (int)Math.Max(0, index);
-			int internal_length = (int)Math.Min((int)Length, length);
-			_bytes.RemoveRange(internal_index, internal_length); 
+			int internalIndex = (int)Math.Max(0, index);
+			int internalLength = (int)Math.Min((int)Length, length);
+			_bytes.RemoveRange(internalIndex, internalLength); 
 
 			OnLengthChanged(EventArgs.Empty);
 			OnChanged(EventArgs.Empty);

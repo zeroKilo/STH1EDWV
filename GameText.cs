@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace sth1edwv
 {
@@ -10,16 +7,16 @@ namespace sth1edwv
     {
         public bool isLower;
         public byte[] raw;
-        public byte X;
-        public byte Y;
+        public byte x;
+        public byte y;
         public string text;
         
         public GameText(byte[] data, bool isLowerMap)
         {
             raw = data;
             isLower = isLowerMap;
-            X = data[0];
-            Y = data[1];
+            x = data[0];
+            y = data[1];
             text = "";
             for (int i = 2; i < data.Length - 1; i++)
             {
@@ -30,35 +27,35 @@ namespace sth1edwv
             }
         }
 
-        public void WriteToMemory(int pos, byte x, byte y, string s, int fillSize = 12)
+        public void WriteToMemory(Cartridge cartridge, int pos, byte x, byte y, string s, int fillSize = 12)
         {
-            Cartridge.memory[pos] = x;
-            Cartridge.memory[pos + 1] = y;
+            cartridge.Memory[pos] = x;
+            cartridge.Memory[pos + 1] = y;
             for (int i = 0; i < fillSize; i++)
             {
                 if (i < s.Length)
                 {
                     if (isLower)
                     {
-                        foreach (KeyValuePair<byte, char> pair in lowChars)
-                            if (pair.Value == s[i])
-                            {
-                                Cartridge.memory[pos + 2 + i] = pair.Key;
-                                break;
-                            }
+                        foreach (var pair in lowChars.Where(pair => pair.Value == s[i]))
+                        {
+                            cartridge.Memory[pos + 2 + i] = pair.Key;
+                            break;
+                        }
                     }
                     else
                     {
-                        foreach (KeyValuePair<byte, char> pair in highChars)
-                            if (pair.Value == s[i])
-                            {
-                                Cartridge.memory[pos + 2 + i] = pair.Key;
-                                break;
-                            }
+                        foreach (var pair in highChars.Where(pair => pair.Value == s[i]))
+                        {
+                            cartridge.Memory[pos + 2 + i] = pair.Key;
+                            break;
+                        }
                     }
                 }
                 else
-                    Cartridge.memory[pos + 2 + i] = 0xEB;
+                {
+                    cartridge.Memory[pos + 2 + i] = 0xEB;
+                }
             }
         }
 

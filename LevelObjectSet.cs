@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace sth1edwv
@@ -13,21 +8,21 @@ namespace sth1edwv
         public class LevelObject
         {
             public byte type;
-            public byte X;
-            public byte Y;
+            public byte x;
+            public byte y;
 
             public LevelObject(byte t, byte x, byte y)
             {
                 type = t;
-                X = x;
-                Y = y;
+                this.x = x;
+                this.y = y;
             }
 
             public TreeNode ToNode()
             {
-                string s = "PosX = " + X + " PosY = " + Y + " Type = 0x" + type + "(";
+                string s = $"PosX = {x} PosY = {y} Type = 0x{type}(";
                 if (objNames.ContainsKey(type))
-                    s += objNames[type] + ")";
+                    s += $"{objNames[type]})";
                 else
                     s += "UNKNOWN)";
                 return new TreeNode(s);
@@ -113,12 +108,12 @@ namespace sth1edwv
         }
 
         public List<LevelObject> objs;
-        public LevelObjectSet(int offset)
+        public LevelObjectSet(Cartridge cartridge, int offset)
         {
             objs = new List<LevelObject>();
-            byte count = Cartridge.memory[offset];
+            byte count = cartridge.Memory[offset];
             for (int i = 0; i < count; i++)
-                objs.Add(new LevelObject(Cartridge.memory[offset + i * 3 + 1], Cartridge.memory[offset + i * 3 + 2], Cartridge.memory[offset + i * 3 + 3]));
+                objs.Add(new LevelObject(cartridge.Memory[offset + i * 3 + 1], cartridge.Memory[offset + i * 3 + 2], cartridge.Memory[offset + i * 3 + 3]));
         }
 
         public TreeNode ToNode()

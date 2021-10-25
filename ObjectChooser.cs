@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace sth1edwv
 {
     public partial class ObjectChooser : Form
     {
-        public bool _exit_ok = false;
+        public bool exitOk = false;
 
         public ObjectChooser()
         {
@@ -29,7 +23,7 @@ namespace sth1edwv
 
         private void button1_Click(object sender, EventArgs e)
         {
-            _exit_ok = true;
+            exitOk = true;
             this.Close();
         }
     }

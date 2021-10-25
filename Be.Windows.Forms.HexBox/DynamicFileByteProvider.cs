@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using System.IO;
 
 namespace Be.Windows.Forms
@@ -13,13 +12,13 @@ namespace Be.Windows.Forms
     /// </remarks>
     public sealed class DynamicFileByteProvider : IByteProvider, IDisposable
     {
-        const int COPY_BLOCK_SIZE = 4096;
+        const int CopyBlockSize = 4096;
 
         string _fileName;
         Stream _stream;
         DataMap _dataMap;
         long _totalLength;
-        bool _readOnly;
+        readonly bool _readOnly;
 
         /// <summary>
         /// Constructs a new <see cref="DynamicFileByteProvider" /> instance.
@@ -377,9 +376,9 @@ namespace Be.Windows.Forms
                 if (memoryBlock != null)
                 {
                     _stream.Position = dataOffset;
-                    for (int memoryOffset = 0; memoryOffset < memoryBlock.Length; memoryOffset += COPY_BLOCK_SIZE)
+                    for (int memoryOffset = 0; memoryOffset < memoryBlock.Length; memoryOffset += CopyBlockSize)
                     {
-                        _stream.Write(memoryBlock.Data, memoryOffset, (int)Math.Min(COPY_BLOCK_SIZE, memoryBlock.Length - memoryOffset));
+                        _stream.Write(memoryBlock.Data, memoryOffset, (int)Math.Min(CopyBlockSize, memoryBlock.Length - memoryOffset));
                     }
                 }
                 dataOffset += block.Length;
@@ -525,7 +524,7 @@ namespace Be.Windows.Forms
             if (fileBlock.FileOffset > dataOffset)
             {
                 // Move the section to earlier in the file stream (done in chunks starting at the beginning of the section).
-                byte[] buffer = new byte[COPY_BLOCK_SIZE];
+                byte[] buffer = new byte[CopyBlockSize];
                 for (long relativeOffset = 0; relativeOffset < fileBlock.Length; relativeOffset += buffer.Length)
                 {
                     long readOffset = fileBlock.FileOffset + relativeOffset;
@@ -541,7 +540,7 @@ namespace Be.Windows.Forms
             else
             {
                 // Move the section to later in the file stream (done in chunks starting at the end of the section).
-                byte[] buffer = new byte[COPY_BLOCK_SIZE];
+                byte[] buffer = new byte[CopyBlockSize];
                 for (long relativeOffset = 0; relativeOffset < fileBlock.Length; relativeOffset += buffer.Length)
                 {
                     int bytesToRead = (int)Math.Min(buffer.Length, fileBlock.Length - relativeOffset);

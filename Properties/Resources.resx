@@ -373,8 +373,8 @@ $16000 Misc Mappings: (RLE Compressed)
 $16000 Title Screen 
 $1627E Map 1 Background 
 $163F6 Map 1 Foreground 
-$1653B Map 2 Background (zoom on Robotnik's 'fortress') 
-$166AB Map 2 Foreground (zoom on Robotnik's 'fortress') 
+$1653B Map 2 Background (zoom on Robotnik'label 'fortress') 
+$166AB Map 2 Foreground (zoom on Robotnik'label 'fortress') 
 $16830 Map 3 (when the game is finished) 
 $16C61 Credits Screen 
 $16DEA Level Layout: (RLE Compressed) 

@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace sth1edwv
@@ -14,39 +11,41 @@ namespace sth1edwv
         //   SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
         //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
         //   SR UW TL 00  MU
-        public byte[] header;
-        public byte   solidityIndex;
-        public uint   address;
-        public ushort floorWidth;
-        public ushort floorHeight;
-        public uint   floorAddress;
-        public ushort floorSize;
-        public uint   blockMappingAddress;
-        public ushort levelXOffset;
-        public byte   levelWidth;
-        public ushort levelYOffset;
-        public byte   levelExtHeight;
-        public byte   levelHeight;
-        public ushort offsetArt;
-        public ushort offsetObjectLayout;
-        public byte   initPalette;
+        private byte[] header;
+        public readonly byte   solidityIndex;
+        private readonly uint   _address;
+        public readonly ushort floorWidth;
+        public readonly ushort floorHeight;
+        public readonly uint   floorAddress;
+        public readonly ushort floorSize;
+        public readonly uint   blockMappingAddress;
+        private readonly ushort levelXOffset;
+        private readonly byte   levelWidth;
+        private readonly ushort levelYOffset;
+        private readonly byte   levelExtHeight;
+        private readonly byte   levelHeight;
+        private readonly ushort offsetArt;
+        public readonly ushort offsetObjectLayout;
+        private readonly byte   initPalette;
         public List<Color> palette;
-        public TileSet tileset;
-        public Floor floor;
-        public LevelObjectSet objSet;
+        public readonly TileSet tileset;
+        public readonly Floor floor;
+        public readonly LevelObjectSet objSet;
         
         public BlockMapping blockMapping;
+        private readonly string _label;
 
-        public Level(uint offset, uint artBanksTableOffset)
+        public Level(Cartridge cartridge, uint offset, uint artBanksTableOffset, IList<Palette> palettes, string label)
         {
-            address = BitConverter.ToUInt16(Cartridge.memory, (int)offset);
+            _label = label;
+            _address = BitConverter.ToUInt16(cartridge.Memory, (int)offset);
             header = new byte[37];
             for (int i = 0; i < 37; i++)
-                header[i] = Cartridge.memory[address + i + 0x15580];
+                header[i] = cartridge.Memory[_address + i + 0x15580];
             solidityIndex = header[0];
             floorWidth = BitConverter.ToUInt16(header, 1);
             floorHeight = BitConverter.ToUInt16(header, 3);
-            if (address == 666)
+            if (_address == 666)
                 floorHeight /= 2;
             floorAddress = BitConverter.ToUInt16(header, 15) + 0x14000u;
             floorSize = BitConverter.ToUInt16(header, 17);
@@ -59,44 +58,48 @@ namespace sth1edwv
             offsetArt = BitConverter.ToUInt16(header, 21);
             offsetObjectLayout = BitConverter.ToUInt16(header, 30);
             initPalette = header[26];
-            Palettes.ReadPallettes(Cartridge.memory);
             if (artBanksTableOffset > 0)
             {
                 var levelIndex = (offset - 0x15580) / 2;
-                var artBank = (uint)Cartridge.memory[artBanksTableOffset + levelIndex];
-                tileset = new TileSet(offsetArt + artBank * 0x4000, Palettes.palettes[initPalette]);
+                var artBank = (uint)cartridge.Memory[artBanksTableOffset + levelIndex];
+                tileset = new TileSet(cartridge, offsetArt + artBank * 0x4000, palettes[initPalette]);
             }
             else
             {
-                tileset = new TileSet(offsetArt + 0x30000u, Palettes.palettes[initPalette]);
+                tileset = new TileSet(cartridge, offsetArt + 0x30000u, palettes[initPalette]);
             }
-            floor = new Floor(floorAddress, floorSize);
-            blockMapping = new BlockMapping(blockMappingAddress, solidityIndex, tileset);
-            objSet = new LevelObjectSet(0x15580 + offsetObjectLayout);
+            floor = new Floor(cartridge, floorAddress, floorSize);
+            blockMapping = new BlockMapping(cartridge, blockMappingAddress, solidityIndex, tileset);
+            objSet = new LevelObjectSet(cartridge, 0x15580 + offsetObjectLayout);
+        }
+
+        public override string ToString()
+        {
+            return _label;
         }
 
         public TreeNode ToNode()
         {
             TreeNode result = new TreeNode("Header");
-            result.Nodes.Add("Floor Size           = (" + floorWidth + " x " + floorHeight + ")");
-            result.Nodes.Add("Floor Data           = (@0x" + floorAddress.ToString("X") + " Size: 0x" + floorSize.ToString("X") + ")");
-            result.Nodes.Add("Level Size           = (" + levelWidth + " x " + levelHeight + ")");
-            result.Nodes.Add("Level Offset         = (dx:" + levelXOffset + " dy:" + levelYOffset + ")");
-            result.Nodes.Add("Extended Height      = " + levelExtHeight);
-            result.Nodes.Add("Offset Art           = 0x" + offsetArt.ToString("X8"));
-            result.Nodes.Add("Offset Object Layout = 0x" + offsetObjectLayout.ToString("X8"));
-            result.Nodes.Add("Initial Palette      = " + initPalette);
+            result.Nodes.Add($"Floor Size           = ({floorWidth} x {floorHeight})");
+            result.Nodes.Add($"Floor Data           = (@0x{floorAddress:X} Size: 0x{floorSize:X})");
+            result.Nodes.Add($"Level Size           = ({levelWidth} x {levelHeight})");
+            result.Nodes.Add($"Level Offset         = (dx:{levelXOffset} dy:{levelYOffset})");
+            result.Nodes.Add($"Extended Height      = {levelExtHeight}");
+            result.Nodes.Add($"Offset Art           = 0x{offsetArt:X8}");
+            result.Nodes.Add($"Offset Object Layout = 0x{offsetObjectLayout:X8}");
+            result.Nodes.Add($"Initial Palette      = {initPalette}");
             result.Nodes.Add(objSet.ToNode());
             result.Expand();
             return result;
         }
 
-        public Color[,] getTile(int index)
+        public Color[,] GetTile(int index)
         {            
-            return tileset.tiles[index];
+            return tileset.Tiles[index];
         }
 
-        public Bitmap Render(byte mode, ref ToolStripProgressBar pb)
+        public Bitmap Render(byte mode, ToolStripProgressBar pb)
         {
             int bs = 32;
             int ts = 8;
@@ -117,8 +120,7 @@ namespace sth1edwv
             byte[] blockData;
             Color[,] tileData;
             Font f = new Font("Courier New", 8, FontStyle.Bold);
-            if (pb != null)
-                pb.Maximum = floorWidth;
+            pb.Maximum = floorWidth;
             if (mode == 2)
                 for (int bx = 0; bx < floorWidth; bx++)
                 {
@@ -130,7 +132,7 @@ namespace sth1edwv
                             for (int tx = 0; tx < 4; tx++)
                             {
                                 tile = blockData[tx + ty * 4];
-                                tileData = tileset.tiles[tile];
+                                tileData = tileset.Tiles[tile];
                                 for (int y = 0; y < 8; y++)
                                     for (int x = 0; x < 8; x++)
                                         result.SetPixel(bx * bs + tx * ts + x, by * bs + ty * ts + y, tileData[x, y]);
@@ -168,8 +170,8 @@ namespace sth1edwv
             foreach (LevelObjectSet.LevelObject obj in objSet.objs)
             {
                 int a, b, c, d;
-                a = obj.X * bs - 1;
-                b = obj.Y * bs - 1;
+                a = obj.x * bs - 1;
+                b = obj.y * bs - 1;
                 c = a + bs;
                 d = b + bs;
                 g.DrawLine(pen, a, b, c, d);

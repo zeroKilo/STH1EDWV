@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -16,7 +14,7 @@ namespace Be.Windows.Forms
         /// <summary>
         /// Contains the HexBox control.
         /// </summary>
-        HexBox _hexBox;
+        readonly HexBox _hexBox;
         /// <summary>
         /// Contains the ContextMenuStrip control.
         /// </summary>

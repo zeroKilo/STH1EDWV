@@ -1,15 +1,14 @@
 using System;
 using System.Collections;
-using System.Text;
 
 namespace Be.Windows.Forms
 {
     internal class DataMap : ICollection, IEnumerable
     {
         readonly object _syncRoot = new object();
-        internal int _count;
-        internal DataBlock _firstBlock;
-        internal int _version;
+        internal int count;
+        internal DataBlock firstBlock;
+        internal int version;
 
         public DataMap()
         {
@@ -32,7 +31,7 @@ namespace Be.Windows.Forms
         {
             get
             {
-                return _firstBlock;
+                return firstBlock;
             }
         }
 
@@ -48,19 +47,19 @@ namespace Be.Windows.Forms
 
         public void AddFirst(DataBlock block)
         {
-            if (_firstBlock == null)
+            if (firstBlock == null)
             {
                 AddBlockToEmptyMap(block);
             }
             else
             {
-                AddBeforeInternal(_firstBlock, block);
+                AddBeforeInternal(firstBlock, block);
             }
         }
 
         public void AddLast(DataBlock block)
         {
-            if (_firstBlock == null)
+            if (firstBlock == null)
             {
                 AddBlockToEmptyMap(block);
             }
@@ -77,16 +76,16 @@ namespace Be.Windows.Forms
 
         public void RemoveFirst()
         {
-            if (_firstBlock == null)
+            if (firstBlock == null)
             {
                 throw new InvalidOperationException("The collection is empty.");
             }
-            RemoveInternal(_firstBlock);
+            RemoveInternal(firstBlock);
         }
 
         public void RemoveLast()
         {
-            if (_firstBlock == null)
+            if (firstBlock == null)
             {
                 throw new InvalidOperationException("The collection is empty.");
             }
@@ -109,71 +108,71 @@ namespace Be.Windows.Forms
                 InvalidateBlock(block);
                 block = nextBlock;
             }
-            _firstBlock = null;
-            _count = 0;
-            _version++;
+            firstBlock = null;
+            count = 0;
+            version++;
         }
 
         void AddAfterInternal(DataBlock block, DataBlock newBlock)
         {
-            newBlock._previousBlock = block;
-            newBlock._nextBlock = block._nextBlock;
-            newBlock._map = this;
+            newBlock.previousBlock = block;
+            newBlock.nextBlock = block.nextBlock;
+            newBlock.map = this;
 
-            if (block._nextBlock != null)
+            if (block.nextBlock != null)
             {
-                block._nextBlock._previousBlock = newBlock;
+                block.nextBlock.previousBlock = newBlock;
             }
-            block._nextBlock = newBlock;
+            block.nextBlock = newBlock;
 
-            this._version++;
-            this._count++;
+            this.version++;
+            this.count++;
         }
 
         void AddBeforeInternal(DataBlock block, DataBlock newBlock)
         {
-            newBlock._nextBlock = block;
-            newBlock._previousBlock = block._previousBlock;
-            newBlock._map = this;
+            newBlock.nextBlock = block;
+            newBlock.previousBlock = block.previousBlock;
+            newBlock.map = this;
 
-            if (block._previousBlock != null)
+            if (block.previousBlock != null)
             {
-                block._previousBlock._nextBlock = newBlock;
+                block.previousBlock.nextBlock = newBlock;
             }
-            block._previousBlock = newBlock;
+            block.previousBlock = newBlock;
 
-            if (_firstBlock == block)
+            if (firstBlock == block)
             {
-                _firstBlock = newBlock;
+                firstBlock = newBlock;
             }
-            this._version++;
-            this._count++;
+            this.version++;
+            this.count++;
         }
 
         void RemoveInternal(DataBlock block)
         {
-            DataBlock previousBlock = block._previousBlock;
-            DataBlock nextBlock = block._nextBlock;
+            DataBlock previousBlock = block.previousBlock;
+            DataBlock nextBlock = block.nextBlock;
 
             if (previousBlock != null)
             {
-                previousBlock._nextBlock = nextBlock;
+                previousBlock.nextBlock = nextBlock;
             }
 
             if (nextBlock != null)
             {
-                nextBlock._previousBlock = previousBlock;
+                nextBlock.previousBlock = previousBlock;
             }
 
-            if (_firstBlock == block)
+            if (firstBlock == block)
             {
-                _firstBlock = nextBlock;
+                firstBlock = nextBlock;
             }
 
             InvalidateBlock(block);
 
-            _count--;
-            _version++;
+            count--;
+            version++;
         }
 
         DataBlock GetLastBlock()
@@ -188,20 +187,20 @@ namespace Be.Windows.Forms
 
         void InvalidateBlock(DataBlock block)
         {
-            block._map = null;
-            block._nextBlock = null;
-            block._previousBlock = null;
+            block.map = null;
+            block.nextBlock = null;
+            block.previousBlock = null;
         }
 
         void AddBlockToEmptyMap(DataBlock block)
         {
-            block._map = this;
-            block._nextBlock = null;
-            block._previousBlock = null;
+            block.map = this;
+            block.nextBlock = null;
+            block.previousBlock = null;
 
-            _firstBlock = block;
-            _version++;
-            _count++;
+            firstBlock = block;
+            version++;
+            count++;
         }
 
         #region ICollection Members
@@ -218,7 +217,7 @@ namespace Be.Windows.Forms
         {
             get
             {
-                return _count;
+                return count;
             }
         }
 
@@ -249,15 +248,15 @@ namespace Be.Windows.Forms
         #region Enumerator Nested Type
         internal class Enumerator : IEnumerator, IDisposable
         {
-            DataMap _map;
+            readonly DataMap _map;
             DataBlock _current;
             int _index;
-            int _version;
+            readonly int _version;
 
             internal Enumerator(DataMap map)
             {
                 _map = map;
-                _version = map._version;
+                _version = map.version;
                 _current = null;
                 _index = -1;
             }
@@ -276,7 +275,7 @@ namespace Be.Windows.Forms
 
             public bool MoveNext()
             {
-                if (this._version != _map._version)
+                if (this._version != _map.version)
                 {
                     throw new InvalidOperationException("Collection was modified after the enumerator was instantiated.");
                 }
@@ -300,7 +299,7 @@ namespace Be.Windows.Forms
 
             void IEnumerator.Reset()
             {
-                if (this._version != this._map._version)
+                if (this._version != this._map.version)
                 {
                     throw new InvalidOperationException("Collection was modified after the enumerator was instantiated.");
                 }

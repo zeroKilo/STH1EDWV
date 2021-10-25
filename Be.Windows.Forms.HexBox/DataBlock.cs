@@ -1,12 +1,10 @@
-using System;
-
 namespace Be.Windows.Forms
 {
     internal abstract class DataBlock
     {
-        internal DataMap _map;
-        internal DataBlock _nextBlock;
-        internal DataBlock _previousBlock;
+        internal DataMap map;
+        internal DataBlock nextBlock;
+        internal DataBlock previousBlock;
 
         public abstract long Length
         {
@@ -17,7 +15,7 @@ namespace Be.Windows.Forms
         {
             get
             {
-                return _map;
+                return map;
             }
         }
 
@@ -25,7 +23,7 @@ namespace Be.Windows.Forms
         {
             get
             {
-                return _nextBlock;
+                return nextBlock;
             }
         }
 
@@ -33,7 +31,7 @@ namespace Be.Windows.Forms
         {
             get
             {
-                return _previousBlock;
+                return previousBlock;
             }
         }
 
