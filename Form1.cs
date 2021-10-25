@@ -32,12 +32,11 @@ namespace sth1edwv
             listBox1.Items.Clear();
             foreach (Cartridge.MemMapEntry e in _cartridge.Labels)
                 listBox1.Items.Add($"${e.Offset:X5} {e.Label}");
-            listBox4.Items.Clear();
-            listBox4.Items.AddRange(_cartridge.LevelList.ToArray<object>());
+            listBoxLevels.Items.Clear();
+            listBoxLevels.Items.AddRange(_cartridge.LevelList.ToArray<object>());
             hb1.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
-            listBox3.Items.Clear();
-            for (int i = 0; i < 8; i++)
-                listBox3.Items.Add(i);
+            listBoxPalettes.Items.Clear();
+            listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
             listBox6.Items.Clear();
             foreach (GameText text in _cartridge.GameText)
                 listBox6.Items.Add(text.text);
@@ -55,11 +54,11 @@ namespace sth1edwv
 
         private void listBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = listBox3.SelectedIndex;
-            if (n == -1)
+            if (!(listBoxPalettes.SelectedItem is Palette palette))
+            {
                 return;
-            var palette = _cartridge.Palettes[n];
-            pb2.Image = palette.ToImage(256, 256);
+            }
+            pb2.Image = palette.ToImage(256, 128);
         }
 
         private void saveFloorAsBitmapToolStripMenuItem_Click(object sender, EventArgs e)
@@ -81,7 +80,7 @@ namespace sth1edwv
             dontRenderToolStripMenuItem.Checked =
             blockGridToolStripMenuItem.Checked =
             tileGridToolStripMenuItem.Checked = false;
-            listBox4.SelectedIndex = -1;
+            listBoxLevels.SelectedIndex = -1;
         }
 
         private void blockGridToolStripMenuItem_Click(object sender, EventArgs e)
@@ -90,7 +89,7 @@ namespace sth1edwv
             dontRenderToolStripMenuItem.Checked =
             seamlessToolStripMenuItem.Checked =
             tileGridToolStripMenuItem.Checked = false;
-            listBox4.SelectedIndex = -1;
+            listBoxLevels.SelectedIndex = -1;
         }
 
         private void tileGridToolStripMenuItem_Click(object sender, EventArgs e)
@@ -99,12 +98,12 @@ namespace sth1edwv
             dontRenderToolStripMenuItem.Checked =
             blockGridToolStripMenuItem.Checked =
             seamlessToolStripMenuItem.Checked = false;
-            listBox4.SelectedIndex = -1;
+            listBoxLevels.SelectedIndex = -1;
         }
 
         private void listBox4_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (n == -1)
                 return;
             byte mode = 0;
@@ -119,6 +118,7 @@ namespace sth1edwv
             listBox2.Items.Clear();
             for (int i = 0; i < l.tileset.UniqueRows.Length; i++)
                 listBox2.Items.Add($"{i:X2} : {l.tileset.UniqueRows[i]:X2}");
+
             tv1.Nodes.Clear();
             TreeNode t = new TreeNode($"{n:X2} : {_cartridge.LevelList[n]}");
             t.Nodes.Add(l.ToNode());
@@ -143,7 +143,7 @@ namespace sth1edwv
 
         private void listBox2_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (n == -1)
                 return;
             int m = listBox2.SelectedIndex;
@@ -163,7 +163,7 @@ namespace sth1edwv
 
         private void listBox5_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (n == -1)
                 return;
             int m = listBox5.SelectedIndex;
@@ -187,7 +187,7 @@ namespace sth1edwv
 
         private void pb4_MouseClick(object sender, MouseEventArgs e)
         {
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (n == -1)
                 return;
             int m = listBox5.SelectedIndex;
@@ -224,7 +224,7 @@ namespace sth1edwv
             _cartridge.Memory[l.blockMappingAddress + m * 16 + tc.subBlockIndex] = (byte)tc.tileIndex;
             _cartridge.ReadLevels();
             RefreshAll();
-            listBox4.SelectedIndex = n;
+            listBoxLevels.SelectedIndex = n;
             listBox5.SelectedIndex = m;
         }
 
@@ -234,7 +234,7 @@ namespace sth1edwv
             seamlessToolStripMenuItem.Checked = 
             blockGridToolStripMenuItem.Checked =
             tileGridToolStripMenuItem.Checked = false;
-            listBox4.SelectedIndex = -1;
+            listBoxLevels.SelectedIndex = -1;
         }
 
         private void saveROMToolStripMenuItem_Click(object sender, EventArgs e)
@@ -250,7 +250,7 @@ namespace sth1edwv
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (n == -1)
                 return;
             int m = listBox5.SelectedIndex;
@@ -263,19 +263,19 @@ namespace sth1edwv
             _cartridge.Memory[offset] = data;
             _cartridge.ReadLevels();
             RefreshAll();
-            listBox4.SelectedIndex = n;
+            listBoxLevels.SelectedIndex = n;
             listBox5.SelectedIndex = m;
         }
 
         private void tv1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             TreeNode t = tv1.SelectedNode;
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (t == null || t.Parent == null || t.Parent.Text != "Objects" || n == -1)
                 return;
             ObjectChooser objc = new ObjectChooser();
             objc.comboBox1.Items.Clear();
-            objc.comboBox1.Items.AddRange(LevelObjectSet.LevelObject.objNames.Values.ToArray());
+            objc.comboBox1.Items.AddRange(LevelObjectSet.LevelObject.objNames.Values.ToArray<object>());
             LevelObjectSet.LevelObject obj = _cartridge.LevelList[n].objSet.objs[t.Index];
             if (LevelObjectSet.LevelObject.objNames.Keys.Contains(obj.type))
             {
@@ -306,7 +306,7 @@ namespace sth1edwv
                     _cartridge.Memory[offset + 2] = y;
                     _cartridge.ReadLevels();
                     RefreshAll();
-                    listBox4.SelectedIndex = n;
+                    listBoxLevels.SelectedIndex = n;
                 }
                 catch { }
             }
@@ -378,7 +378,7 @@ namespace sth1edwv
         private void pb3_MouseDown(object sender, MouseEventArgs e)
         {
 
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (n == -1)
                 return;
             if (!blockGridToolStripMenuItem.Checked)
@@ -392,7 +392,7 @@ namespace sth1edwv
 
         private void pb3_MouseUp(object sender, MouseEventArgs e)
         {
-            int n = listBox4.SelectedIndex;
+            int n = listBoxLevels.SelectedIndex;
             if (n == -1)
                 return;
             if (!blockGridToolStripMenuItem.Checked)
@@ -435,7 +435,7 @@ namespace sth1edwv
                             _cartridge.Memory[l.floorAddress + i] = 1;
                     _cartridge.ReadLevels();
                     RefreshAll();
-                    listBox4.SelectedIndex = n;
+                    listBoxLevels.SelectedIndex = n;
                 }
             }
         }

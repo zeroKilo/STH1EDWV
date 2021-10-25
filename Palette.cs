@@ -6,10 +6,12 @@ namespace sth1edwv
 {
     public class Palette
     {
+        private readonly string _label;
         public IList<Color> Colors { get; } = new List<Color>();
 
-        public Palette(byte[] mem, int offset)
+        public Palette(byte[] mem, int offset, string label)
         {
+            _label = label;
             for (var i = 0; i < 32; i++)
             {
                 var color = mem[offset + i];
@@ -18,6 +20,11 @@ namespace sth1edwv
                 var b = ScaleColor((color >> 4) & 0b11);
                 Colors.Add(Color.FromArgb(r, g, b));
             }
+        }
+
+        public override string ToString()
+        {
+            return _label;
         }
 
         private static int ScaleColor(int c)
@@ -41,7 +48,7 @@ namespace sth1edwv
             for (var i = 0; i < 8; i++)
             {
                 var address = BitConverter.ToUInt16(mem, offset);
-                yield return new Palette(mem, address);
+                yield return new Palette(mem, address, $"{i} @ {offset:X}");
                 offset += 2;
             }
         }

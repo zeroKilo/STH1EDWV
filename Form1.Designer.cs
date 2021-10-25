@@ -41,7 +41,7 @@
             this.dontRenderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
-            this.listBox4 = new System.Windows.Forms.ListBox();
+            this.listBoxLevels = new System.Windows.Forms.ListBox();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.tv1 = new System.Windows.Forms.TreeView();
@@ -59,7 +59,7 @@
             this.pb3 = new System.Windows.Forms.PictureBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
-            this.listBox3 = new System.Windows.Forms.ListBox();
+            this.listBoxPalettes = new System.Windows.Forms.ListBox();
             this.pb2 = new System.Windows.Forms.PictureBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -169,7 +169,7 @@
             this.tileGridToolStripMenuItem,
             this.dontRenderToolStripMenuItem});
             this.renderToolStripMenuItem.Name = "renderToolStripMenuItem";
-            this.renderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.renderToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
             this.renderToolStripMenuItem.Text = "Render";
             // 
             // seamlessToolStripMenuItem
@@ -221,7 +221,7 @@
             // 
             // splitContainer6.Panel1
             // 
-            this.splitContainer6.Panel1.Controls.Add(this.listBox4);
+            this.splitContainer6.Panel1.Controls.Add(this.listBoxLevels);
             // 
             // splitContainer6.Panel2
             // 
@@ -230,18 +230,18 @@
             this.splitContainer6.SplitterDistance = 218;
             this.splitContainer6.TabIndex = 0;
             // 
-            // listBox4
+            // listBoxLevels
             // 
-            this.listBox4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox4.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.listBox4.FormattingEnabled = true;
-            this.listBox4.IntegralHeight = false;
-            this.listBox4.ItemHeight = 14;
-            this.listBox4.Location = new System.Drawing.Point(0, 0);
-            this.listBox4.Name = "listBox4";
-            this.listBox4.Size = new System.Drawing.Size(218, 531);
-            this.listBox4.TabIndex = 1;
-            this.listBox4.SelectedIndexChanged += new System.EventHandler(this.listBox4_SelectedIndexChanged);
+            this.listBoxLevels.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxLevels.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBoxLevels.FormattingEnabled = true;
+            this.listBoxLevels.IntegralHeight = false;
+            this.listBoxLevels.ItemHeight = 14;
+            this.listBoxLevels.Location = new System.Drawing.Point(0, 0);
+            this.listBoxLevels.Name = "listBoxLevels";
+            this.listBoxLevels.Size = new System.Drawing.Size(218, 531);
+            this.listBoxLevels.TabIndex = 1;
+            this.listBoxLevels.SelectedIndexChanged += new System.EventHandler(this.listBox4_SelectedIndexChanged);
             // 
             // tabControl2
             // 
@@ -441,7 +441,7 @@
             // 
             // splitContainer3.Panel1
             // 
-            this.splitContainer3.Panel1.Controls.Add(this.listBox3);
+            this.splitContainer3.Panel1.Controls.Add(this.listBoxPalettes);
             // 
             // splitContainer3.Panel2
             // 
@@ -450,18 +450,18 @@
             this.splitContainer3.SplitterDistance = 314;
             this.splitContainer3.TabIndex = 1;
             // 
-            // listBox3
+            // listBoxPalettes
             // 
-            this.listBox3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox3.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.listBox3.FormattingEnabled = true;
-            this.listBox3.IntegralHeight = false;
-            this.listBox3.ItemHeight = 14;
-            this.listBox3.Location = new System.Drawing.Point(0, 0);
-            this.listBox3.Name = "listBox3";
-            this.listBox3.Size = new System.Drawing.Size(314, 531);
-            this.listBox3.TabIndex = 0;
-            this.listBox3.SelectedIndexChanged += new System.EventHandler(this.listBox3_SelectedIndexChanged);
+            this.listBoxPalettes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxPalettes.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBoxPalettes.FormattingEnabled = true;
+            this.listBoxPalettes.IntegralHeight = false;
+            this.listBoxPalettes.ItemHeight = 14;
+            this.listBoxPalettes.Location = new System.Drawing.Point(0, 0);
+            this.listBoxPalettes.Name = "listBoxPalettes";
+            this.listBoxPalettes.Size = new System.Drawing.Size(314, 531);
+            this.listBoxPalettes.TabIndex = 0;
+            this.listBoxPalettes.SelectedIndexChanged += new System.EventHandler(this.listBox3_SelectedIndexChanged);
             // 
             // pb2
             // 
@@ -675,7 +675,7 @@
         private System.Windows.Forms.ToolStripMenuItem tileGridToolStripMenuItem;
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.SplitContainer splitContainer6;
-        private System.Windows.Forms.ListBox listBox4;
+        private System.Windows.Forms.ListBox listBoxLevels;
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage6;
         private System.Windows.Forms.TreeView tv1;
@@ -687,7 +687,7 @@
         private System.Windows.Forms.PictureBox pb3;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.SplitContainer splitContainer3;
-        private System.Windows.Forms.ListBox listBox3;
+        private System.Windows.Forms.ListBox listBoxPalettes;
         private System.Windows.Forms.PictureBox pb2;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.SplitContainer splitContainer1;
