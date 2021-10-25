@@ -1,0 +1,25 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: build
+    runs-on: windows-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.3
+
+    - name: build
+      shell: cmd
+      run: |
+        msbuild sth1edwv.sln /p:Configuration=Release
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: roms
+        path: bin\Release\*
