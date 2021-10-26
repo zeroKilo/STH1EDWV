@@ -189,11 +189,13 @@ namespace sth1edwv
             if (m == -1)
                 return;
             var block = level.blockMapping.Blocks[m];
-            var bmp = new Bitmap(36, 36);
+            var scale = 4;
+            var bmp = new Bitmap(36*scale, 36*scale);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.ScaleTransform(scale, scale);
                 for (int bx = 0; bx < 4; bx++)
                 for (int by = 0; by < 4; by++)
                 {
@@ -216,8 +218,8 @@ namespace sth1edwv
             if (m == -1)
                 return;
             var block = level.blockMapping.Blocks[m];
-            byte x = (byte)(e.X / 9);
-            byte y = (byte)(e.Y / 9);
+            var x = e.X / 4 / 9;
+            var y = e.Y / 4 / 9;
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
             using (var tc = new TileChooser(level.TileSet){ TileIndex = tileIndex })

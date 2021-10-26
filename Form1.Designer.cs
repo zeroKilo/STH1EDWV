@@ -393,7 +393,7 @@
             // 
             this.pb4.Location = new System.Drawing.Point(2, 29);
             this.pb4.Name = "pb4";
-            this.pb4.Size = new System.Drawing.Size(36, 36);
+            this.pb4.Size = new System.Drawing.Size(128, 128);
             this.pb4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pb4.TabIndex = 3;
             this.pb4.TabStop = false;
