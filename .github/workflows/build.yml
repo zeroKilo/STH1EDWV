@@ -17,6 +17,7 @@ jobs:
     - name: build
       shell: cmd
       run: |
+        nuget restore
         msbuild sth1edwv.sln /p:Configuration=Release
 
     - uses: actions/upload-artifact@v2
