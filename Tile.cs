@@ -8,10 +8,33 @@ namespace sth1edwv
     public class Tile
     {
         private readonly byte[,] _data = new byte[8, 8];
-        public Bitmap Image { get; }
+        private readonly Palette _palette;
+        private Bitmap _image;
+
+        public Bitmap Image
+        {
+            get
+            {
+                if (_image != null)
+                {
+                    return _image;
+                }
+                // Lazy rendering
+                _image = new Bitmap(8, 8);
+                for (int y = 0; y < 8; ++y)
+                {
+                    for (int x = 0; x < 8; ++x)
+                    {
+                        _image.SetPixel(x, y, _palette.Colors[_data[x, y]]);
+                    }
+                }
+                return _image;
+            }
+        }
 
         public Tile(Cartridge cartridge, byte bitmask, int artBase, ref int artPos, ref int dupPos, Palette palette)
         {
+            _palette = palette;
             for (var y = 0; y < 8; ++y)
             {
                 IList<int> row;
@@ -41,15 +64,6 @@ namespace sth1edwv
                 for (int x = 0; x < 8; x++)
                 {
                     _data[x, y] = (byte)row[x];
-                }
-            }
-            // Make it into an image
-            Image = new Bitmap(8, 8);
-            for (int y = 0; y < 8; ++y)
-            {
-                for (int x = 0; x < 8; ++x)
-                {
-                    Image.SetPixel(x, y, palette.Colors[_data[x, y]]);
                 }
             }
         }

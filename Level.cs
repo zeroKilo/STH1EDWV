@@ -18,7 +18,7 @@ namespace sth1edwv
         public readonly ushort floorHeight;
         public readonly int   floorAddress;
         public readonly ushort floorSize;
-        public readonly uint   blockMappingAddress;
+        public readonly int   blockMappingAddress;
         private readonly ushort levelXOffset;
         private readonly byte   levelWidth;
         private readonly ushort levelYOffset;
@@ -49,7 +49,7 @@ namespace sth1edwv
                 floorHeight /= 2;
             floorAddress = BitConverter.ToUInt16(header, 15) + 0x14000;
             floorSize = BitConverter.ToUInt16(header, 17);
-            blockMappingAddress = BitConverter.ToUInt16(header, 19) + 0x10000u;
+            blockMappingAddress = BitConverter.ToUInt16(header, 19) + 0x10000;
             levelXOffset = BitConverter.ToUInt16(header, 5);
             levelWidth = header[8];
             levelYOffset = BitConverter.ToUInt16(header, 9);
@@ -112,11 +112,9 @@ namespace sth1edwv
             }
             Bitmap result = new Bitmap(floorWidth * bs, floorHeight * bs);
             using (Graphics g = Graphics.FromImage(result)) 
-            using (var f = new Font("Courier New", 8, FontStyle.Bold))
             {
-                g.SmoothingMode = SmoothingMode.None;
-//            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-//            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.Clear(Color.White);
                 pb.Maximum = floorWidth;
                 if (mode == 2)
@@ -126,14 +124,14 @@ namespace sth1edwv
                     {
                         for (int by = 0; by < floorHeight; by++)
                         {
-                            var block = floor.data[bx + by * floorWidth];
-                            var blockData = blockMapping.blocks[block];
+                            var blockIndex = floor.data[bx + by * floorWidth];
+                            var block = blockMapping.Blocks[blockIndex];
                             for (int ty = 0; ty < 4; ty++)
                             for (int tx = 0; tx < 4; tx++)
                             {
-                                var tile = blockData[tx + ty * 4];
-                                var tileData = tileset.Tiles[tile];
-                                g.DrawImageUnscaled(tileData.Image, bx * bs + tx * ts, by * bs + ty * ts);
+                                var tileIndex = block.TileIndices[tx + ty * 4];
+                                var tile = tileset.Tiles[tileIndex];
+                                g.DrawImageUnscaled(tile.Image, bx * bs + tx * ts, by * bs + ty * ts);
                             }
                         }
                         pb.Value = bx;
@@ -142,24 +140,27 @@ namespace sth1edwv
                 else
                 {
                     // Block-wise drawing
-                    for (int bx = 0; bx < floorWidth; bx++)
+                    using (var f = new Font("Courier New", 8, FontStyle.Bold))
                     {
-                        for (int by = 0; by < floorHeight; by++)
+                        for (int bx = 0; bx < floorWidth; bx++)
                         {
-                            var block = floor.data[bx + by * floorWidth];
-                            var tileData = blockMapping.Images[block];
-
-                            g.DrawImageUnscaled(tileData, bx * bs, by * bs);
-
-                            if (mode == 1)
+                            for (int by = 0; by < floorHeight; by++)
                             {
-                                // Draw a rect over it for the label
-                                g.FillRectangle(Brushes.White, bx*bs, by*bs, 13, 11);
-                                g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
-                            }
-                        }
+                                var block = floor.data[bx + by * floorWidth];
+                                var tileData = blockMapping.Blocks[block];
 
-                        pb.Value = bx;
+                                g.DrawImageUnscaled(tileData.Image, bx * bs, by * bs);
+
+                                if (mode == 1)
+                                {
+                                    // Draw a rect over it for the label
+                                    g.FillRectangle(Brushes.White, bx*bs, by*bs, 13, 11);
+                                    g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
+                                }
+                            }
+
+                            pb.Value = bx;
+                        }
                     }
                 }
 

@@ -131,17 +131,12 @@ namespace sth1edwv
             t.Expand();
             tv1.Nodes.Add(t);
             listBox5.Items.Clear();
-            for (int i = 0; i < l.blockMapping.blocks.Count; i++)
+            for (int i = 0; i < l.blockMapping.Blocks.Count; i++)
             {
                 var sb = new StringBuilder();
                 sb.Append($"{i:X2} : ");
-                byte[] blockdata = l.blockMapping.blocks[i];
-                foreach (var b in blockdata.Take(16))
-                {
-                    sb.Append(b.ToString("X2"));
-                }
-                sb.Append(" - ");
-                sb.Append(Convert.ToString(blockdata[16], 2).PadLeft(8, '0'));
+                var blockdata = l.blockMapping.Blocks[i];
+                sb.Append(blockdata);
                 listBox5.Items.Add(sb.ToString());
             }
         }
@@ -156,13 +151,14 @@ namespace sth1edwv
                 return;
             var level = _cartridge.LevelList[n];
             var tile = level.GetTile(m);
-            int zoom = 32;
+            const int zoom = 8;
             var bmp = new Bitmap(8 * zoom, 8 * zoom);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.DrawImage(tile.Image, 0, 0, bmp.Width, bmp.Height);
+                g.ScaleTransform(zoom, zoom);
+                g.DrawImageUnscaled(tile.Image, 0, 0);
             }
 
             pb1.Image = bmp;
@@ -176,22 +172,23 @@ namespace sth1edwv
             int m = listBox5.SelectedIndex;
             if (m == -1)
                 return;
-            Level l = _cartridge.LevelList[n];
-            byte[] blockdata = l.blockMapping.blocks[m];
-            Bitmap bmp = new Bitmap(36, 36);
+            var level = _cartridge.LevelList[n];
+            var block = level.blockMapping.Blocks[m];
+            var bmp = new Bitmap(36, 36);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 for (int bx = 0; bx < 4; bx++)
                 for (int by = 0; by < 4; by++)
                 {
-                    var tile = l.GetTile(blockdata[bx + by * 4]);
-                    g.DrawImage(tile.Image, new Rectangle(bx * 9, by * 9, 8, 8));
+                    var tile = level.GetTile(block.TileIndices[bx + by * 4]);
+                    g.DrawImageUnscaled(tile.Image, bx * 9, by * 9);
                 }
             }
 
             pb4.Image = bmp;
-            textBox1.Text = blockdata[16].ToString("X2");
+            textBox1.Text = block.SolidityIndex.ToString("X2");
         }
 
         private void pb4_MouseClick(object sender, MouseEventArgs e)
@@ -202,35 +199,38 @@ namespace sth1edwv
             int m = listBox5.SelectedIndex;
             if (m == -1)
                 return;
-            Level l = _cartridge.LevelList[n];
-            byte[] blockdata = l.blockMapping.blocks[m];
+            Level level = _cartridge.LevelList[n];
+            var block = level.blockMapping.Blocks[m];
             byte x = (byte)(e.X / 9);
             byte y = (byte)(e.Y / 9);
-            TileChooser tc = new TileChooser();
-            tc.levelIndex = n;
-            tc.blockIndex = m;
-            tc.subBlockIndex = x + y * 4;
-            tc.tileIndex = blockdata[tc.subBlockIndex];
-            int maxY = 16;
-            if (l.tileset.Tiles.Count == 128)
-                maxY = 8;
-            var bmp = new Bitmap(256, 256);
-            using (var g = Graphics.FromImage(bmp))
+            using (var tc = new TileChooser())
             {
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                for (int ty = 0; ty < maxY; ty++)
-                for (int tx = 0; tx < 16; tx++)
+                tc.levelIndex = n;
+                tc.blockIndex = m;
+                tc.subBlockIndex = x + y * 4;
+                tc.tileIndex = block.TileIndices[tc.subBlockIndex];
+                int maxY = 16;
+                if (level.tileset.Tiles.Count == 128)
+                    maxY = 8;
+                var bmp = new Bitmap(256, 256);
+                using (var g = Graphics.FromImage(bmp))
                 {
-                    // TODO store this in the tileset?
-                    var tile = l.tileset.Tiles[tx + ty * 16];
-                    g.DrawImage(tile.Image, new Rectangle(tx * 16, ty * 16, 16, 16));
+                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    for (int ty = 0; ty < maxY; ty++)
+                    for (int tx = 0; tx < 16; tx++)
+                    {
+                        // TODO store this in the tileset?
+                        var tile = level.tileset.Tiles[tx + ty * 16];
+                        g.DrawImage(tile.Image, new Rectangle(tx * 16, ty * 16, 16, 16));
+                    }
                 }
+
+                tc.pb1.Image = bmp;
+                tc.ShowDialog(this);
+                _cartridge.Memory[level.blockMappingAddress + m * 16 + tc.subBlockIndex] = (byte)tc.tileIndex;
             }
 
-            tc.pb1.Image = bmp;
-            tc.ShowDialog(this);
-            _cartridge.Memory[l.blockMappingAddress + m * 16 + tc.subBlockIndex] = (byte)tc.tileIndex;
             _cartridge.ReadLevels();
             RefreshAll();
             listBoxLevels.SelectedIndex = n;
@@ -265,9 +265,8 @@ namespace sth1edwv
             int m = listBox5.SelectedIndex;
             if (m == -1)
                 return;
-            Level l = _cartridge.LevelList[n];
-            byte[] blockdata = l.blockMapping.blocks[m];
-            ushort offset = (ushort)(BitConverter.ToUInt16(_cartridge.Memory, 0x3A65 + l.solidityIndex * 2) + m);
+            Level level = _cartridge.LevelList[n];
+            ushort offset = (ushort)(BitConverter.ToUInt16(_cartridge.Memory, 0x3A65 + level.solidityIndex * 2) + m);
             byte data = Convert.ToByte(textBox1.Text, 16);
             _cartridge.Memory[offset] = data;
             _cartridge.ReadLevels();
@@ -427,7 +426,7 @@ namespace sth1edwv
             int minY = y < _lastY ? y : _lastY;
             int maxY = y > _lastY ? y : _lastY;
             Level l = _cartridge.LevelList[n];
-            Blockchooser bc = new Blockchooser(l);
+            BlockChooser bc = new BlockChooser(l);
             int selection = bc.SelectedBlock = l.floor.data[x + y * l.floorWidth];
             bc.ShowDialog(this);
             byte[] temp = new byte[l.floor.data.Length];

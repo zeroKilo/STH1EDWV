@@ -1,6 +1,6 @@
 ﻿namespace sth1edwv
 {
-    partial class Blockchooser
+    partial class BlockChooser
     {
         /// <summary>
         /// Required designer variable.
@@ -41,13 +41,13 @@
             this.pb1.TabStop = false;
             this.pb1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pb1_MouseClick);
             // 
-            // Blockchooser
+            // BlockChooser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(531, 533);
             this.Controls.Add(this.pb1);
-            this.Name = "Blockchooser";
+            this.Name = "BlockChooser";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Block Chooser";
             this.Load += new System.EventHandler(this.Blockchooser_Load);
