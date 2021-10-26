@@ -33,10 +33,10 @@ namespace sth1edwv
         public readonly BlockMapping blockMapping;
         private readonly string _label;
 
-        public Level(Cartridge cartridge, uint offset, uint artBanksTableOffset, IList<Palette> palettes, string label)
+        public Level(Cartridge cartridge, int offset, int artBanksTableOffset, IList<Palette> palettes, string label)
         {
             _label = label;
-            var address = BitConverter.ToUInt16(cartridge.Memory, (int)offset);
+            var address = BitConverter.ToUInt16(cartridge.Memory, offset);
             header = new byte[37];
             Array.Copy(cartridge.Memory, address + 0x15580, header, 0, header.Length);
 

@@ -24,7 +24,7 @@ namespace sth1edwv
             if (d.ShowDialog(this) == DialogResult.OK)
             {
                 _cartridge = new Cartridge(d.FileName);
-                rtb1.Text = _cartridge.MakeSummary();
+                _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
                 RefreshAll();
             }
         }
@@ -128,7 +128,7 @@ namespace sth1edwv
             }
 
             listBox2.Items.Clear();
-            for (int i = 0; i < level.tileset.Tiles.Count; i++)
+            for (int i = 0; i < level.TileSet.Tiles.Count; i++)
             {
                 listBox2.Items.Add($"{i:X2}"); // TODO  : {l.tileset.UniqueRows[i]:X2}");
             }
@@ -136,7 +136,7 @@ namespace sth1edwv
             tv1.Nodes.Clear();
             var t = new TreeNode($"{level}");
             t.Nodes.Add(level.ToNode());
-            t.Nodes.Add(level.tileset.ToNode());
+            t.Nodes.Add(level.TileSet.ToNode());
             t.Expand();
             tv1.Nodes.Add(t);
             listBox5.Items.Clear();
@@ -214,7 +214,7 @@ namespace sth1edwv
             byte y = (byte)(e.Y / 9);
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
-            using (var tc = new TileChooser(level.tileset){ TileIndex = tileIndex })
+            using (var tc = new TileChooser(level.TileSet){ TileIndex = tileIndex })
             {
                 tc.ShowDialog(this);
                 _cartridge.Memory[level.blockMappingAddress + m * 16 + subBlockIndex] = (byte)tc.TileIndex;
@@ -283,7 +283,7 @@ namespace sth1edwv
             {
                 objc.comboBox1.Items.Clear();
                 objc.comboBox1.Items.AddRange(LevelObjectSet.LevelObject.objNames.Values.ToArray<object>());
-                LevelObjectSet.LevelObject obj = level.objSet.objs[node.Index];
+                LevelObjectSet.LevelObject obj = level.ObjSet.objs[node.Index];
                 if (LevelObjectSet.LevelObject.objNames.Keys.Contains(obj.type))
                 {
                     string s = LevelObjectSet.LevelObject.objNames[obj.type];
@@ -386,12 +386,12 @@ namespace sth1edwv
             int maxY = y > _lastY ? y : _lastY;
             using (var bc = new BlockChooser(level))
             {
-                int selection = bc.SelectedBlock = level.floor.data[x + y * level.floorWidth];
+                int selection = bc.SelectedBlock = level.Floor1.data[x + y * level.floorWidth];
                 bc.ShowDialog(this);
-                byte[] temp = new byte[level.floor.data.Length];
+                byte[] temp = new byte[level.Floor1.data.Length];
                 for (int i = 0; i < temp.Length; i++)
                 {
-                    temp[i] = level.floor.data[i];
+                    temp[i] = level.Floor1.data[i];
                 }
 
                 if (bc.SelectedBlock != selection)
@@ -399,14 +399,14 @@ namespace sth1edwv
                     for (int row = minY; row <= maxY; row++)
                     for (int col = minX; col <= maxX; col++)
                     {
-                        level.floor.data[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
+                        level.Floor1.data[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
                     }
 
-                    byte[] newData = level.floor.CompressData(level);
+                    byte[] newData = level.Floor1.CompressData(level);
                     if (level.floorSize < newData.Length)
                     {
                         MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
-                        level.floor.data = temp;
+                        level.Floor1.data = temp;
                         return;
                     }
 

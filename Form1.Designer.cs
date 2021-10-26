@@ -67,7 +67,7 @@
             this.hb1 = new Be.Windows.Forms.HexBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.rtb1 = new System.Windows.Forms.RichTextBox();
+            this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBox6 = new System.Windows.Forms.ListBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -546,7 +546,7 @@
             // 
             // tabPage4
             // 
-            this.tabPage4.Controls.Add(this.rtb1);
+            this.tabPage4.Controls.Add(this._richTextBoxGeneralSummary);
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
@@ -555,17 +555,17 @@
             this.tabPage4.Text = "General Info";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
-            // rtb1
+            // _richTextBoxGeneralSummary
             // 
-            this.rtb1.DetectUrls = false;
-            this.rtb1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.rtb1.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rtb1.Location = new System.Drawing.Point(3, 3);
-            this.rtb1.Name = "rtb1";
-            this.rtb1.Size = new System.Drawing.Size(948, 531);
-            this.rtb1.TabIndex = 0;
-            this.rtb1.Text = "";
-            this.rtb1.WordWrap = false;
+            this._richTextBoxGeneralSummary.DetectUrls = false;
+            this._richTextBoxGeneralSummary.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._richTextBoxGeneralSummary.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._richTextBoxGeneralSummary.Location = new System.Drawing.Point(3, 3);
+            this._richTextBoxGeneralSummary.Name = "_richTextBoxGeneralSummary";
+            this._richTextBoxGeneralSummary.Size = new System.Drawing.Size(948, 531);
+            this._richTextBoxGeneralSummary.TabIndex = 0;
+            this._richTextBoxGeneralSummary.Text = "";
+            this._richTextBoxGeneralSummary.WordWrap = false;
             // 
             // tabPage9
             // 
@@ -706,7 +706,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TabPage tabPage4;
-        private System.Windows.Forms.RichTextBox rtb1;
+        private System.Windows.Forms.RichTextBox _richTextBoxGeneralSummary;
         private System.Windows.Forms.TabPage tabPage9;
         private System.Windows.Forms.ListBox listBox6;
     }

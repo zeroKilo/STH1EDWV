@@ -11,10 +11,10 @@ namespace sth1edwv
     {
         public class MemMapEntry
         {
-            public uint Offset { get; }
+            public int Offset { get; }
             public string Label { get; }
 
-            public MemMapEntry(uint offset, string label)
+            public MemMapEntry(int offset, string label)
             {
                 Offset = offset;
                 Label = label;
@@ -28,7 +28,7 @@ namespace sth1edwv
         public IList<Palette> Palettes { get; }
 
         private readonly IList<MemMapEntry> _levelOffsets;
-        private readonly uint _artBanksTableOffset;
+        private readonly int _artBanksTableOffset;
 
         public Cartridge(string path)
         {
@@ -48,7 +48,7 @@ namespace sth1edwv
                 if (line != null)
                 {
                     // Compute the art banks table offset
-                    _artBanksTableOffset = Convert.ToUInt32(line.Groups["bank"].Value, 16) * 0x4000 + Convert.ToUInt32(line.Groups["offset"].Value, 16) % 0x4000;
+                    _artBanksTableOffset = Convert.ToInt32(line.Groups["bank"].Value, 16) * 0x4000 + Convert.ToInt32(line.Groups["offset"].Value, 16) % 0x4000;
                 }
             }
 
@@ -66,8 +66,9 @@ namespace sth1edwv
             }
         }
 
-        public void ReadGameText()
+        private void ReadGameText()
         {
+            GameText.Clear();
             for (int i = 0; i < 6; i++)
             {
                 GameText.Add(new GameText(this, 0x122D + i * 0xF, i < 3));
@@ -78,22 +79,13 @@ namespace sth1edwv
             }
         }
 
-        public List<MemMapEntry> ReadList(string s)
+        private static List<MemMapEntry> ReadList(string s)
         {
-            List<MemMapEntry> result  = new List<MemMapEntry>();
-            using (StringReader sr = new StringReader(s))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] parts = line.Split(' ');
-                    int len = parts[0].Length;
-                    string offset = parts[0].Substring(1, len - 1);
-                    string label = line.Substring(len + 1, line.Length - len - 1);
-                    result.Add(new MemMapEntry(Convert.ToUInt32(offset, 16), label));
-                }
-            }
-            return result;
+            return s.Split(new []{'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => Regex.Match(line, "^\\$(?<offset>[0-9A-Fa-f]+) (?<label>.+)$"))
+                .Where(m => m.Success)
+                .Select(m => new MemMapEntry(Convert.ToInt32(m.Groups["offset"].Value, 16), m.Groups["label"].Value))
+                .ToList();
         }
 
         public string RomSizes(int size)
