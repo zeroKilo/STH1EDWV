@@ -122,7 +122,7 @@ namespace sth1edwv
                     {
                         for (int by = 0; by < floorHeight; by++)
                         {
-                            var blockIndex = Floor1.data[bx + by * floorWidth];
+                            var blockIndex = Floor1.BlockIndices[bx + by * floorWidth];
                             var block = blockMapping.Blocks[blockIndex];
                             for (int ty = 0; ty < 4; ty++)
                             for (int tx = 0; tx < 4; tx++)
@@ -144,7 +144,7 @@ namespace sth1edwv
                         {
                             for (int by = 0; by < floorHeight; by++)
                             {
-                                var block = Floor1.data[bx + by * floorWidth];
+                                var block = Floor1.BlockIndices[bx + by * floorWidth];
                                 var tileData = blockMapping.Blocks[block];
 
                                 g.DrawImageUnscaled(tileData.Image, bx * bs, by * bs);

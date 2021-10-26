@@ -47,6 +47,7 @@
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.tilePicker1 = new sth1edwv.TilePicker();
             this.pb1 = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
@@ -71,7 +72,6 @@
             this.listBoxGameText = new System.Windows.Forms.ListBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.pbar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.tilePicker1 = new sth1edwv.TilePicker();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -170,27 +170,27 @@
             this.tileGridToolStripMenuItem,
             this.dontRenderToolStripMenuItem});
             this.renderToolStripMenuItem.Name = "renderToolStripMenuItem";
-            this.renderToolStripMenuItem.Size = new System.Drawing.Size(111, 22);
+            this.renderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.renderToolStripMenuItem.Text = "Render";
             // 
             // seamlessToolStripMenuItem
             // 
             this.seamlessToolStripMenuItem.Name = "seamlessToolStripMenuItem";
-            this.seamlessToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.seamlessToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.seamlessToolStripMenuItem.Text = "Seamless";
             this.seamlessToolStripMenuItem.Click += new System.EventHandler(this.seamlessToolStripMenuItem_Click);
             // 
             // blockGridToolStripMenuItem
             // 
             this.blockGridToolStripMenuItem.Name = "blockGridToolStripMenuItem";
-            this.blockGridToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.blockGridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.blockGridToolStripMenuItem.Text = "Block Grid";
             this.blockGridToolStripMenuItem.Click += new System.EventHandler(this.blockGridToolStripMenuItem_Click);
             // 
             // tileGridToolStripMenuItem
             // 
             this.tileGridToolStripMenuItem.Name = "tileGridToolStripMenuItem";
-            this.tileGridToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.tileGridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.tileGridToolStripMenuItem.Text = "Tile Grid";
             this.tileGridToolStripMenuItem.Click += new System.EventHandler(this.tileGridToolStripMenuItem_Click);
             // 
@@ -199,7 +199,7 @@
             this.dontRenderToolStripMenuItem.Checked = true;
             this.dontRenderToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.dontRenderToolStripMenuItem.Name = "dontRenderToolStripMenuItem";
-            this.dontRenderToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.dontRenderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.dontRenderToolStripMenuItem.Text = "Dont Render";
             this.dontRenderToolStripMenuItem.Click += new System.EventHandler(this.dontRenderToolStripMenuItem_Click);
             // 
@@ -265,7 +265,7 @@
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage6.Size = new System.Drawing.Size(718, 505);
             this.tabPage6.TabIndex = 0;
-            this.tabPage6.Text = "Data";
+            this.tabPage6.Text = "BlockIndices";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
             // treeViewLevelData
@@ -306,6 +306,17 @@
             this.splitContainer2.Size = new System.Drawing.Size(712, 499);
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
+            // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 497);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
             // 
             // pb1
             // 
@@ -505,10 +516,8 @@
             // 
             // hb1
             // 
-            this.hb1.BoldFont = null;
             this.hb1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.hb1.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hb1.LineInfoForeColor = System.Drawing.Color.Empty;
             this.hb1.LineInfoVisible = true;
             this.hb1.Location = new System.Drawing.Point(0, 0);
             this.hb1.Name = "hb1";
@@ -595,16 +604,6 @@
             // 
             this.pbar1.Name = "pbar1";
             this.pbar1.Size = new System.Drawing.Size(100, 16);
-            // 
-            // tilePicker1
-            // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.Size = new System.Drawing.Size(191, 331);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
             // 
             // Form1
             // 

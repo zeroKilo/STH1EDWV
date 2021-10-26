@@ -37,7 +37,7 @@ namespace sth1edwv
                 listBoxMemoryLocations.Items.Add($"${memMapEntry.Offset:X5} {memMapEntry.Label}");
             }
             listBoxLevels.Items.Clear();
-            listBoxLevels.Items.AddRange(_cartridge.LevelList.ToArray<object>());
+            listBoxLevels.Items.AddRange(_cartridge.Levels.ToArray<object>());
             hb1.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
             listBoxPalettes.Items.Clear();
             listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
@@ -382,12 +382,12 @@ namespace sth1edwv
             int maxY = y > _lastY ? y : _lastY;
             using (var bc = new BlockChooser(level))
             {
-                int selection = bc.SelectedBlock = level.Floor1.data[x + y * level.floorWidth];
+                int selection = bc.SelectedBlock = level.Floor1.BlockIndices[x + y * level.floorWidth];
                 bc.ShowDialog(this);
-                byte[] temp = new byte[level.Floor1.data.Length];
+                byte[] temp = new byte[level.Floor1.BlockIndices.Length];
                 for (int i = 0; i < temp.Length; i++)
                 {
-                    temp[i] = level.Floor1.data[i];
+                    temp[i] = level.Floor1.BlockIndices[i];
                 }
 
                 if (bc.SelectedBlock != selection)
@@ -395,14 +395,14 @@ namespace sth1edwv
                     for (int row = minY; row <= maxY; row++)
                     for (int col = minX; col <= maxX; col++)
                     {
-                        level.Floor1.data[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
+                        level.Floor1.BlockIndices[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
                     }
 
                     byte[] newData = level.Floor1.CompressData(level);
                     if (level.floorSize < newData.Length)
                     {
                         MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
-                        level.Floor1.data = temp;
+                        level.Floor1.BlockIndices = temp;
                         return;
                     }
 

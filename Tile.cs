@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 
 namespace sth1edwv
 {
     public class Tile
     {
-        private readonly byte[,] _data = new byte[8, 8];
+        private readonly byte[] _data = new byte[8 * 8];
         private readonly Palette _palette;
         private Bitmap _image;
 
@@ -21,12 +22,11 @@ namespace sth1edwv
                 }
                 // Lazy rendering
                 _image = new Bitmap(8, 8);
-                for (int y = 0; y < 8; ++y)
+                for (int i = 0; i < _data.Length; ++i)
                 {
-                    for (int x = 0; x < 8; ++x)
-                    {
-                        _image.SetPixel(x, y, _palette.Colors[_data[x, y]]);
-                    }
+                    var x = i % 8;
+                    var y = i / 8;
+                    _image.SetPixel(x, y, _palette.Colors[_data[i]]);
                 }
                 return _image;
             }
@@ -63,7 +63,7 @@ namespace sth1edwv
                 // Apply row to tile
                 for (int x = 0; x < 8; x++)
                 {
-                    _data[x, y] = (byte)row[x];
+                    _data[x + y * 8] = (byte)row[x];
                 }
             }
         }
@@ -87,9 +87,9 @@ namespace sth1edwv
             }
         }
 
-        public Color getColor(int x, int y)
+        public void WriteTo(MemoryStream ms)
         {
-            return Image.GetPixel(x, y);
+            ms.Write(_data, 0, _data.Length);
         }
     }
 }

@@ -7,23 +7,48 @@ using System.Text.RegularExpressions;
 
 namespace sth1edwv
 {
+    public interface IDataItem
+    {
+        /// <summary>
+        /// Offset data was read from
+        /// </summary>
+        int Offset { get; }
+        /// <summary>
+        /// Length of data read from there
+        /// </summary>
+        int LengthConsumed { get; }
+
+        /// <summary>
+        /// BlockIndices now
+        /// </summary>
+        IList<byte> GetData();
+        /*
+        /// <summary>
+        /// Addresses of pointers to this data, along with the slot used for the pointer
+        /// </summary>
+        IEnumerable<Tuple<int, int>> Pointers { get; }
+        /// <summary>
+        /// Addresses of bank numbers used to access this data
+        /// </summary>
+        IEnumerable<int> BankReferences { get; }
+        /// <summary>
+        /// Addresses of relative references to this data, along with the reference point they are relative to
+        /// </summary>
+        IEnumerable<Tuple<int, int>> RelativeReferences { get; }
+        */
+    }
+
     public class Cartridge
     {
         public class MemMapEntry
         {
-            public int Offset { get; }
-            public string Label { get; }
-
-            public MemMapEntry(int offset, string label)
-            {
-                Offset = offset;
-                Label = label;
-            }
+            public int Offset { get; set; }
+            public string Label { get; set; }
         }
 
         public byte[] Memory { get; }
         public IList<MemMapEntry> Labels { get; }
-        public IList<Level> LevelList { get; } = new List<Level>();
+        public IList<Level> Levels { get; } = new List<Level>();
         public IList<GameText> GameText { get; } = new List<GameText>();
         public IList<Palette> Palettes { get; }
 
@@ -59,10 +84,10 @@ namespace sth1edwv
 
         public void ReadLevels()
         {
-            LevelList.Clear();
-            foreach (MemMapEntry e in _levelOffsets)
+            Levels.Clear();
+            foreach (var e in _levelOffsets)
             {
-                LevelList.Add(new Level(this, e.Offset, _artBanksTableOffset, Palettes, e.Label));
+                Levels.Add(new Level(this, e.Offset, _artBanksTableOffset, Palettes, e.Label));
             }
         }
 
@@ -84,7 +109,7 @@ namespace sth1edwv
             return s.Split(new []{'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line => Regex.Match(line, "^\\$(?<offset>[0-9A-Fa-f]+) (?<label>.+)$"))
                 .Where(m => m.Success)
-                .Select(m => new MemMapEntry(Convert.ToInt32(m.Groups["offset"].Value, 16), m.Groups["label"].Value))
+                .Select(m => new MemMapEntry { Offset = Convert.ToInt32(m.Groups["offset"].Value, 16), Label = m.Groups["label"].Value})
                 .ToList();
         }
 
