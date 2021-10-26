@@ -59,6 +59,7 @@ namespace sth1edwv
 
         public void ReadLevels()
         {
+            LevelList.Clear();
             foreach (MemMapEntry e in _levelOffsets)
             {
                 LevelList.Add(new Level(this, e.Offset, _artBanksTableOffset, Palettes, e.Label));
@@ -69,15 +70,11 @@ namespace sth1edwv
         {
             for (int i = 0; i < 6; i++)
             {
-                MemoryStream m = new MemoryStream();
-                m.Write(Memory, 0x122D + i * 0xF, 0xF);
-                GameText.Add(new GameText(m.ToArray(), i < 3));
+                GameText.Add(new GameText(this, 0x122D + i * 0xF, i < 3));
             }
             for (int i = 0; i < 3; i++)
             {
-                MemoryStream m = new MemoryStream();
-                m.Write(Memory, 0x197E + i * 0x10, 0x10);
-                GameText.Add(new GameText(m.ToArray(), true));
+                GameText.Add(new GameText(this, 0x197E + i * 0x10, true));
             }
         }
 

@@ -13,7 +13,6 @@ namespace sth1edwv
         //   SR UW TL 00  MU
         private byte[] header;
         public readonly byte   solidityIndex;
-        private readonly uint   _address;
         public readonly ushort floorWidth;
         public readonly ushort floorHeight;
         public readonly int   floorAddress;
@@ -27,25 +26,24 @@ namespace sth1edwv
         private readonly ushort offsetArt;
         public readonly ushort offsetObjectLayout;
         private readonly byte   initPalette;
-        public List<Color> palette;
-        public readonly TileSet tileset;
-        public readonly Floor floor;
-        public readonly LevelObjectSet objSet;
-        
-        public BlockMapping blockMapping;
+        public TileSet TileSet { get; }
+        public Floor Floor1 { get; }
+        public LevelObjectSet ObjSet { get; }
+
+        public readonly BlockMapping blockMapping;
         private readonly string _label;
 
         public Level(Cartridge cartridge, uint offset, uint artBanksTableOffset, IList<Palette> palettes, string label)
         {
             _label = label;
-            _address = BitConverter.ToUInt16(cartridge.Memory, (int)offset);
+            var address = BitConverter.ToUInt16(cartridge.Memory, (int)offset);
             header = new byte[37];
-            for (int i = 0; i < 37; i++)
-                header[i] = cartridge.Memory[_address + i + 0x15580];
+            Array.Copy(cartridge.Memory, address + 0x15580, header, 0, header.Length);
+
             solidityIndex = header[0];
             floorWidth = BitConverter.ToUInt16(header, 1);
             floorHeight = BitConverter.ToUInt16(header, 3);
-            if (_address == 666)
+            if (address == 666)
                 floorHeight /= 2;
             floorAddress = BitConverter.ToUInt16(header, 15) + 0x14000;
             floorSize = BitConverter.ToUInt16(header, 17);
@@ -62,15 +60,15 @@ namespace sth1edwv
             {
                 var levelIndex = (offset - 0x15580) / 2;
                 var artBank = cartridge.Memory[artBanksTableOffset + levelIndex];
-                tileset = new TileSet(cartridge, offsetArt + artBank * 0x4000, palettes[initPalette]);
+                TileSet = new TileSet(cartridge, offsetArt + artBank * 0x4000, palettes[initPalette]);
             }
             else
             {
-                tileset = new TileSet(cartridge, offsetArt + 0x30000, palettes[initPalette]);
+                TileSet = new TileSet(cartridge, offsetArt + 0x30000, palettes[initPalette]);
             }
-            floor = new Floor(cartridge, floorAddress, floorSize);
-            blockMapping = new BlockMapping(cartridge, blockMappingAddress, solidityIndex, tileset);
-            objSet = new LevelObjectSet(cartridge, 0x15580 + offsetObjectLayout);
+            Floor1 = new Floor(cartridge, floorAddress, floorSize);
+            blockMapping = new BlockMapping(cartridge, blockMappingAddress, solidityIndex, TileSet);
+            ObjSet = new LevelObjectSet(cartridge, 0x15580 + offsetObjectLayout);
         }
 
         public override string ToString()
@@ -89,14 +87,14 @@ namespace sth1edwv
             result.Nodes.Add($"Offset Art           = 0x{offsetArt:X8}");
             result.Nodes.Add($"Offset Object Layout = 0x{offsetObjectLayout:X8}");
             result.Nodes.Add($"Initial Palette      = {initPalette}");
-            result.Nodes.Add(objSet.ToNode());
+            result.Nodes.Add(ObjSet.ToNode());
             result.Expand();
             return result;
         }
 
         public Tile GetTile(int index)
         {            
-            return tileset.Tiles[index];
+            return TileSet.Tiles[index];
         }
 
         public Bitmap Render(byte mode, ToolStripProgressBar pb)
@@ -124,13 +122,13 @@ namespace sth1edwv
                     {
                         for (int by = 0; by < floorHeight; by++)
                         {
-                            var blockIndex = floor.data[bx + by * floorWidth];
+                            var blockIndex = Floor1.data[bx + by * floorWidth];
                             var block = blockMapping.Blocks[blockIndex];
                             for (int ty = 0; ty < 4; ty++)
                             for (int tx = 0; tx < 4; tx++)
                             {
                                 var tileIndex = block.TileIndices[tx + ty * 4];
-                                var tile = tileset.Tiles[tileIndex];
+                                var tile = TileSet.Tiles[tileIndex];
                                 g.DrawImageUnscaled(tile.Image, bx * bs + tx * ts, by * bs + ty * ts);
                             }
                         }
@@ -146,7 +144,7 @@ namespace sth1edwv
                         {
                             for (int by = 0; by < floorHeight; by++)
                             {
-                                var block = floor.data[bx + by * floorWidth];
+                                var block = Floor1.data[bx + by * floorWidth];
                                 var tileData = blockMapping.Blocks[block];
 
                                 g.DrawImageUnscaled(tileData.Image, bx * bs, by * bs);
@@ -166,7 +164,7 @@ namespace sth1edwv
 
                 using (var pen = new Pen(Color.Black, 1))
                 {
-                    foreach (var obj in objSet.objs)
+                    foreach (var obj in ObjSet.objs)
                     {
                         var a = obj.x * bs - 1;
                         var b = obj.y * bs - 1;
