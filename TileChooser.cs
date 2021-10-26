@@ -4,22 +4,17 @@ namespace sth1edwv
 {
     public partial class TileChooser : Form
     {
-        private const int TileScale = 2;
-        public int TileIndex { get; set; }
-
-        public TileChooser(TileSet tileSet)
+        public TileChooser(TileSet tileSet, int selectedIndex)
         {
             InitializeComponent();
-
-            // Draw the tiles in a grid
-            pb1.Image = tileSet.getImage(pb1.Width);
+            tilePicker1.TileSet = tileSet;
+            tilePicker1.SelectedIndex = selectedIndex;
         }
 
-        private void pb1_MouseClick(object sender, MouseEventArgs e)
+        public Tile SelectedTile => tilePicker1.SelectedTile;
+
+        private void tilePicker1_SelectionChanged(object sender, Tile e)
         {
-            int x = e.X / 16;
-            int y = e.Y / 16;
-            TileIndex = x + y * 16;
             Close();
         }
     }

@@ -47,7 +47,6 @@
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.pictureBoxTilesPicker = new System.Windows.Forms.PictureBox();
             this.pb1 = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
@@ -72,6 +71,7 @@
             this.listBoxGameText = new System.Windows.Forms.ListBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.pbar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.tilePicker1 = new sth1edwv.TilePicker();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -85,7 +85,6 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilesPicker)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
@@ -292,37 +291,28 @@
             // 
             // splitContainer2
             // 
+            this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(3, 3);
             this.splitContainer2.Name = "splitContainer2";
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.pictureBoxTilesPicker);
+            this.splitContainer2.Panel1.Controls.Add(this.tilePicker1);
             // 
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.pb1);
             this.splitContainer2.Size = new System.Drawing.Size(712, 499);
-            this.splitContainer2.SplitterDistance = 258;
+            this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
-            // 
-            // pictureBoxTilesPicker
-            // 
-            this.pictureBoxTilesPicker.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxTilesPicker.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxTilesPicker.Name = "pictureBoxTilesPicker";
-            this.pictureBoxTilesPicker.Size = new System.Drawing.Size(258, 499);
-            this.pictureBoxTilesPicker.TabIndex = 0;
-            this.pictureBoxTilesPicker.TabStop = false;
-            this.pictureBoxTilesPicker.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxTilesPicker_MouseClick);
             // 
             // pb1
             // 
             this.pb1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pb1.Location = new System.Drawing.Point(0, 0);
             this.pb1.Name = "pb1";
-            this.pb1.Size = new System.Drawing.Size(450, 499);
+            this.pb1.Size = new System.Drawing.Size(418, 497);
             this.pb1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pb1.TabIndex = 0;
             this.pb1.TabStop = false;
@@ -606,6 +596,16 @@
             this.pbar1.Name = "pbar1";
             this.pbar1.Size = new System.Drawing.Size(100, 16);
             // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.Size = new System.Drawing.Size(191, 331);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -631,7 +631,6 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilesPicker)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.splitContainer4.Panel1.ResumeLayout(false);
@@ -709,7 +708,7 @@
         private System.Windows.Forms.RichTextBox _richTextBoxGeneralSummary;
         private System.Windows.Forms.TabPage tabPage9;
         private System.Windows.Forms.ListBox listBoxGameText;
-        private System.Windows.Forms.PictureBox pictureBoxTilesPicker;
+        private TilePicker tilePicker1;
     }
 }
 

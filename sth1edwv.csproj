@@ -79,6 +79,12 @@
     <Compile Include="TileChooser.Designer.cs">
       <DependentUpon>TileChooser.cs</DependentUpon>
     </Compile>
+    <Compile Include="TilePicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TilePicker.Designer.cs">
+      <DependentUpon>TilePicker.cs</DependentUpon>
+    </Compile>
     <Compile Include="TileSet.cs" />
     <EmbeddedResource Include="BlockChooser.resx">
       <DependentUpon>BlockChooser.cs</DependentUpon>
@@ -101,6 +107,9 @@
     </Compile>
     <EmbeddedResource Include="TileChooser.resx">
       <DependentUpon>TileChooser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TilePicker.resx">
+      <DependentUpon>TilePicker.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

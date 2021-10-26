@@ -127,8 +127,7 @@ namespace sth1edwv
                 pb3.Image = level.Render(mode, pbar1);
             }
 
-            pictureBoxTilesPicker.Image?.Dispose();
-            pictureBoxTilesPicker.Image = level.TileSet.getImage(pictureBoxTilesPicker.Width);
+            tilePicker1.TileSet = level.TileSet;
 
             treeViewLevelData.Nodes.Clear();
             var t = new TreeNode($"{level}");
@@ -147,27 +146,16 @@ namespace sth1edwv
             }
         }
 
-        private void pictureBoxTilesPicker_MouseClick(object sender, MouseEventArgs e)
+        private void tilePicker1_SelectionChanged(object sender, Tile tile)
         {
-            if (!(listBoxLevels.SelectedItem is Level level))
+            pb1.Image?.Dispose();
+            if (tile == null)
             {
+                pb1.Image = null;
                 return;
             }
-
-            // Determine the clicked tile
-            var pixelsPerTile = pictureBoxTilesPicker.Image.Width / 16;
-            var x = e.X / pixelsPerTile;
-            var y = e.Y / pixelsPerTile;
-            var tileIndex = x + y * 16;
-            if (tileIndex >= level.TileSet.Tiles.Count)
-            {
-                return;
-            }
-
-            var tile = level.TileSet.Tiles[tileIndex];
-
-            const int zoom = 8;
-            var bmp = new Bitmap(8 * zoom, 8 * zoom);
+            float zoom = pb1.Width / 8.0f;
+            var bmp = new Bitmap(pb1.Width, pb1.Width);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -222,10 +210,10 @@ namespace sth1edwv
             var y = e.Y / 4 / 9;
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
-            using (var tc = new TileChooser(level.TileSet){ TileIndex = tileIndex })
+            using (var tc = new TileChooser(level.TileSet, tileIndex))
             {
                 tc.ShowDialog(this);
-                _cartridge.Memory[level.blockMappingAddress + m * 16 + subBlockIndex] = (byte)tc.TileIndex;
+                _cartridge.Memory[level.blockMappingAddress + m * 16 + subBlockIndex] = (byte)(level.TileSet.Tiles.IndexOf(tc.SelectedTile));
             }
 
             _cartridge.ReadLevels();
