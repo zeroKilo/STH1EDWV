@@ -88,7 +88,7 @@ namespace sth1edwv
                 .ToList();
         }
 
-        public string RomSizes(int size)
+        private string RomSizes(int size)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(" (");
@@ -126,7 +126,7 @@ namespace sth1edwv
             return sb.ToString();
         }
 
-        public string Regions(int region)
+        private string Regions(int region)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(" (");

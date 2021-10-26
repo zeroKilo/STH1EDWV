@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace sth1edwv
@@ -40,6 +42,32 @@ namespace sth1edwv
             t.Nodes.Add($"Row Count       = 0x{_rowCount:X4}");
             result.Nodes.Add(t);
             return result;
+        }
+
+        public Bitmap getImage(int width)
+        {
+            // We round the width to a multiple of 128
+            width -= width % 128;
+            // This gives us our drawing scale
+            var scale = width / 128;
+            // And thus our needed height
+            const int tilesPerRow = 16;
+            var rowCount = Tiles.Count / tilesPerRow; // it is always a multiple of 16
+            var bmp = new Bitmap(16*8*scale, rowCount*8*scale);
+            using (var g = Graphics.FromImage(bmp))
+            {
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.ScaleTransform(scale, scale);
+                for (int i = 0; i < Tiles.Count; ++i)
+                {
+                    var x = i % tilesPerRow * 8;
+                    var y = i / tilesPerRow * 8;
+                    g.DrawImageUnscaled(Tiles[i].Image, x, y);
+                }
+            }
+
+            return bmp; // callers must dispose it
         }
     }
 }

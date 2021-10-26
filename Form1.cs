@@ -31,26 +31,26 @@ namespace sth1edwv
 
         void RefreshAll()
         {
-            listBox1.Items.Clear();
+            listBoxMemoryLocations.Items.Clear();
             foreach (var memMapEntry in _cartridge.Labels)
             {
-                listBox1.Items.Add($"${memMapEntry.Offset:X5} {memMapEntry.Label}");
+                listBoxMemoryLocations.Items.Add($"${memMapEntry.Offset:X5} {memMapEntry.Label}");
             }
             listBoxLevels.Items.Clear();
             listBoxLevels.Items.AddRange(_cartridge.LevelList.ToArray<object>());
             hb1.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
             listBoxPalettes.Items.Clear();
             listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
-            listBox6.Items.Clear();
+            listBoxGameText.Items.Clear();
             foreach (var text in _cartridge.GameText)
             {
-                listBox6.Items.Add(text);
+                listBoxGameText.Items.Add(text);
             }
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = listBox1.SelectedIndex;
+            int n = listBoxMemoryLocations.SelectedIndex;
             if (n == -1)
                 return;
             hb1.SelectionStart = _cartridge.Labels[n].Offset;
@@ -127,18 +127,15 @@ namespace sth1edwv
                 pb3.Image = level.Render(mode, pbar1);
             }
 
-            listBox2.Items.Clear();
-            for (int i = 0; i < level.TileSet.Tiles.Count; i++)
-            {
-                listBox2.Items.Add($"{i:X2}"); // TODO  : {l.tileset.UniqueRows[i]:X2}");
-            }
+            pictureBoxTilesPicker.Image?.Dispose();
+            pictureBoxTilesPicker.Image = level.TileSet.getImage(pictureBoxTilesPicker.Width);
 
-            tv1.Nodes.Clear();
+            treeViewLevelData.Nodes.Clear();
             var t = new TreeNode($"{level}");
             t.Nodes.Add(level.ToNode());
             t.Nodes.Add(level.TileSet.ToNode());
             t.Expand();
-            tv1.Nodes.Add(t);
+            treeViewLevelData.Nodes.Add(t);
             listBox5.Items.Clear();
             for (int i = 0; i < level.blockMapping.Blocks.Count; i++)
             {
@@ -150,16 +147,25 @@ namespace sth1edwv
             }
         }
 
-        private void listBox2_SelectedIndexChanged_1(object sender, EventArgs e)
+        private void pictureBoxTilesPicker_MouseClick(object sender, MouseEventArgs e)
         {
             if (!(listBoxLevels.SelectedItem is Level level))
             {
                 return;
             }
-            int m = listBox2.SelectedIndex;
-            if (m == -1)
+
+            // Determine the clicked tile
+            var pixelsPerTile = pictureBoxTilesPicker.Image.Width / 16;
+            var x = e.X / pixelsPerTile;
+            var y = e.Y / pixelsPerTile;
+            var tileIndex = x + y * 16;
+            if (tileIndex >= level.TileSet.Tiles.Count)
+            {
                 return;
-            var tile = level.GetTile(m);
+            }
+
+            var tile = level.TileSet.Tiles[tileIndex];
+
             const int zoom = 8;
             var bmp = new Bitmap(8 * zoom, 8 * zoom);
             using (var g = Graphics.FromImage(bmp))
@@ -269,7 +275,7 @@ namespace sth1edwv
 
         private void tv1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var node = tv1.SelectedNode;
+            var node = treeViewLevelData.SelectedNode;
             if (node?.Parent == null || node.Parent.Text != "Objects")
             {
                 return;
@@ -328,7 +334,7 @@ namespace sth1edwv
 
         private void listBox6_DoubleClick(object sender, EventArgs e)
         {
-            if (!(listBox6.SelectedItem is GameText text))
+            if (!(listBoxGameText.SelectedItem is GameText text))
             {
                 return;
             }
@@ -347,7 +353,7 @@ namespace sth1edwv
                 }
 
                 // This makes the listbox re-get the text
-                listBox6.Items[listBox6.SelectedIndex] = text;
+                listBoxGameText.Items[listBoxGameText.SelectedIndex] = text;
             }
         }
 

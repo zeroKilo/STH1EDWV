@@ -44,10 +44,10 @@
             this.listBoxLevels = new System.Windows.Forms.ListBox();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.tv1 = new System.Windows.Forms.TreeView();
+            this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.listBox2 = new System.Windows.Forms.ListBox();
+            this.pictureBoxTilesPicker = new System.Windows.Forms.PictureBox();
             this.pb1 = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
@@ -63,13 +63,13 @@
             this.pb2 = new System.Windows.Forms.PictureBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.listBoxMemoryLocations = new System.Windows.Forms.ListBox();
             this.hb1 = new Be.Windows.Forms.HexBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
-            this.listBox6 = new System.Windows.Forms.ListBox();
+            this.listBoxGameText = new System.Windows.Forms.ListBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.pbar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.menuStrip1.SuspendLayout();
@@ -85,6 +85,7 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilesPicker)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
@@ -113,6 +114,7 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.optionToolStripMenuItem});
@@ -258,7 +260,7 @@
             // 
             // tabPage6
             // 
-            this.tabPage6.Controls.Add(this.tv1);
+            this.tabPage6.Controls.Add(this.treeViewLevelData);
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
@@ -267,15 +269,15 @@
             this.tabPage6.Text = "Data";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
-            // tv1
+            // treeViewLevelData
             // 
-            this.tv1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tv1.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.tv1.Location = new System.Drawing.Point(3, 3);
-            this.tv1.Name = "tv1";
-            this.tv1.Size = new System.Drawing.Size(712, 499);
-            this.tv1.TabIndex = 1;
-            this.tv1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tv1_AfterSelect);
+            this.treeViewLevelData.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeViewLevelData.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.treeViewLevelData.Location = new System.Drawing.Point(3, 3);
+            this.treeViewLevelData.Name = "treeViewLevelData";
+            this.treeViewLevelData.Size = new System.Drawing.Size(712, 499);
+            this.treeViewLevelData.TabIndex = 1;
+            this.treeViewLevelData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tv1_AfterSelect);
             // 
             // tabPage7
             // 
@@ -296,34 +298,31 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.listBox2);
+            this.splitContainer2.Panel1.Controls.Add(this.pictureBoxTilesPicker);
             // 
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.pb1);
             this.splitContainer2.Size = new System.Drawing.Size(712, 499);
-            this.splitContainer2.SplitterDistance = 234;
+            this.splitContainer2.SplitterDistance = 258;
             this.splitContainer2.TabIndex = 1;
             // 
-            // listBox2
+            // pictureBoxTilesPicker
             // 
-            this.listBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox2.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.listBox2.FormattingEnabled = true;
-            this.listBox2.IntegralHeight = false;
-            this.listBox2.ItemHeight = 14;
-            this.listBox2.Location = new System.Drawing.Point(0, 0);
-            this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(234, 499);
-            this.listBox2.TabIndex = 1;
-            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged_1);
+            this.pictureBoxTilesPicker.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxTilesPicker.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxTilesPicker.Name = "pictureBoxTilesPicker";
+            this.pictureBoxTilesPicker.Size = new System.Drawing.Size(258, 499);
+            this.pictureBoxTilesPicker.TabIndex = 0;
+            this.pictureBoxTilesPicker.TabStop = false;
+            this.pictureBoxTilesPicker.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxTilesPicker_MouseClick);
             // 
             // pb1
             // 
             this.pb1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pb1.Location = new System.Drawing.Point(0, 0);
             this.pb1.Name = "pb1";
-            this.pb1.Size = new System.Drawing.Size(474, 499);
+            this.pb1.Size = new System.Drawing.Size(450, 499);
             this.pb1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pb1.TabIndex = 0;
             this.pb1.TabStop = false;
@@ -492,7 +491,7 @@
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.listBox1);
+            this.splitContainer1.Panel1.Controls.Add(this.listBoxMemoryLocations);
             // 
             // splitContainer1.Panel2
             // 
@@ -501,18 +500,18 @@
             this.splitContainer1.SplitterDistance = 314;
             this.splitContainer1.TabIndex = 0;
             // 
-            // listBox1
+            // listBoxMemoryLocations
             // 
-            this.listBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox1.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.IntegralHeight = false;
-            this.listBox1.ItemHeight = 14;
-            this.listBox1.Location = new System.Drawing.Point(0, 0);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(314, 531);
-            this.listBox1.TabIndex = 0;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            this.listBoxMemoryLocations.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxMemoryLocations.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBoxMemoryLocations.FormattingEnabled = true;
+            this.listBoxMemoryLocations.IntegralHeight = false;
+            this.listBoxMemoryLocations.ItemHeight = 14;
+            this.listBoxMemoryLocations.Location = new System.Drawing.Point(0, 0);
+            this.listBoxMemoryLocations.Name = "listBoxMemoryLocations";
+            this.listBoxMemoryLocations.Size = new System.Drawing.Size(314, 531);
+            this.listBoxMemoryLocations.TabIndex = 0;
+            this.listBoxMemoryLocations.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // hb1
             // 
@@ -569,7 +568,7 @@
             // 
             // tabPage9
             // 
-            this.tabPage9.Controls.Add(this.listBox6);
+            this.tabPage9.Controls.Add(this.listBoxGameText);
             this.tabPage9.Location = new System.Drawing.Point(4, 22);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
@@ -578,21 +577,22 @@
             this.tabPage9.Text = "Game Text";
             this.tabPage9.UseVisualStyleBackColor = true;
             // 
-            // listBox6
+            // listBoxGameText
             // 
-            this.listBox6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox6.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.listBox6.FormattingEnabled = true;
-            this.listBox6.IntegralHeight = false;
-            this.listBox6.ItemHeight = 14;
-            this.listBox6.Location = new System.Drawing.Point(3, 3);
-            this.listBox6.Name = "listBox6";
-            this.listBox6.Size = new System.Drawing.Size(948, 531);
-            this.listBox6.TabIndex = 1;
-            this.listBox6.DoubleClick += new System.EventHandler(this.listBox6_DoubleClick);
+            this.listBoxGameText.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxGameText.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBoxGameText.FormattingEnabled = true;
+            this.listBoxGameText.IntegralHeight = false;
+            this.listBoxGameText.ItemHeight = 14;
+            this.listBoxGameText.Location = new System.Drawing.Point(3, 3);
+            this.listBoxGameText.Name = "listBoxGameText";
+            this.listBoxGameText.Size = new System.Drawing.Size(948, 531);
+            this.listBoxGameText.TabIndex = 1;
+            this.listBoxGameText.DoubleClick += new System.EventHandler(this.listBox6_DoubleClick);
             // 
             // statusStrip1
             // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.pbar1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 587);
@@ -631,6 +631,7 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilesPicker)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.splitContainer4.Panel1.ResumeLayout(false);
@@ -679,10 +680,9 @@
         private System.Windows.Forms.ListBox listBoxLevels;
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage6;
-        private System.Windows.Forms.TreeView tv1;
+        private System.Windows.Forms.TreeView treeViewLevelData;
         private System.Windows.Forms.TabPage tabPage7;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.ListBox listBox2;
         private System.Windows.Forms.PictureBox pb1;
         private System.Windows.Forms.TabPage tabPage8;
         private System.Windows.Forms.PictureBox pb3;
@@ -692,7 +692,7 @@
         private System.Windows.Forms.PictureBox pb2;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox listBoxMemoryLocations;
         private Be.Windows.Forms.HexBox hb1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.StatusStrip statusStrip1;
@@ -708,7 +708,8 @@
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.RichTextBox _richTextBoxGeneralSummary;
         private System.Windows.Forms.TabPage tabPage9;
-        private System.Windows.Forms.ListBox listBox6;
+        private System.Windows.Forms.ListBox listBoxGameText;
+        private System.Windows.Forms.PictureBox pictureBoxTilesPicker;
     }
 }
 
