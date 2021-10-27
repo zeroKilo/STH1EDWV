@@ -20,7 +20,16 @@ jobs:
         nuget restore
         msbuild sth1edwv.sln /p:Configuration=Release
 
-    - uses: actions/upload-artifact@v2
+    - name: Make artifact
+      uses: actions/upload-artifact@v2
       with:
         name: program
         path: bin\Release\*
+
+    - name: Create release
+      uses: elgohr/Github-Release-Action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      with:
+        args: "Automatic build"
+        
