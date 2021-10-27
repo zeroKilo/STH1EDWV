@@ -10,19 +10,19 @@ namespace sth1edwv
         {
             Offset = address;
             LengthConsumed = size;
-            BlockIndices = RleCompressor.Decompress(cartridge, address, size);
+            BlockIndices = Compression.DecompressRle(cartridge, address, size);
         }
 
         public byte[] CompressData(Level l)
         {
-            return RleCompressor.Compress(BlockIndices);
+            return Compression.CompressRle(BlockIndices);
         }
 
         public int Offset { get; }
         public int LengthConsumed { get; }
         public IList<byte> GetData()
         {
-            return RleCompressor.Compress(BlockIndices);
+            return Compression.CompressRle(BlockIndices);
         }
     }
 }
