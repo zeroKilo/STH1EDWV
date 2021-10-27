@@ -27,9 +27,10 @@ jobs:
         path: bin\Release\*
 
     - name: Create release
-      uses: elgohr/Github-Release-Action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+    - uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        args: "Automatic build"
-        
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        title: "Automatic Build"
+        files: bin\Release\*
