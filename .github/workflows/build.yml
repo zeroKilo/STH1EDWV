@@ -11,14 +11,15 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
 
-    - name: Add msbuild to PATH
+    - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1.0.3
 
-    - name: build
+    - name: Build
       shell: cmd
       run: |
         nuget restore
         msbuild sth1edwv.sln /p:Configuration=Release
+        7z a program.zip bin\Release\*
 
     - name: Make artifact
       uses: actions/upload-artifact@v2
@@ -33,4 +34,4 @@ jobs:
         automatic_release_tag: "latest"
         prerelease: false
         title: "Automatic Build"
-        files: bin\Release\*
+        files: program.zip
