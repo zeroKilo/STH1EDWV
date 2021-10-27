@@ -27,10 +27,10 @@ namespace sth1edwv
         public readonly ushort offsetObjectLayout;
         private readonly byte   initPalette;
         public TileSet TileSet { get; }
-        public Floor Floor1 { get; }
+        public Floor Floor { get; }
         public LevelObjectSet ObjSet { get; }
 
-        public readonly BlockMapping blockMapping;
+        public BlockMapping BlockMapping { get; }
         private readonly string _label;
 
         public Level(Cartridge cartridge, int offset, int artBanksTableOffset, IList<Palette> palettes, string label)
@@ -60,14 +60,14 @@ namespace sth1edwv
             {
                 var levelIndex = (offset - 0x15580) / 2;
                 var artBank = cartridge.Memory[artBanksTableOffset + levelIndex];
-                TileSet = new TileSet(cartridge, offsetArt + artBank * 0x4000, palettes[initPalette]);
+                TileSet = cartridge.GetTileSet(offsetArt + artBank * 0x4000, palettes[initPalette]);
             }
             else
             {
-                TileSet = new TileSet(cartridge, offsetArt + 0x30000, palettes[initPalette]);
+                TileSet = cartridge.GetTileSet(offsetArt + 0x30000, palettes[initPalette]);
             }
-            Floor1 = new Floor(cartridge, floorAddress, floorSize);
-            blockMapping = new BlockMapping(cartridge, blockMappingAddress, solidityIndex, TileSet);
+            Floor = cartridge.GetFloor(floorAddress, floorSize);
+            BlockMapping = cartridge.GetBlockMapping(blockMappingAddress, solidityIndex, TileSet);
             ObjSet = new LevelObjectSet(cartridge, 0x15580 + offsetObjectLayout);
         }
 
@@ -122,8 +122,8 @@ namespace sth1edwv
                     {
                         for (int by = 0; by < floorHeight; by++)
                         {
-                            var blockIndex = Floor1.BlockIndices[bx + by * floorWidth];
-                            var block = blockMapping.Blocks[blockIndex];
+                            var blockIndex = Floor.BlockIndices[bx + by * floorWidth];
+                            var block = BlockMapping.Blocks[blockIndex];
                             for (int ty = 0; ty < 4; ty++)
                             for (int tx = 0; tx < 4; tx++)
                             {
@@ -144,8 +144,8 @@ namespace sth1edwv
                         {
                             for (int by = 0; by < floorHeight; by++)
                             {
-                                var block = Floor1.BlockIndices[bx + by * floorWidth];
-                                var tileData = blockMapping.Blocks[block];
+                                var block = Floor.BlockIndices[bx + by * floorWidth];
+                                var tileData = BlockMapping.Blocks[block];
 
                                 g.DrawImageUnscaled(tileData.Image, bx * bs, by * bs);
 

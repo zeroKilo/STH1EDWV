@@ -38,12 +38,16 @@ namespace sth1edwv
         */
     }
 
-    public class Cartridge
+    public class Cartridge: IDisposable
     {
         public class MemMapEntry
         {
             public int Offset { get; set; }
             public string Label { get; set; }
+            public override string ToString()
+            {
+                return $"${Offset:X5} {Label}";
+            }
         }
 
         public byte[] Memory { get; }
@@ -54,6 +58,10 @@ namespace sth1edwv
 
         private readonly IList<MemMapEntry> _levelOffsets;
         private readonly int _artBanksTableOffset;
+
+        private readonly Dictionary<int, TileSet> _tileSets = new Dictionary<int, TileSet>();
+        private readonly Dictionary<int, Floor> _floors = new Dictionary<int, Floor>();
+        private readonly Dictionary<int, BlockMapping> _blockMappings = new Dictionary<int, BlockMapping>();
 
         public Cartridge(string path)
         {
@@ -89,6 +97,32 @@ namespace sth1edwv
             {
                 Levels.Add(new Level(this, e.Offset, _artBanksTableOffset, Palettes, e.Label));
             }
+        }
+
+        public TileSet GetTileSet(int offset, Palette palette)
+        {
+            return GetItem(_tileSets, offset, () => new TileSet(this, offset, palette));
+        }
+
+        public Floor GetFloor(int offset, int size)
+        {
+            return GetItem(_floors, offset, () => new Floor(this, offset, size));
+        }
+
+        public BlockMapping GetBlockMapping(int offset, byte solidityIndex, TileSet tileSet)
+        {
+            return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet));
+        }
+
+        private T GetItem<T>(Dictionary<int, T> dictionary, int offset, Func<T> generatorFunc) 
+        {
+            if (!dictionary.TryGetValue(offset, out var result))
+            {
+                result = generatorFunc();
+                dictionary.Add(offset, result);
+            }
+
+            return result;
         }
 
         private void ReadGameText()
@@ -197,6 +231,21 @@ namespace sth1edwv
             sb.AppendLine($"ROM Size     : 0x{(header[15] & 7):X1}{RomSizes(header[15] & 7)}");
             sb.AppendLine($"ROM Header   : \"{Encoding.UTF7.GetString(Memory, 0x3B, 0x2A)}\"");
             return sb.ToString();
+        }
+
+        public void Dispose()
+        {
+            DisposeAll(_tileSets);
+            DisposeAll(_blockMappings);
+        }
+
+        private void DisposeAll<T>(Dictionary<int, T> collection) where T: IDisposable
+        {
+            foreach (var item in collection.Values)
+            {
+                item.Dispose();
+            }
+            collection.Clear();
         }
     }
 }

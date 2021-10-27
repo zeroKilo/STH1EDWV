@@ -60,11 +60,11 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.listBoxPalettes = new System.Windows.Forms.ListBox();
-            this.pb2 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxPalette = new System.Windows.Forms.PictureBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.listBoxMemoryLocations = new System.Windows.Forms.ListBox();
-            this.hb1 = new Be.Windows.Forms.HexBox();
+            this.hexViewer = new Be.Windows.Forms.HexBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
@@ -99,7 +99,7 @@
             this.splitContainer3.Panel1.SuspendLayout();
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPalette)).BeginInit();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -446,7 +446,7 @@
             // 
             // splitContainer3.Panel2
             // 
-            this.splitContainer3.Panel2.Controls.Add(this.pb2);
+            this.splitContainer3.Panel2.Controls.Add(this.pictureBoxPalette);
             this.splitContainer3.Size = new System.Drawing.Size(948, 531);
             this.splitContainer3.SplitterDistance = 314;
             this.splitContainer3.TabIndex = 1;
@@ -462,16 +462,16 @@
             this.listBoxPalettes.Name = "listBoxPalettes";
             this.listBoxPalettes.Size = new System.Drawing.Size(314, 531);
             this.listBoxPalettes.TabIndex = 0;
-            this.listBoxPalettes.SelectedIndexChanged += new System.EventHandler(this.listBox3_SelectedIndexChanged);
+            this.listBoxPalettes.SelectedIndexChanged += new System.EventHandler(this.ListBoxPalettesSelectedIndexChanged);
             // 
-            // pb2
+            // pictureBoxPalette
             // 
-            this.pb2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pb2.Location = new System.Drawing.Point(0, 0);
-            this.pb2.Name = "pb2";
-            this.pb2.Size = new System.Drawing.Size(630, 531);
-            this.pb2.TabIndex = 1;
-            this.pb2.TabStop = false;
+            this.pictureBoxPalette.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxPalette.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxPalette.Name = "pictureBoxPalette";
+            this.pictureBoxPalette.Size = new System.Drawing.Size(630, 531);
+            this.pictureBoxPalette.TabIndex = 1;
+            this.pictureBoxPalette.TabStop = false;
             // 
             // tabPage1
             // 
@@ -496,7 +496,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.hb1);
+            this.splitContainer1.Panel2.Controls.Add(this.hexViewer);
             this.splitContainer1.Size = new System.Drawing.Size(948, 531);
             this.splitContainer1.SplitterDistance = 314;
             this.splitContainer1.TabIndex = 0;
@@ -512,21 +512,21 @@
             this.listBoxMemoryLocations.Name = "listBoxMemoryLocations";
             this.listBoxMemoryLocations.Size = new System.Drawing.Size(314, 531);
             this.listBoxMemoryLocations.TabIndex = 0;
-            this.listBoxMemoryLocations.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            this.listBoxMemoryLocations.SelectedIndexChanged += new System.EventHandler(this.ListBoxMemoryLocationsSelectedIndexChanged);
             // 
-            // hb1
+            // hexViewer
             // 
-            this.hb1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hb1.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hb1.LineInfoVisible = true;
-            this.hb1.Location = new System.Drawing.Point(0, 0);
-            this.hb1.Name = "hb1";
-            this.hb1.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
-            this.hb1.Size = new System.Drawing.Size(630, 531);
-            this.hb1.StringViewVisible = true;
-            this.hb1.TabIndex = 0;
-            this.hb1.UseFixedBytesPerLine = true;
-            this.hb1.VScrollBarVisible = true;
+            this.hexViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.hexViewer.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.hexViewer.LineInfoVisible = true;
+            this.hexViewer.Location = new System.Drawing.Point(0, 0);
+            this.hexViewer.Name = "hexViewer";
+            this.hexViewer.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
+            this.hexViewer.Size = new System.Drawing.Size(630, 531);
+            this.hexViewer.StringViewVisible = true;
+            this.hexViewer.TabIndex = 0;
+            this.hexViewer.UseFixedBytesPerLine = true;
+            this.hexViewer.VScrollBarVisible = true;
             // 
             // tabControl1
             // 
@@ -646,7 +646,7 @@
             this.splitContainer3.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pb2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPalette)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -687,11 +687,11 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.ListBox listBoxPalettes;
-        private System.Windows.Forms.PictureBox pb2;
+        private System.Windows.Forms.PictureBox pictureBoxPalette;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListBox listBoxMemoryLocations;
-        private Be.Windows.Forms.HexBox hb1;
+        private Be.Windows.Forms.HexBox hexViewer;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar pbar1;

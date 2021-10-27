@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 
 namespace sth1edwv
 {
-    public class Tile
+    public class Tile: IDisposable
     {
         private readonly byte[] _data = new byte[8 * 8];
         private readonly Palette _palette;
@@ -41,6 +39,11 @@ namespace sth1edwv
         public void WriteTo(MemoryStream ms)
         {
             ms.Write(_data, 0, _data.Length);
+        }
+
+        public void Dispose()
+        {
+            _image?.Dispose();
         }
     }
 }

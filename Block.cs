@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace sth1edwv
 {
-    public class Block
+    public class Block: IDisposable
     {
         private readonly TileSet _tileSet;
         private Bitmap _image;
@@ -44,6 +44,11 @@ namespace sth1edwv
         public override string ToString()
         {
             return string.Join("", TileIndices.Select(x => x.ToString("X2"))) + " - " + Convert.ToString(SolidityIndex, 2).PadLeft(8, '0');
+        }
+
+        public void Dispose()
+        {
+            _image?.Dispose();
         }
     }
 }

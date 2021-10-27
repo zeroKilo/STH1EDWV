@@ -9,7 +9,7 @@ namespace sth1edwv
         private readonly string _label;
         public IList<Color> Colors { get; } = new List<Color>();
 
-        public Palette(byte[] mem, int offset, string label)
+        private Palette(byte[] mem, int offset, string label)
         {
             _label = label;
             for (var i = 0; i < 32; i++)
@@ -45,7 +45,7 @@ namespace sth1edwv
 
         public static IEnumerable<Palette> ReadPalettes(byte[] mem, int offset, int count)
         {
-            for (var i = 0; i < 8; i++)
+            for (var i = 0; i < count; i++)
             {
                 var address = BitConverter.ToUInt16(mem, offset);
                 yield return new Palette(mem, address, $"{i} @ {offset:X}");

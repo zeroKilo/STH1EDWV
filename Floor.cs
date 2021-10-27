@@ -13,7 +13,7 @@ namespace sth1edwv
             BlockIndices = Compression.DecompressRle(cartridge, address, size);
         }
 
-        public byte[] CompressData(Level l)
+        public byte[] CompressData()
         {
             return Compression.CompressRle(BlockIndices);
         }

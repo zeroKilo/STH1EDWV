@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace sth1edwv
 {
-    public class BlockMapping
+    public class BlockMapping: IDisposable
     {
         public List<Block> Blocks { get; } = new List<Block>();
     
@@ -43,6 +43,15 @@ namespace sth1edwv
             {
                 Blocks.Add(new Block(cartridge.Memory, address + i * 16, solidityOffset + i, tileSet));
             }
+        }
+
+        public void Dispose()
+        {
+            foreach (var block in Blocks)
+            {
+                block.Dispose();
+            }
+            Blocks.Clear();
         }
     }
 }

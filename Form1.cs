@@ -19,26 +19,25 @@ namespace sth1edwv
 
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog d = new OpenFileDialog();
-            d.Filter = "*.sms|*.sms";
-            if (d.ShowDialog(this) == DialogResult.OK)
+            using (var d = new OpenFileDialog{Filter = "*.sms|*.sms"})
             {
-                _cartridge = new Cartridge(d.FileName);
-                _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
-                RefreshAll();
+                if (d.ShowDialog(this) == DialogResult.OK)
+                {
+                    _cartridge?.Dispose();
+                    _cartridge = new Cartridge(d.FileName);
+                    _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
+                    RefreshAll();
+                }
             }
         }
 
-        void RefreshAll()
+        private void RefreshAll()
         {
             listBoxMemoryLocations.Items.Clear();
-            foreach (var memMapEntry in _cartridge.Labels)
-            {
-                listBoxMemoryLocations.Items.Add($"${memMapEntry.Offset:X5} {memMapEntry.Label}");
-            }
+            listBoxMemoryLocations.Items.AddRange(_cartridge.Labels.ToArray<object>());
             listBoxLevels.Items.Clear();
             listBoxLevels.Items.AddRange(_cartridge.Levels.ToArray<object>());
-            hb1.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
+            hexViewer.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
             listBoxPalettes.Items.Clear();
             listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
             listBoxGameText.Items.Clear();
@@ -48,24 +47,27 @@ namespace sth1edwv
             }
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void ListBoxMemoryLocationsSelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = listBoxMemoryLocations.SelectedIndex;
-            if (n == -1)
-                return;
-            hb1.SelectionStart = _cartridge.Labels[n].Offset;
-            hb1.SelectionLength = 1;
-            hb1.ScrollByteIntoView();
-        }
-
-        private void listBox3_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (!(listBoxPalettes.SelectedItem is Palette palette))
+            if (!(listBoxMemoryLocations.SelectedItem is Cartridge.MemMapEntry label))
             {
                 return;
             }
+            hexViewer.SelectionStart = label.Offset;
+            hexViewer.SelectionLength = 1;
+            hexViewer.ScrollByteIntoView();
+        }
 
-            pb2.Image = palette.ToImage(256, 128);
+        private void ListBoxPalettesSelectedIndexChanged(object sender, EventArgs e)
+        {
+            pictureBoxPalette.Image?.Dispose();
+            if (!(listBoxPalettes.SelectedItem is Palette palette))
+            {
+                pictureBoxPalette.Image = null;
+                return;
+            }
+
+            pictureBoxPalette.Image = palette.ToImage(256, 128);
         }
 
         private void saveFloorAsBitmapToolStripMenuItem_Click(object sender, EventArgs e)
@@ -83,28 +85,28 @@ namespace sth1edwv
 
         private void seamlessToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            seamlessToolStripMenuItem.Checked = true;
-            dontRenderToolStripMenuItem.Checked =
-                blockGridToolStripMenuItem.Checked =
-                    tileGridToolStripMenuItem.Checked = false;
+            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
+            {
+                child.Checked = child == sender;
+            }
             listBoxLevels.SelectedItem = null;
         }
 
         private void blockGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            blockGridToolStripMenuItem.Checked = true;
-            dontRenderToolStripMenuItem.Checked =
-                seamlessToolStripMenuItem.Checked =
-                    tileGridToolStripMenuItem.Checked = false;
+            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
+            {
+                child.Checked = child == sender;
+            }
             listBoxLevels.SelectedItem = null;
         }
 
         private void tileGridToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            tileGridToolStripMenuItem.Checked = true;
-            dontRenderToolStripMenuItem.Checked =
-                blockGridToolStripMenuItem.Checked =
-                    seamlessToolStripMenuItem.Checked = false;
+            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
+            {
+                child.Checked = child == sender;
+            }
             listBoxLevels.SelectedItem = null;
         }
 
@@ -118,6 +120,7 @@ namespace sth1edwv
             if (blockGridToolStripMenuItem.Checked) mode = 1;
             if (tileGridToolStripMenuItem.Checked) mode = 2;
             if (dontRenderToolStripMenuItem.Checked) mode = 3;
+            pb3.Image?.Dispose();
             if (mode == 3)
             {
                 pb3.Image = null;
@@ -136,11 +139,11 @@ namespace sth1edwv
             t.Expand();
             treeViewLevelData.Nodes.Add(t);
             listBox5.Items.Clear();
-            for (int i = 0; i < level.blockMapping.Blocks.Count; i++)
+            for (int i = 0; i < level.BlockMapping.Blocks.Count; i++)
             {
                 var sb = new StringBuilder();
                 sb.Append($"{i:X2} : ");
-                var block = level.blockMapping.Blocks[i];
+                var block = level.BlockMapping.Blocks[i];
                 sb.Append(block);
                 listBox5.Items.Add(sb.ToString());
             }
@@ -176,7 +179,7 @@ namespace sth1edwv
             int m = listBox5.SelectedIndex;
             if (m == -1)
                 return;
-            var block = level.blockMapping.Blocks[m];
+            var block = level.BlockMapping.Blocks[m];
             var scale = 4;
             var bmp = new Bitmap(36*scale, 36*scale);
             using (var g = Graphics.FromImage(bmp))
@@ -205,7 +208,7 @@ namespace sth1edwv
             int m = listBox5.SelectedIndex;
             if (m == -1)
                 return;
-            var block = level.blockMapping.Blocks[m];
+            var block = level.BlockMapping.Blocks[m];
             var x = e.X / 4 / 9;
             var y = e.Y / 4 / 9;
             var subBlockIndex = x + y * 4;
@@ -225,10 +228,10 @@ namespace sth1edwv
 
         private void dontRenderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dontRenderToolStripMenuItem.Checked = true;
-            seamlessToolStripMenuItem.Checked =
-                blockGridToolStripMenuItem.Checked =
-                    tileGridToolStripMenuItem.Checked = false;
+            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
+            {
+                child.Checked = child == sender;
+            }
             listBoxLevels.SelectedItem = null;
         }
 
@@ -382,12 +385,12 @@ namespace sth1edwv
             int maxY = y > _lastY ? y : _lastY;
             using (var bc = new BlockChooser(level))
             {
-                int selection = bc.SelectedBlock = level.Floor1.BlockIndices[x + y * level.floorWidth];
+                int selection = bc.SelectedBlock = level.Floor.BlockIndices[x + y * level.floorWidth];
                 bc.ShowDialog(this);
-                byte[] temp = new byte[level.Floor1.BlockIndices.Length];
+                byte[] temp = new byte[level.Floor.BlockIndices.Length];
                 for (int i = 0; i < temp.Length; i++)
                 {
-                    temp[i] = level.Floor1.BlockIndices[i];
+                    temp[i] = level.Floor.BlockIndices[i];
                 }
 
                 if (bc.SelectedBlock != selection)
@@ -395,14 +398,14 @@ namespace sth1edwv
                     for (int row = minY; row <= maxY; row++)
                     for (int col = minX; col <= maxX; col++)
                     {
-                        level.Floor1.BlockIndices[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
+                        level.Floor.BlockIndices[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
                     }
 
-                    byte[] newData = level.Floor1.CompressData(level);
+                    byte[] newData = level.Floor.CompressData();
                     if (level.floorSize < newData.Length)
                     {
                         MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
-                        level.Floor1.BlockIndices = temp;
+                        level.Floor.BlockIndices = temp;
                         return;
                     }
 

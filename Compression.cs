@@ -11,7 +11,7 @@ namespace sth1edwv
         public static byte[] DecompressRle(Cartridge cartridge, int address, int size)
         {
             // Read into a memory stream
-            // DecompressRle into another one
+            // Decompress into another one
             using (var m = new MemoryStream(cartridge.Memory, address, size))
             using (var result = new MemoryStream())
             {
@@ -90,7 +90,7 @@ namespace sth1edwv
             }
         }
 
-        public static byte[] DecompressArt(byte[] data, int offset)
+        public static byte[] DecompressArt(byte[] data, int offset, out int lengthConsumed)
         {
             var magic = Encoding.ASCII.GetString(data, offset, 2);
             if (magic != "HY")
@@ -144,6 +144,9 @@ namespace sth1edwv
                     }
                 }
 
+                // We assume that the data is contiguous from the header to the end of whichever of the art data and duplicates data comes last.
+                lengthConsumed = Math.Max(duplicateRowsOffset + (int)duplicatesData.Position, nextArtDataOffset) - offset;
+
                 return result.ToArray();
             }
         }
@@ -167,47 +170,47 @@ namespace sth1edwv
             return result;
         }
 
-        public static byte[] CompressArt(byte[] data)
+        public static byte[] CompressArt(MemoryStream source)
         {
             var artData = new List<byte[]>();
             var duplicates = new List<int>();
             var bitMasks = new List<byte>();
-            using (var source = new MemoryStream(data))
+            
+            // We work through it one row at a time...
+            source.Position = 0;
+            byte bitmask = 0;
+            int linesConsumed = 0;
+            while (source.Position < source.Length)
             {
-                // We work through it one row at a time...
-                source.Position = 0;
-                byte bitmask = 0;
-                int linesConsumed = 0;
-                while (source.Position < source.Length)
-                {
-                    // Read a line
-                    var line = new byte[8];
-                    source.Read(line, 0, 8);
-                    ++linesConsumed;
-                    bitmask <<= 1;
-                    // See if we already have it
-                    var index = artData.IndexOf(line);
+                // Read a line
+                var line = new byte[8];
+                source.Read(line, 0, 8);
+                ++linesConsumed;
+                bitmask <<= 1;
+                // See if we already have it
+                var index = artData.IndexOf(line);
 
-                    if (index == -1)
-                    {
-                        // If not found, add to art data
-                        artData.Add(line);
-                    }
-                    else
-                    {
-                        // If found, add the reference
-                        duplicates.Add(index);
-                        // And set the bit
-                        bitmask |= 1;
-                    }
-                    // If we have finished a tile, emit the bitmask
-                    if (linesConsumed == 8)
-                    {
-                        bitMasks.Add(bitmask);
-                        linesConsumed = 0;
-                    }
+                if (index == -1)
+                {
+                    // If not found, add to art data
+                    artData.Add(line);
+                }
+                else
+                {
+                    // If found, add the reference
+                    duplicates.Add(index);
+                    // And set the bit
+                    bitmask |= 1;
+                }
+
+                // If we have finished a tile, emit the bitmask
+                if (linesConsumed == 8)
+                {
+                    bitMasks.Add(bitmask);
+                    linesConsumed = 0;
                 }
             }
+
             // Now we emit it back...
             using (var result = new MemoryStream())
             using (var resultWriter = new BinaryWriter(result, Encoding.ASCII))

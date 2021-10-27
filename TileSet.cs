@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace sth1edwv
 {
-    public class TileSet: IDataItem
+    public class TileSet: IDataItem, IDisposable
     {
         private readonly ushort _magic;
         private readonly ushort _dupRows;
@@ -22,13 +20,12 @@ namespace sth1edwv
             _dupRows = BitConverter.ToUInt16(cartridge.Memory, offset + 2);
             _artData = BitConverter.ToUInt16(cartridge.Memory, offset + 4);
             _rowCount = BitConverter.ToUInt16(cartridge.Memory, offset + 6);
-            var decompressed = Compression.DecompressArt(cartridge.Memory, offset);
+            var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
             for (int i = 0; i < decompressed.Length; i += 64)
             {
                 Tiles.Add(new Tile(decompressed, i, palette));
             }
-
-            //LengthConsumed = Math.Max(artPos, dupPos) - Offset;
+            LengthConsumed = lengthConsumed;
         }
 
         public TreeNode ToNode()
@@ -57,8 +54,18 @@ namespace sth1edwv
                 }
 
                 // Then we compress it...
-                return Compression.CompressArt(ms.ToArray());
+                ms.Position = 0;
+                return Compression.CompressArt(ms);
             }
+        }
+
+        public void Dispose()
+        {
+            foreach (var tile in Tiles)
+            {
+                tile.Dispose();
+            }
+            Tiles.Clear();
         }
     }
 }
