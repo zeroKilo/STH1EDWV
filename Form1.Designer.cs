@@ -28,17 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveFloorAsBitmapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.renderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.seamlessToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.blockGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tileGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dontRenderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listBoxLevels = new System.Windows.Forms.ListBox();
@@ -47,16 +41,22 @@
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.tilePicker1 = new sth1edwv.TilePicker();
-            this.pb1 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.listBox5 = new System.Windows.Forms.ListBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.pb4 = new System.Windows.Forms.PictureBox();
+            this.textBoxTileSolidity = new System.Windows.Forms.TextBox();
+            this.pictureBoxBlockEditor = new System.Windows.Forms.PictureBox();
             this.tabPage8 = new System.Windows.Forms.TabPage();
-            this.pb3 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxRenderedLevel = new System.Windows.Forms.PictureBox();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.buttonShowObjects = new System.Windows.Forms.ToolStripButton();
+            this.buttonBlockNumbers = new System.Windows.Forms.ToolStripButton();
+            this.buttonTileGaps = new System.Windows.Forms.ToolStripButton();
+            this.buttonBlockGaps = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButtonSaveRenderedLevel = new System.Windows.Forms.ToolStripButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.listBoxPalettes = new System.Windows.Forms.ListBox();
@@ -70,8 +70,8 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.pbar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.tilePicker1 = new sth1edwv.TilePicker();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -85,15 +85,16 @@
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilePreview)).BeginInit();
             this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
             this.splitContainer4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBlockEditor)).BeginInit();
             this.tabPage8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRenderedLevel)).BeginInit();
+            this.toolStrip1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
@@ -108,15 +109,14 @@
             this.tabControl1.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.tabPage9.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.optionToolStripMenuItem});
+            this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(962, 24);
@@ -127,8 +127,7 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openROMToolStripMenuItem,
-            this.saveROMToolStripMenuItem,
-            this.saveFloorAsBitmapToolStripMenuItem});
+            this.saveROMToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -136,72 +135,16 @@
             // openROMToolStripMenuItem
             // 
             this.openROMToolStripMenuItem.Name = "openROMToolStripMenuItem";
-            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.openROMToolStripMenuItem.Text = "Open ROM...";
             this.openROMToolStripMenuItem.Click += new System.EventHandler(this.openROMToolStripMenuItem_Click);
             // 
             // saveROMToolStripMenuItem
             // 
             this.saveROMToolStripMenuItem.Name = "saveROMToolStripMenuItem";
-            this.saveROMToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+            this.saveROMToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.saveROMToolStripMenuItem.Text = "Save ROM...";
             this.saveROMToolStripMenuItem.Click += new System.EventHandler(this.saveROMToolStripMenuItem_Click);
-            // 
-            // saveFloorAsBitmapToolStripMenuItem
-            // 
-            this.saveFloorAsBitmapToolStripMenuItem.Name = "saveFloorAsBitmapToolStripMenuItem";
-            this.saveFloorAsBitmapToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.saveFloorAsBitmapToolStripMenuItem.Text = "Save Floor as Bitmap...";
-            this.saveFloorAsBitmapToolStripMenuItem.Click += new System.EventHandler(this.saveFloorAsBitmapToolStripMenuItem_Click);
-            // 
-            // optionToolStripMenuItem
-            // 
-            this.optionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.renderToolStripMenuItem});
-            this.optionToolStripMenuItem.Name = "optionToolStripMenuItem";
-            this.optionToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
-            this.optionToolStripMenuItem.Text = "Option";
-            // 
-            // renderToolStripMenuItem
-            // 
-            this.renderToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.seamlessToolStripMenuItem,
-            this.blockGridToolStripMenuItem,
-            this.tileGridToolStripMenuItem,
-            this.dontRenderToolStripMenuItem});
-            this.renderToolStripMenuItem.Name = "renderToolStripMenuItem";
-            this.renderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.renderToolStripMenuItem.Text = "Render";
-            // 
-            // seamlessToolStripMenuItem
-            // 
-            this.seamlessToolStripMenuItem.Name = "seamlessToolStripMenuItem";
-            this.seamlessToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.seamlessToolStripMenuItem.Text = "Seamless";
-            this.seamlessToolStripMenuItem.Click += new System.EventHandler(this.seamlessToolStripMenuItem_Click);
-            // 
-            // blockGridToolStripMenuItem
-            // 
-            this.blockGridToolStripMenuItem.Name = "blockGridToolStripMenuItem";
-            this.blockGridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.blockGridToolStripMenuItem.Text = "Block Grid";
-            this.blockGridToolStripMenuItem.Click += new System.EventHandler(this.blockGridToolStripMenuItem_Click);
-            // 
-            // tileGridToolStripMenuItem
-            // 
-            this.tileGridToolStripMenuItem.Name = "tileGridToolStripMenuItem";
-            this.tileGridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.tileGridToolStripMenuItem.Text = "Tile Grid";
-            this.tileGridToolStripMenuItem.Click += new System.EventHandler(this.tileGridToolStripMenuItem_Click);
-            // 
-            // dontRenderToolStripMenuItem
-            // 
-            this.dontRenderToolStripMenuItem.Checked = true;
-            this.dontRenderToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.dontRenderToolStripMenuItem.Name = "dontRenderToolStripMenuItem";
-            this.dontRenderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.dontRenderToolStripMenuItem.Text = "Dont Render";
-            this.dontRenderToolStripMenuItem.Click += new System.EventHandler(this.dontRenderToolStripMenuItem_Click);
             // 
             // tabPage5
             // 
@@ -209,7 +152,7 @@
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(954, 537);
+            this.tabPage5.Size = new System.Drawing.Size(954, 559);
             this.tabPage5.TabIndex = 5;
             this.tabPage5.Text = "Level";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -227,20 +170,18 @@
             // splitContainer6.Panel2
             // 
             this.splitContainer6.Panel2.Controls.Add(this.tabControl2);
-            this.splitContainer6.Size = new System.Drawing.Size(948, 531);
+            this.splitContainer6.Size = new System.Drawing.Size(948, 553);
             this.splitContainer6.SplitterDistance = 218;
             this.splitContainer6.TabIndex = 0;
             // 
             // listBoxLevels
             // 
             this.listBoxLevels.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxLevels.Font = new System.Drawing.Font("Courier New", 8.25F);
             this.listBoxLevels.FormattingEnabled = true;
             this.listBoxLevels.IntegralHeight = false;
-            this.listBoxLevels.ItemHeight = 14;
             this.listBoxLevels.Location = new System.Drawing.Point(0, 0);
             this.listBoxLevels.Name = "listBoxLevels";
-            this.listBoxLevels.Size = new System.Drawing.Size(218, 531);
+            this.listBoxLevels.Size = new System.Drawing.Size(218, 553);
             this.listBoxLevels.TabIndex = 1;
             this.listBoxLevels.SelectedIndexChanged += new System.EventHandler(this.listBox4_SelectedIndexChanged);
             // 
@@ -254,7 +195,7 @@
             this.tabControl2.Location = new System.Drawing.Point(0, 0);
             this.tabControl2.Name = "tabControl2";
             this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(726, 531);
+            this.tabControl2.Size = new System.Drawing.Size(726, 553);
             this.tabControl2.TabIndex = 1;
             // 
             // tabPage6
@@ -263,18 +204,18 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(718, 505);
+            this.tabPage6.Size = new System.Drawing.Size(718, 527);
             this.tabPage6.TabIndex = 0;
-            this.tabPage6.Text = "BlockIndices";
+            this.tabPage6.Text = "Level metadata";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
             // treeViewLevelData
             // 
             this.treeViewLevelData.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeViewLevelData.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.treeViewLevelData.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.treeViewLevelData.Location = new System.Drawing.Point(3, 3);
             this.treeViewLevelData.Name = "treeViewLevelData";
-            this.treeViewLevelData.Size = new System.Drawing.Size(712, 499);
+            this.treeViewLevelData.Size = new System.Drawing.Size(712, 521);
             this.treeViewLevelData.TabIndex = 1;
             this.treeViewLevelData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tv1_AfterSelect);
             // 
@@ -284,7 +225,7 @@
             this.tabPage7.Location = new System.Drawing.Point(4, 22);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(718, 505);
+            this.tabPage7.Size = new System.Drawing.Size(718, 527);
             this.tabPage7.TabIndex = 1;
             this.tabPage7.Text = "Tiles";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -302,31 +243,20 @@
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.pb1);
-            this.splitContainer2.Size = new System.Drawing.Size(712, 499);
+            this.splitContainer2.Panel2.Controls.Add(this.pictureBoxTilePreview);
+            this.splitContainer2.Size = new System.Drawing.Size(712, 521);
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
             // 
-            // tilePicker1
+            // pictureBoxTilePreview
             // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 497);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
-            // 
-            // pb1
-            // 
-            this.pb1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pb1.Location = new System.Drawing.Point(0, 0);
-            this.pb1.Name = "pb1";
-            this.pb1.Size = new System.Drawing.Size(418, 497);
-            this.pb1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pb1.TabIndex = 0;
-            this.pb1.TabStop = false;
+            this.pictureBoxTilePreview.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxTilePreview.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxTilePreview.Name = "pictureBoxTilePreview";
+            this.pictureBoxTilePreview.Size = new System.Drawing.Size(418, 519);
+            this.pictureBoxTilePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBoxTilePreview.TabIndex = 0;
+            this.pictureBoxTilePreview.TabStop = false;
             // 
             // tabPage3
             // 
@@ -334,7 +264,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(718, 505);
+            this.tabPage3.Size = new System.Drawing.Size(718, 527);
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "Blocks";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -353,9 +283,9 @@
             // 
             this.splitContainer4.Panel2.AutoScroll = true;
             this.splitContainer4.Panel2.Controls.Add(this.button1);
-            this.splitContainer4.Panel2.Controls.Add(this.textBox1);
-            this.splitContainer4.Panel2.Controls.Add(this.pb4);
-            this.splitContainer4.Size = new System.Drawing.Size(712, 499);
+            this.splitContainer4.Panel2.Controls.Add(this.textBoxTileSolidity);
+            this.splitContainer4.Panel2.Controls.Add(this.pictureBoxBlockEditor);
+            this.splitContainer4.Size = new System.Drawing.Size(712, 521);
             this.splitContainer4.SplitterDistance = 439;
             this.splitContainer4.TabIndex = 2;
             // 
@@ -368,9 +298,9 @@
             this.listBox5.ItemHeight = 14;
             this.listBox5.Location = new System.Drawing.Point(0, 0);
             this.listBox5.Name = "listBox5";
-            this.listBox5.Size = new System.Drawing.Size(439, 499);
+            this.listBox5.Size = new System.Drawing.Size(439, 521);
             this.listBox5.TabIndex = 1;
-            this.listBox5.SelectedIndexChanged += new System.EventHandler(this.listBox5_SelectedIndexChanged);
+            this.listBox5.SelectedIndexChanged += new System.EventHandler(this.ListBoxTilesSelectedIndexChanged);
             // 
             // button1
             // 
@@ -382,46 +312,119 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // textBox1
+            // textBoxTileSolidity
             // 
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.Location = new System.Drawing.Point(2, 3);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(36, 20);
-            this.textBox1.TabIndex = 4;
+            this.textBoxTileSolidity.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxTileSolidity.Location = new System.Drawing.Point(2, 3);
+            this.textBoxTileSolidity.Name = "textBoxTileSolidity";
+            this.textBoxTileSolidity.Size = new System.Drawing.Size(36, 20);
+            this.textBoxTileSolidity.TabIndex = 4;
             // 
-            // pb4
+            // pictureBoxBlockEditor
             // 
-            this.pb4.Location = new System.Drawing.Point(2, 29);
-            this.pb4.Name = "pb4";
-            this.pb4.Size = new System.Drawing.Size(128, 128);
-            this.pb4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pb4.TabIndex = 3;
-            this.pb4.TabStop = false;
-            this.pb4.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pb4_MouseClick);
+            this.pictureBoxBlockEditor.Location = new System.Drawing.Point(2, 29);
+            this.pictureBoxBlockEditor.Name = "pictureBoxBlockEditor";
+            this.pictureBoxBlockEditor.Size = new System.Drawing.Size(128, 128);
+            this.pictureBoxBlockEditor.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxBlockEditor.TabIndex = 3;
+            this.pictureBoxBlockEditor.TabStop = false;
+            this.pictureBoxBlockEditor.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pb4_MouseClick);
             // 
             // tabPage8
             // 
-            this.tabPage8.AutoScroll = true;
-            this.tabPage8.Controls.Add(this.pb3);
+            this.tabPage8.Controls.Add(this.panel1);
+            this.tabPage8.Controls.Add(this.toolStrip1);
             this.tabPage8.Location = new System.Drawing.Point(4, 22);
             this.tabPage8.Name = "tabPage8";
             this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(718, 505);
+            this.tabPage8.Size = new System.Drawing.Size(718, 527);
             this.tabPage8.TabIndex = 2;
-            this.tabPage8.Text = "Rendered";
+            this.tabPage8.Text = "Layout";
             this.tabPage8.UseVisualStyleBackColor = true;
             // 
-            // pb3
+            // pictureBoxRenderedLevel
             // 
-            this.pb3.Location = new System.Drawing.Point(0, 0);
-            this.pb3.Name = "pb3";
-            this.pb3.Size = new System.Drawing.Size(330, 243);
-            this.pb3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pb3.TabIndex = 2;
-            this.pb3.TabStop = false;
-            this.pb3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseDown);
-            this.pb3.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseUp);
+            this.pictureBoxRenderedLevel.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxRenderedLevel.Name = "pictureBoxRenderedLevel";
+            this.pictureBoxRenderedLevel.Size = new System.Drawing.Size(330, 243);
+            this.pictureBoxRenderedLevel.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxRenderedLevel.TabIndex = 2;
+            this.pictureBoxRenderedLevel.TabStop = false;
+            this.pictureBoxRenderedLevel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseDown);
+            this.pictureBoxRenderedLevel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseUp);
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buttonShowObjects,
+            this.buttonBlockNumbers,
+            this.buttonBlockGaps,
+            this.buttonTileGaps,
+            this.toolStripSeparator1,
+            this.toolStripButtonSaveRenderedLevel});
+            this.toolStrip1.Location = new System.Drawing.Point(3, 3);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(712, 25);
+            this.toolStrip1.TabIndex = 3;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // buttonShowObjects
+            // 
+            this.buttonShowObjects.Checked = true;
+            this.buttonShowObjects.CheckOnClick = true;
+            this.buttonShowObjects.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.buttonShowObjects.Image = global::sth1edwv.Properties.Resources.package;
+            this.buttonShowObjects.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonShowObjects.Name = "buttonShowObjects";
+            this.buttonShowObjects.Size = new System.Drawing.Size(67, 22);
+            this.buttonShowObjects.Text = "Objects";
+            this.buttonShowObjects.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
+            // 
+            // buttonBlockNumbers
+            // 
+            this.buttonBlockNumbers.Checked = true;
+            this.buttonBlockNumbers.CheckOnClick = true;
+            this.buttonBlockNumbers.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.buttonBlockNumbers.Image = ((System.Drawing.Image)(resources.GetObject("buttonBlockNumbers.Image")));
+            this.buttonBlockNumbers.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonBlockNumbers.Name = "buttonBlockNumbers";
+            this.buttonBlockNumbers.Size = new System.Drawing.Size(106, 22);
+            this.buttonBlockNumbers.Text = "Block numbers";
+            this.buttonBlockNumbers.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
+            // 
+            // buttonTileGaps
+            // 
+            this.buttonTileGaps.CheckOnClick = true;
+            this.buttonTileGaps.Image = ((System.Drawing.Image)(resources.GetObject("buttonTileGaps.Image")));
+            this.buttonTileGaps.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTileGaps.Name = "buttonTileGaps";
+            this.buttonTileGaps.Size = new System.Drawing.Size(73, 22);
+            this.buttonTileGaps.Text = "Tile gaps";
+            this.buttonTileGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
+            // 
+            // buttonBlockGaps
+            // 
+            this.buttonBlockGaps.CheckOnClick = true;
+            this.buttonBlockGaps.Image = ((System.Drawing.Image)(resources.GetObject("buttonBlockGaps.Image")));
+            this.buttonBlockGaps.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonBlockGaps.Name = "buttonBlockGaps";
+            this.buttonBlockGaps.Size = new System.Drawing.Size(84, 22);
+            this.buttonBlockGaps.Text = "Block gaps";
+            this.buttonBlockGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripButtonSaveRenderedLevel
+            // 
+            this.toolStripButtonSaveRenderedLevel.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSaveRenderedLevel.Image")));
+            this.toolStripButtonSaveRenderedLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButtonSaveRenderedLevel.Name = "toolStripButtonSaveRenderedLevel";
+            this.toolStripButtonSaveRenderedLevel.Size = new System.Drawing.Size(60, 22);
+            this.toolStripButtonSaveRenderedLevel.Text = "Save...";
+            this.toolStripButtonSaveRenderedLevel.Click += new System.EventHandler(this.toolStripButtonSaveRenderedLevel_Click);
             // 
             // tabPage2
             // 
@@ -429,7 +432,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(954, 537);
+            this.tabPage2.Size = new System.Drawing.Size(954, 559);
             this.tabPage2.TabIndex = 3;
             this.tabPage2.Text = "Palettes";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -447,7 +450,7 @@
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.pictureBoxPalette);
-            this.splitContainer3.Size = new System.Drawing.Size(948, 531);
+            this.splitContainer3.Size = new System.Drawing.Size(948, 553);
             this.splitContainer3.SplitterDistance = 314;
             this.splitContainer3.TabIndex = 1;
             // 
@@ -460,7 +463,7 @@
             this.listBoxPalettes.ItemHeight = 14;
             this.listBoxPalettes.Location = new System.Drawing.Point(0, 0);
             this.listBoxPalettes.Name = "listBoxPalettes";
-            this.listBoxPalettes.Size = new System.Drawing.Size(314, 531);
+            this.listBoxPalettes.Size = new System.Drawing.Size(314, 553);
             this.listBoxPalettes.TabIndex = 0;
             this.listBoxPalettes.SelectedIndexChanged += new System.EventHandler(this.ListBoxPalettesSelectedIndexChanged);
             // 
@@ -469,7 +472,7 @@
             this.pictureBoxPalette.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxPalette.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxPalette.Name = "pictureBoxPalette";
-            this.pictureBoxPalette.Size = new System.Drawing.Size(630, 531);
+            this.pictureBoxPalette.Size = new System.Drawing.Size(630, 553);
             this.pictureBoxPalette.TabIndex = 1;
             this.pictureBoxPalette.TabStop = false;
             // 
@@ -479,7 +482,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(954, 537);
+            this.tabPage1.Size = new System.Drawing.Size(954, 559);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Memory";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -497,7 +500,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.hexViewer);
-            this.splitContainer1.Size = new System.Drawing.Size(948, 531);
+            this.splitContainer1.Size = new System.Drawing.Size(948, 553);
             this.splitContainer1.SplitterDistance = 314;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -510,7 +513,7 @@
             this.listBoxMemoryLocations.ItemHeight = 14;
             this.listBoxMemoryLocations.Location = new System.Drawing.Point(0, 0);
             this.listBoxMemoryLocations.Name = "listBoxMemoryLocations";
-            this.listBoxMemoryLocations.Size = new System.Drawing.Size(314, 531);
+            this.listBoxMemoryLocations.Size = new System.Drawing.Size(314, 553);
             this.listBoxMemoryLocations.TabIndex = 0;
             this.listBoxMemoryLocations.SelectedIndexChanged += new System.EventHandler(this.ListBoxMemoryLocationsSelectedIndexChanged);
             // 
@@ -522,7 +525,7 @@
             this.hexViewer.Location = new System.Drawing.Point(0, 0);
             this.hexViewer.Name = "hexViewer";
             this.hexViewer.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
-            this.hexViewer.Size = new System.Drawing.Size(630, 531);
+            this.hexViewer.Size = new System.Drawing.Size(630, 553);
             this.hexViewer.StringViewVisible = true;
             this.hexViewer.TabIndex = 0;
             this.hexViewer.UseFixedBytesPerLine = true;
@@ -539,7 +542,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(962, 563);
+            this.tabControl1.Size = new System.Drawing.Size(962, 585);
             this.tabControl1.TabIndex = 1;
             // 
             // tabPage4
@@ -548,7 +551,7 @@
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(954, 537);
+            this.tabPage4.Size = new System.Drawing.Size(954, 559);
             this.tabPage4.TabIndex = 6;
             this.tabPage4.Text = "General Info";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -560,7 +563,7 @@
             this._richTextBoxGeneralSummary.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._richTextBoxGeneralSummary.Location = new System.Drawing.Point(3, 3);
             this._richTextBoxGeneralSummary.Name = "_richTextBoxGeneralSummary";
-            this._richTextBoxGeneralSummary.Size = new System.Drawing.Size(948, 531);
+            this._richTextBoxGeneralSummary.Size = new System.Drawing.Size(948, 553);
             this._richTextBoxGeneralSummary.TabIndex = 0;
             this._richTextBoxGeneralSummary.Text = "";
             this._richTextBoxGeneralSummary.WordWrap = false;
@@ -571,7 +574,7 @@
             this.tabPage9.Location = new System.Drawing.Point(4, 22);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage9.Size = new System.Drawing.Size(954, 537);
+            this.tabPage9.Size = new System.Drawing.Size(954, 559);
             this.tabPage9.TabIndex = 7;
             this.tabPage9.Text = "Game Text";
             this.tabPage9.UseVisualStyleBackColor = true;
@@ -585,25 +588,30 @@
             this.listBoxGameText.ItemHeight = 14;
             this.listBoxGameText.Location = new System.Drawing.Point(3, 3);
             this.listBoxGameText.Name = "listBoxGameText";
-            this.listBoxGameText.Size = new System.Drawing.Size(948, 531);
+            this.listBoxGameText.Size = new System.Drawing.Size(948, 553);
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.listBox6_DoubleClick);
             // 
-            // statusStrip1
+            // panel1
             // 
-            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pbar1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 587);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(962, 22);
-            this.statusStrip1.TabIndex = 2;
-            this.statusStrip1.Text = "statusStrip1";
+            this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.pictureBoxRenderedLevel);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 28);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(712, 496);
+            this.panel1.TabIndex = 4;
             // 
-            // pbar1
+            // tilePicker1
             // 
-            this.pbar1.Name = "pbar1";
-            this.pbar1.Size = new System.Drawing.Size(100, 16);
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 519);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
             // 
             // Form1
             // 
@@ -612,7 +620,6 @@
             this.ClientSize = new System.Drawing.Size(962, 609);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.menuStrip1);
-            this.Controls.Add(this.statusStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "STH1 Editor by WV";
@@ -630,17 +637,19 @@
             this.splitContainer2.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilePreview)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.splitContainer4.Panel1.ResumeLayout(false);
             this.splitContainer4.Panel2.ResumeLayout(false);
             this.splitContainer4.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pb4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBlockEditor)).EndInit();
             this.tabPage8.ResumeLayout(false);
             this.tabPage8.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pb3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRenderedLevel)).EndInit();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.tabPage2.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
@@ -655,8 +664,8 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.tabPage9.ResumeLayout(false);
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -667,12 +676,6 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openROMToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveFloorAsBitmapToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem renderToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem seamlessToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem blockGridToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem tileGridToolStripMenuItem;
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.SplitContainer splitContainer6;
         private System.Windows.Forms.ListBox listBoxLevels;
@@ -681,9 +684,9 @@
         private System.Windows.Forms.TreeView treeViewLevelData;
         private System.Windows.Forms.TabPage tabPage7;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.PictureBox pb1;
+        private System.Windows.Forms.PictureBox pictureBoxTilePreview;
         private System.Windows.Forms.TabPage tabPage8;
-        private System.Windows.Forms.PictureBox pb3;
+        private System.Windows.Forms.PictureBox pictureBoxRenderedLevel;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.SplitContainer splitContainer3;
         private System.Windows.Forms.ListBox listBoxPalettes;
@@ -693,21 +696,26 @@
         private System.Windows.Forms.ListBox listBoxMemoryLocations;
         private Be.Windows.Forms.HexBox hexViewer;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripProgressBar pbar1;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.SplitContainer splitContainer4;
         private System.Windows.Forms.ListBox listBox5;
-        private System.Windows.Forms.PictureBox pb4;
-        private System.Windows.Forms.ToolStripMenuItem dontRenderToolStripMenuItem;
+        private System.Windows.Forms.PictureBox pictureBoxBlockEditor;
         private System.Windows.Forms.ToolStripMenuItem saveROMToolStripMenuItem;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBoxTileSolidity;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.RichTextBox _richTextBoxGeneralSummary;
         private System.Windows.Forms.TabPage tabPage9;
         private System.Windows.Forms.ListBox listBoxGameText;
         private TilePicker tilePicker1;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton toolStripButtonSaveRenderedLevel;
+        private System.Windows.Forms.ToolStripButton buttonShowObjects;
+        private System.Windows.Forms.ToolStripButton buttonBlockNumbers;
+        private System.Windows.Forms.ToolStripButton buttonTileGaps;
+        private System.Windows.Forms.ToolStripButton buttonBlockGaps;
+        private System.Windows.Forms.Panel panel1;
     }
 }
 

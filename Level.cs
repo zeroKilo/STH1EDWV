@@ -93,94 +93,79 @@ namespace sth1edwv
         }
 
         public Tile GetTile(int index)
-        {            
+        {
             return TileSet.Tiles[index];
         }
 
-        public Bitmap Render(byte mode, ToolStripProgressBar pb)
+        public Bitmap Render(bool withObjects, bool blockGaps, bool tileGaps, bool blockLabels)
         {
-            int bs = 32;
-            int ts = 8;
-            if (mode == 1)
-                bs = 33;
-            if (mode == 2)
+            var blockSize = 32;
+            var tileSize = 8;
+            if (tileGaps)
             {
-                bs = 36;
-                ts = 9;
+                blockSize += 4;
+                ++tileSize;
             }
-            Bitmap result = new Bitmap(floorWidth * bs, floorHeight * bs);
-            using (Graphics g = Graphics.FromImage(result)) 
+
+            if (blockGaps)
+            {
+                ++blockSize;
+            }
+
+            const int labelWidth = 13;
+            const int labelHeight = 9;
+
+            var result = new Bitmap(floorWidth * blockSize, floorHeight * blockSize);
+            using (var f = new Font("Consolas", 8, FontStyle.Bold))
+            using (var g = Graphics.FromImage(result)) 
             {
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.Clear(Color.White);
-                pb.Maximum = floorWidth;
-                if (mode == 2)
+
+                for (var blockX = 0; blockX < floorWidth; ++blockX)
+                for (var blockY = 0; blockY < floorHeight; ++blockY)
                 {
-                    // Tile-wise drawing
-                    for (int bx = 0; bx < floorWidth; bx++)
+                    var blockIndex = Floor.BlockIndices[blockX + blockY * floorWidth];
+                    var block = BlockMapping.Blocks[blockIndex];
+                    for (var tileX = 0; tileX < 4; ++tileX)
+                    for (var tileY = 0; tileY < 4; ++tileY)
                     {
-                        for (int by = 0; by < floorHeight; by++)
-                        {
-                            var blockIndex = Floor.BlockIndices[bx + by * floorWidth];
-                            var block = BlockMapping.Blocks[blockIndex];
-                            for (int ty = 0; ty < 4; ty++)
-                            for (int tx = 0; tx < 4; tx++)
-                            {
-                                var tileIndex = block.TileIndices[tx + ty * 4];
-                                var tile = TileSet.Tiles[tileIndex];
-                                g.DrawImageUnscaled(tile.Image, bx * bs + tx * ts, by * bs + ty * ts);
-                            }
-                        }
-                        pb.Value = bx;
+                        var tileIndex = block.TileIndices[tileX + tileY * 4];
+                        var tile = TileSet.Tiles[tileIndex];
+                        var x = blockX * blockSize + tileX * tileSize;
+                        var y = blockY * blockSize + tileY * tileSize;
+                        g.DrawImageUnscaled(tile.Image, x, y);
                     }
-                }
-                else
-                {
-                    // Block-wise drawing
-                    using (var f = new Font("Courier New", 8, FontStyle.Bold))
+
+                    if (blockLabels)
                     {
-                        for (int bx = 0; bx < floorWidth; bx++)
-                        {
-                            for (int by = 0; by < floorHeight; by++)
-                            {
-                                var block = Floor.BlockIndices[bx + by * floorWidth];
-                                var tileData = BlockMapping.Blocks[block];
-
-                                g.DrawImageUnscaled(tileData.Image, bx * bs, by * bs);
-
-                                if (mode == 1)
-                                {
-                                    // Draw a rect over it for the label
-                                    g.FillRectangle(Brushes.White, bx*bs, by*bs, 13, 11);
-                                    g.DrawString(block.ToString("X2"), f, Brushes.Black, bx * bs - 2, by * bs - 3);
-                                }
-                            }
-
-                            pb.Value = bx;
-                        }
+                        // Draw a rect over it for the label
+//                        g.FillRectangle(Brushes.White, blockX * blockSize, blockY * blockSize, labelWidth, labelHeight);
+                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.Black, blockX * blockSize, blockY * blockSize - 1);
+                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.White, blockX * blockSize - 1, blockY * blockSize - 2);
                     }
                 }
 
-                using (var pen = new Pen(Color.Black, 1))
+                if (withObjects)
                 {
+                    var image = Properties.Resources.package;
+                    // Draw objects
                     foreach (var obj in ObjSet.objs)
                     {
-                        var a = obj.x * bs - 1;
-                        var b = obj.y * bs - 1;
-                        var c = a + bs;
-                        var d = b + bs;
-                        g.DrawLine(pen, a, b, c, d);
-                        g.DrawLine(pen, c, b, a, d);
-                        g.DrawLine(pen, a, b, a, d);
-                        g.DrawLine(pen, c, b, c, d);
-                        g.DrawLine(pen, a, b, c, b);
-                        g.DrawLine(pen, a, d, c, d);
+                        var x = obj.x * blockSize;
+                        var y = obj.y * blockSize;
+                        g.DrawRectangle(Pens.Blue, x, y, blockSize, blockSize);
+                        g.DrawImageUnscaled(image, x + blockSize / 2 - image.Width / 2, y + blockSize / 2 - image.Height / 2);
+
+                        x += blockSize - labelWidth;
+                        y += blockSize - labelHeight;
+                        g.FillRectangle(Brushes.Blue, x, y, labelWidth, labelHeight);
+                        g.DrawString(obj.type.ToString("X2"), f, Brushes.White, x - 1, y - 2);
                     }
                 }
             }
 
-            pb.Value = 0;
             return result;
         }
     }

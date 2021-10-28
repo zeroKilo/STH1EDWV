@@ -11,6 +11,7 @@ namespace sth1edwv
         private readonly ushort _dupRows;
         private readonly ushort _artData;
         private readonly ushort _rowCount;
+        private readonly double _compression;
         public List<Tile> Tiles { get; } = new List<Tile>();
 
         public TileSet(Cartridge cartridge, int offset, Palette palette)
@@ -26,18 +27,29 @@ namespace sth1edwv
                 Tiles.Add(new Tile(decompressed, i, palette));
             }
             LengthConsumed = lengthConsumed;
+            _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
         }
 
         public TreeNode ToNode()
         {
-            TreeNode result = new TreeNode("Tile Set");
-            TreeNode t = new TreeNode("Header");
-            t.Nodes.Add($"Magic           = 0x{_magic:X4}");
-            t.Nodes.Add($"Duplicate Rows  = 0x{_dupRows:X4}");
-            t.Nodes.Add($"Art BlockIndices Offset = 0x{_artData:X4}");
-            t.Nodes.Add($"Row Count       = 0x{_rowCount:X4}");
-            result.Nodes.Add(t);
-            return result;
+            return new TreeNode($"Tile Set @ {Offset:X6}")
+            {
+                Nodes =
+                {
+                    new TreeNode("Header")
+                    {
+                        Nodes =
+                        {
+                            new TreeNode($"Magic           = 0x{_magic:X4}"),
+                            new TreeNode($"Duplicate Rows  = 0x{_dupRows:X4}"),
+                            new TreeNode($"Art Data Offset = 0x{_artData:X4}"),
+                            new TreeNode($"Row Count       = 0x{_rowCount:X4}"),
+                        }
+                    },
+                    new TreeNode($"{Tiles.Count} tiles"),
+                    new TreeNode($"{_compression:P} compression")
+                },
+            };
         }
 
         public int Offset { get; }

@@ -70,65 +70,14 @@ namespace sth1edwv
             pictureBoxPalette.Image = palette.ToImage(256, 128);
         }
 
-        private void saveFloorAsBitmapToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (pb3.Image == null)
-                return;
-            SaveFileDialog d = new SaveFileDialog();
-            d.Filter = "*.bmp|*.bmp";
-            if (d.ShowDialog(this) == DialogResult.OK)
-            {
-                pb3.Image.Save(d.FileName);
-                MessageBox.Show(this, "Done.");
-            }
-        }
-
-        private void seamlessToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
-            {
-                child.Checked = child == sender;
-            }
-            listBoxLevels.SelectedItem = null;
-        }
-
-        private void blockGridToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
-            {
-                child.Checked = child == sender;
-            }
-            listBoxLevels.SelectedItem = null;
-        }
-
-        private void tileGridToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
-            {
-                child.Checked = child == sender;
-            }
-            listBoxLevels.SelectedItem = null;
-        }
-
         private void listBox4_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (!(listBoxLevels.SelectedItem is Level level))
             {
                 return;
             }
-            byte mode = 0;
-            if (blockGridToolStripMenuItem.Checked) mode = 1;
-            if (tileGridToolStripMenuItem.Checked) mode = 2;
-            if (dontRenderToolStripMenuItem.Checked) mode = 3;
-            pb3.Image?.Dispose();
-            if (mode == 3)
-            {
-                pb3.Image = null;
-            }
-            else
-            {
-                pb3.Image = level.Render(mode, pbar1);
-            }
+
+            RenderLevel();
 
             tilePicker1.TileSet = level.TileSet;
 
@@ -149,16 +98,29 @@ namespace sth1edwv
             }
         }
 
+        private void LevelRenderModeChanged(object sender, EventArgs e)
+        {
+            RenderLevel();
+        }
+
+        private void RenderLevel()
+        {
+            if (listBoxLevels.SelectedItem is Level level)
+            {
+                pictureBoxRenderedLevel.Image = level.Render(buttonShowObjects.Checked, buttonBlockGaps.Checked, buttonTileGaps.Checked, buttonBlockNumbers.Checked);
+            }
+        }
+
         private void tilePicker1_SelectionChanged(object sender, Tile tile)
         {
-            pb1.Image?.Dispose();
+            pictureBoxTilePreview.Image?.Dispose();
             if (tile == null)
             {
-                pb1.Image = null;
+                pictureBoxTilePreview.Image = null;
                 return;
             }
-            float zoom = pb1.Width / 8.0f;
-            var bmp = new Bitmap(pb1.Width, pb1.Width);
+            var zoom = pictureBoxTilePreview.Width / 8.0f;
+            var bmp = new Bitmap(pictureBoxTilePreview.Width, pictureBoxTilePreview.Width);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -167,10 +129,10 @@ namespace sth1edwv
                 g.DrawImageUnscaled(tile.Image, 0, 0);
             }
 
-            pb1.Image = bmp;
+            pictureBoxTilePreview.Image = bmp;
         }
 
-        private void listBox5_SelectedIndexChanged(object sender, EventArgs e)
+        private void ListBoxTilesSelectedIndexChanged(object sender, EventArgs e)
         {
             if (!(listBoxLevels.SelectedItem is Level level))
             {
@@ -178,7 +140,9 @@ namespace sth1edwv
             }
             int m = listBox5.SelectedIndex;
             if (m == -1)
+            {
                 return;
+            }
             var block = level.BlockMapping.Blocks[m];
             var scale = 4;
             var bmp = new Bitmap(36*scale, 36*scale);
@@ -195,8 +159,8 @@ namespace sth1edwv
                 }
             }
 
-            pb4.Image = bmp;
-            textBox1.Text = block.SolidityIndex.ToString("X2");
+            pictureBoxBlockEditor.Image = bmp;
+            textBoxTileSolidity.Text = block.SolidityIndex.ToString("X2");
         }
 
         private void pb4_MouseClick(object sender, MouseEventArgs e)
@@ -226,15 +190,6 @@ namespace sth1edwv
             listBox5.SelectedIndex = m;
         }
 
-        private void dontRenderToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (ToolStripMenuItem child in renderToolStripMenuItem.DropDownItems)
-            {
-                child.Checked = child == sender;
-            }
-            listBoxLevels.SelectedItem = null;
-        }
-
         private void saveROMToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var dialog = new SaveFileDialog { Filter = "*.sms|*.sms" })
@@ -257,7 +212,7 @@ namespace sth1edwv
             if (m == -1)
                 return;
             ushort offset = (ushort)(BitConverter.ToUInt16(_cartridge.Memory, 0x3A65 + level.solidityIndex * 2) + m);
-            byte data = Convert.ToByte(textBox1.Text, 16);
+            byte data = Convert.ToByte(textBoxTileSolidity.Text, 16);
             _cartridge.Memory[offset] = data;
             _cartridge.ReadLevels();
             var n = listBoxLevels.SelectedIndex;
@@ -350,29 +305,33 @@ namespace sth1edwv
             }
         }
 
+        private void toolStripButtonSaveRenderedLevel_Click(object sender, EventArgs e)
+        {
+            if (pictureBoxRenderedLevel.Image == null)
+            {
+                return;
+            }
+
+            using (var d = new SaveFileDialog() { Filter = "*.png|*.png" })
+            {
+                if (d.ShowDialog(this) == DialogResult.OK)
+                {
+                    pictureBoxRenderedLevel.Image.Save(d.FileName);
+                }
+            }
+        }
+
         private int _lastX, _lastY;
         private Cartridge _cartridge;
 
         private void pb3_MouseDown(object sender, MouseEventArgs e)
         {
-            if (!blockGridToolStripMenuItem.Checked)
-            {
-                MessageBox.Show(this, "Please select block as render mode to edit blocks");
-                return;
-            }
-
             _lastX = e.X / 33;
             _lastY = e.Y / 33;
         }
 
         private void pb3_MouseUp(object sender, MouseEventArgs e)
         {
-            if (!blockGridToolStripMenuItem.Checked)
-            {
-                MessageBox.Show(this, "Please select block as render mode to edit blocks");
-                return;
-            }
-
             if (!(listBoxLevels.SelectedItem is Level level))
             {
                 return;
