@@ -92,6 +92,8 @@ namespace sth1edwv
 
         public void ReadLevels()
         {
+            DisposeAll(_blockMappings);
+            DisposeAll(_tileSets);
             Levels.Clear();
             foreach (var e in _levelOffsets)
             {
