@@ -27,11 +27,16 @@ jobs:
         name: program
         path: bin\Release\*
 
+    - name: Build Number Generator
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{secrets.GITHUB_TOKEN}}  
+
     - name: Create release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{secrets.GITHUB_TOKEN}}"
-        automatic_release_tag: "build${{github.run_attempt}}"
+        automatic_release_tag: "build${env:BUILD_NUMBER}"
         prerelease: false
         title: "Automatic build of ${{github.sha}}"
         files: program.zip
