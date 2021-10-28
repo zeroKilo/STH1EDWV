@@ -32,6 +32,7 @@ namespace sth1edwv
 
         public BlockMapping BlockMapping { get; }
         private readonly string _label;
+        private int _blockSize;
 
         public Level(Cartridge cartridge, int offset, int artBanksTableOffset, IList<Palette> palettes, string label)
         {
@@ -99,23 +100,23 @@ namespace sth1edwv
 
         public Bitmap Render(bool withObjects, bool blockGaps, bool tileGaps, bool blockLabels)
         {
-            var blockSize = 32;
+            _blockSize = 32;
             var tileSize = 8;
             if (tileGaps)
             {
-                blockSize += 4;
+                _blockSize += 4;
                 ++tileSize;
             }
 
             if (blockGaps)
             {
-                ++blockSize;
+                ++_blockSize;
             }
 
             const int labelWidth = 13;
             const int labelHeight = 9;
 
-            var result = new Bitmap(floorWidth * blockSize, floorHeight * blockSize);
+            var result = new Bitmap(floorWidth * _blockSize, floorHeight * _blockSize);
             using (var f = new Font("Consolas", 8, FontStyle.Bold))
             using (var g = Graphics.FromImage(result)) 
             {
@@ -133,8 +134,8 @@ namespace sth1edwv
                     {
                         var tileIndex = block.TileIndices[tileX + tileY * 4];
                         var tile = TileSet.Tiles[tileIndex];
-                        var x = blockX * blockSize + tileX * tileSize;
-                        var y = blockY * blockSize + tileY * tileSize;
+                        var x = blockX * _blockSize + tileX * tileSize;
+                        var y = blockY * _blockSize + tileY * tileSize;
                         g.DrawImageUnscaled(tile.Image, x, y);
                     }
 
@@ -142,8 +143,8 @@ namespace sth1edwv
                     {
                         // Draw a rect over it for the label
 //                        g.FillRectangle(Brushes.White, blockX * blockSize, blockY * blockSize, labelWidth, labelHeight);
-                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.Black, blockX * blockSize, blockY * blockSize - 1);
-                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.White, blockX * blockSize - 1, blockY * blockSize - 2);
+                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.Black, blockX * _blockSize, blockY * _blockSize - 1);
+                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.White, blockX * _blockSize - 1, blockY * _blockSize - 2);
                     }
                 }
 
@@ -153,13 +154,13 @@ namespace sth1edwv
                     // Draw objects
                     foreach (var obj in ObjSet.objs)
                     {
-                        var x = obj.x * blockSize;
-                        var y = obj.y * blockSize;
-                        g.DrawRectangle(Pens.Blue, x, y, blockSize, blockSize);
-                        g.DrawImageUnscaled(image, x + blockSize / 2 - image.Width / 2, y + blockSize / 2 - image.Height / 2);
+                        var x = obj.x * _blockSize;
+                        var y = obj.y * _blockSize;
+                        g.DrawRectangle(Pens.Blue, x, y, _blockSize, _blockSize);
+                        g.DrawImageUnscaled(image, x + _blockSize / 2 - image.Width / 2, y + _blockSize / 2 - image.Height / 2);
 
-                        x += blockSize - labelWidth;
-                        y += blockSize - labelHeight;
+                        x += _blockSize - labelWidth;
+                        y += _blockSize - labelHeight;
                         g.FillRectangle(Brushes.Blue, x, y, labelWidth, labelHeight);
                         g.DrawString(obj.type.ToString("X2"), f, Brushes.White, x - 1, y - 2);
                     }
@@ -167,6 +168,12 @@ namespace sth1edwv
             }
 
             return result;
+        }
+
+        public void AdjustPixelsToTile(ref int x, ref int y)
+        {
+            x /= _blockSize;
+            y /= _blockSize;
         }
     }
 }

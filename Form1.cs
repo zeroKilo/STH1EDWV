@@ -326,8 +326,8 @@ namespace sth1edwv
 
         private void pb3_MouseDown(object sender, MouseEventArgs e)
         {
-            _lastX = e.X / 33;
-            _lastY = e.Y / 33;
+            _lastX = e.X;
+            _lastY = e.Y;
         }
 
         private void pb3_MouseUp(object sender, MouseEventArgs e)
@@ -336,31 +336,34 @@ namespace sth1edwv
             {
                 return;
             }
-            int x = e.X / 33;
-            int y = e.Y / 33;
-            int minX = x < _lastX ? x : _lastX;
-            int maxX = x > _lastX ? x : _lastX;
-            int minY = y < _lastY ? y : _lastY;
-            int maxY = y > _lastY ? y : _lastY;
+
+            var x = e.X;
+            var y = e.Y;
+            level.AdjustPixelsToTile(ref x, ref y);
+            level.AdjustPixelsToTile(ref _lastX, ref _lastY);
+
+            var minX = Math.Min(x, _lastX);
+            var maxX = Math.Max(x, _lastX);
+            var minY = Math.Min(y, _lastY);
+            var maxY = Math.Max(y, _lastY);
             using (var bc = new BlockChooser(level))
             {
-                int selection = bc.SelectedBlock = level.Floor.BlockIndices[x + y * level.floorWidth];
+                var selection = bc.SelectedBlock = level.Floor.BlockIndices[x + y * level.floorWidth];
                 bc.ShowDialog(this);
-                byte[] temp = new byte[level.Floor.BlockIndices.Length];
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    temp[i] = level.Floor.BlockIndices[i];
-                }
 
-                if (bc.SelectedBlock != selection)
+                // Make a backup
+                var temp = new byte[level.Floor.BlockIndices.Length];
+                Array.Copy(level.Floor.BlockIndices, temp, level.Floor.BlockIndices.Length);
+
+                if (bc.SelectedBlock != selection && bc.SelectedBlock >= 0)
                 {
-                    for (int row = minY; row <= maxY; row++)
-                    for (int col = minX; col <= maxX; col++)
+                    for (var row = minY; row <= maxY; row++)
+                    for (var col = minX; col <= maxX; col++)
                     {
                         level.Floor.BlockIndices[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
                     }
 
-                    byte[] newData = level.Floor.CompressData();
+                    var newData = level.Floor.CompressData();
                     if (level.floorSize < newData.Length)
                     {
                         MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
@@ -368,7 +371,7 @@ namespace sth1edwv
                         return;
                     }
 
-                    for (int i = 0; i < level.floorSize; i++)
+                    for (var i = 0; i < level.floorSize; i++)
                     {
                         if (i < newData.Length)
                         {
