@@ -24,7 +24,7 @@ namespace sth1edwv
             var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
             for (int i = 0; i < decompressed.Length; i += 64)
             {
-                Tiles.Add(new Tile(decompressed, i, palette));
+                Tiles.Add(new Tile(decompressed, i, palette, i / 64));
             }
             LengthConsumed = lengthConsumed;
             _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;

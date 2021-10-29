@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -37,7 +37,7 @@
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listBoxLevels = new System.Windows.Forms.ListBox();
-            this.tabControl2 = new System.Windows.Forms.TabControl();
+            this.tabControlLevel = new System.Windows.Forms.TabControl();
             this.tabPage6 = new System.Windows.Forms.TabPage();
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
@@ -47,8 +47,12 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
+            this.Image = new System.Windows.Forms.DataGridViewImageColumn();
+            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Solidity = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.Foreground = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.pictureBoxBlockEditor = new System.Windows.Forms.PictureBox();
-            this.tabPage8 = new System.Windows.Forms.TabPage();
+            this.tabPageLayout = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBoxRenderedLevel = new System.Windows.Forms.PictureBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -71,17 +75,13 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
-            this.Image = new System.Windows.Forms.DataGridViewImageColumn();
-            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Solidity = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.Foreground = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
             this.splitContainer6.Panel1.SuspendLayout();
             this.splitContainer6.Panel2.SuspendLayout();
             this.splitContainer6.SuspendLayout();
-            this.tabControl2.SuspendLayout();
+            this.tabControlLevel.SuspendLayout();
             this.tabPage6.SuspendLayout();
             this.tabPage7.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
@@ -96,7 +96,7 @@
             this.splitContainer4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewBlocks)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBlockEditor)).BeginInit();
-            this.tabPage8.SuspendLayout();
+            this.tabPageLayout.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRenderedLevel)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -173,7 +173,7 @@
             // 
             // splitContainer6.Panel2
             // 
-            this.splitContainer6.Panel2.Controls.Add(this.tabControl2);
+            this.splitContainer6.Panel2.Controls.Add(this.tabControlLevel);
             this.splitContainer6.Size = new System.Drawing.Size(948, 553);
             this.splitContainer6.SplitterDistance = 218;
             this.splitContainer6.TabIndex = 0;
@@ -189,18 +189,19 @@
             this.listBoxLevels.TabIndex = 1;
             this.listBoxLevels.SelectedIndexChanged += new System.EventHandler(this.SelectedLevelChanged);
             // 
-            // tabControl2
+            // tabControlLevel
             // 
-            this.tabControl2.Controls.Add(this.tabPage6);
-            this.tabControl2.Controls.Add(this.tabPage7);
-            this.tabControl2.Controls.Add(this.tabPage3);
-            this.tabControl2.Controls.Add(this.tabPage8);
-            this.tabControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl2.Location = new System.Drawing.Point(0, 0);
-            this.tabControl2.Name = "tabControl2";
-            this.tabControl2.SelectedIndex = 0;
-            this.tabControl2.Size = new System.Drawing.Size(726, 553);
-            this.tabControl2.TabIndex = 1;
+            this.tabControlLevel.Controls.Add(this.tabPage6);
+            this.tabControlLevel.Controls.Add(this.tabPage7);
+            this.tabControlLevel.Controls.Add(this.tabPage3);
+            this.tabControlLevel.Controls.Add(this.tabPageLayout);
+            this.tabControlLevel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControlLevel.Location = new System.Drawing.Point(0, 0);
+            this.tabControlLevel.Name = "tabControlLevel";
+            this.tabControlLevel.SelectedIndex = 0;
+            this.tabControlLevel.Size = new System.Drawing.Size(726, 553);
+            this.tabControlLevel.TabIndex = 1;
+            this.tabControlLevel.SelectedIndexChanged += new System.EventHandler(this.tabControlLevel_SelectedIndexChanged);
             // 
             // tabPage6
             // 
@@ -329,6 +330,36 @@
             this.dataGridViewBlocks.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridViewBlocks_EditingControlShowing);
             this.dataGridViewBlocks.SelectionChanged += new System.EventHandler(this.SelectedBlockChanged);
             // 
+            // Image
+            // 
+            this.Image.DataPropertyName = "Image";
+            this.Image.HeaderText = "Image";
+            this.Image.Name = "Image";
+            this.Image.ReadOnly = true;
+            // 
+            // Index
+            // 
+            this.Index.DataPropertyName = "Index";
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            this.Index.HeaderText = "Index";
+            this.Index.Name = "Index";
+            this.Index.ReadOnly = true;
+            // 
+            // Solidity
+            // 
+            this.Solidity.DataPropertyName = "SolidityIndex";
+            this.Solidity.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.Solidity.HeaderText = "Solidity";
+            this.Solidity.Name = "Solidity";
+            this.Solidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // Foreground
+            // 
+            this.Foreground.DataPropertyName = "IsForeground";
+            this.Foreground.HeaderText = "Foreground";
+            this.Foreground.Name = "Foreground";
+            // 
             // pictureBoxBlockEditor
             // 
             this.pictureBoxBlockEditor.Location = new System.Drawing.Point(3, 3);
@@ -339,17 +370,17 @@
             this.pictureBoxBlockEditor.TabStop = false;
             this.pictureBoxBlockEditor.MouseClick += new System.Windows.Forms.MouseEventHandler(this.BlockEditorMouseClick);
             // 
-            // tabPage8
+            // tabPageLayout
             // 
-            this.tabPage8.Controls.Add(this.panel1);
-            this.tabPage8.Controls.Add(this.toolStrip1);
-            this.tabPage8.Location = new System.Drawing.Point(4, 22);
-            this.tabPage8.Name = "tabPage8";
-            this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage8.Size = new System.Drawing.Size(718, 527);
-            this.tabPage8.TabIndex = 2;
-            this.tabPage8.Text = "Layout";
-            this.tabPage8.UseVisualStyleBackColor = true;
+            this.tabPageLayout.Controls.Add(this.panel1);
+            this.tabPageLayout.Controls.Add(this.toolStrip1);
+            this.tabPageLayout.Location = new System.Drawing.Point(4, 22);
+            this.tabPageLayout.Name = "tabPageLayout";
+            this.tabPageLayout.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageLayout.Size = new System.Drawing.Size(718, 527);
+            this.tabPageLayout.TabIndex = 2;
+            this.tabPageLayout.Text = "Layout";
+            this.tabPageLayout.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
@@ -611,36 +642,6 @@
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
-            // Image
-            // 
-            this.Image.DataPropertyName = "Image";
-            this.Image.HeaderText = "Image";
-            this.Image.Name = "Image";
-            this.Image.ReadOnly = true;
-            // 
-            // Index
-            // 
-            this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
-            this.Index.HeaderText = "Index";
-            this.Index.Name = "Index";
-            this.Index.ReadOnly = true;
-            // 
-            // Solidity
-            // 
-            this.Solidity.DataPropertyName = "SolidityIndex";
-            this.Solidity.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            this.Solidity.HeaderText = "Solidity";
-            this.Solidity.Name = "Solidity";
-            this.Solidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // Foreground
-            // 
-            this.Foreground.DataPropertyName = "IsForeground";
-            this.Foreground.HeaderText = "Foreground";
-            this.Foreground.Name = "Foreground";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -659,7 +660,7 @@
             this.splitContainer6.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
-            this.tabControl2.ResumeLayout(false);
+            this.tabControlLevel.ResumeLayout(false);
             this.tabPage6.ResumeLayout(false);
             this.tabPage7.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
@@ -675,8 +676,8 @@
             this.splitContainer4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewBlocks)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBlockEditor)).EndInit();
-            this.tabPage8.ResumeLayout(false);
-            this.tabPage8.PerformLayout();
+            this.tabPageLayout.ResumeLayout(false);
+            this.tabPageLayout.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRenderedLevel)).EndInit();
@@ -709,13 +710,13 @@
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.SplitContainer splitContainer6;
         private System.Windows.Forms.ListBox listBoxLevels;
-        private System.Windows.Forms.TabControl tabControl2;
+        private System.Windows.Forms.TabControl tabControlLevel;
         private System.Windows.Forms.TabPage tabPage6;
         private System.Windows.Forms.TreeView treeViewLevelData;
         private System.Windows.Forms.TabPage tabPage7;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.PictureBox pictureBoxTilePreview;
-        private System.Windows.Forms.TabPage tabPage8;
+        private System.Windows.Forms.TabPage tabPageLayout;
         private System.Windows.Forms.PictureBox pictureBoxRenderedLevel;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.SplitContainer splitContainer3;

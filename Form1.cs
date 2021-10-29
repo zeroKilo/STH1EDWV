@@ -17,7 +17,7 @@ namespace sth1edwv
             InitializeComponent();
             _solidityImages = new ImageList
             {
-                ColorDepth = ColorDepth.Depth4Bit,
+                ColorDepth = ColorDepth.Depth16Bit,
                 ImageSize = new Size(32, 32),
             };
             _solidityImages.Images.AddStrip(Properties.Resources.SolidityImages);
@@ -103,9 +103,15 @@ namespace sth1edwv
 
         private void RenderLevel()
         {
-            if (listBoxLevels.SelectedItem is Level level)
+            if (tabControlLevel.SelectedTab == tabPageLayout && listBoxLevels.SelectedItem is Level level)
             {
-                pictureBoxRenderedLevel.Image = level.Render(buttonShowObjects.Checked, buttonBlockGaps.Checked, buttonTileGaps.Checked, buttonBlockNumbers.Checked);
+                pictureBoxRenderedLevel.Image?.Dispose();
+                pictureBoxRenderedLevel.Image = level.Render(buttonShowObjects.Checked, buttonBlockGaps.Checked,
+                    buttonTileGaps.Checked, buttonBlockNumbers.Checked);
+            }
+            else
+            {
+                pictureBoxRenderedLevel.Image = null;
             }
         }
 
@@ -157,6 +163,11 @@ namespace sth1edwv
 
         private void SelectedBlockChanged(object sender, EventArgs e)
         {
+            DrawBlockEditor();
+        }
+
+        private void DrawBlockEditor()
+        {
             pictureBoxBlockEditor.Image?.Dispose();
             pictureBoxBlockEditor.Image = null;
             var block = GetSelectedBlock();
@@ -164,8 +175,9 @@ namespace sth1edwv
             {
                 return;
             }
+
             const int scale = 4;
-            var bmp = new Bitmap(36*scale, 36*scale);
+            var bmp = new Bitmap(36 * scale, 36 * scale);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -179,10 +191,6 @@ namespace sth1edwv
 
         private void BlockEditorMouseClick(object sender, MouseEventArgs e)
         {
-            if (!(listBoxLevels.SelectedItem is Level level))
-            {
-                return;
-            }
             var block = GetSelectedBlock();
             if (block == null)
             {
@@ -192,16 +200,22 @@ namespace sth1edwv
             var y = e.Y / 4 / 9;
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
-            using (var tc = new TileChooser(level.TileSet, tileIndex))
+            using (var tc = new TileChooser(block.TileSet, tileIndex))
             {
                 tc.ShowDialog(this);
-                _cartridge.Memory[level.blockMappingAddress + level.BlockMapping.Blocks.IndexOf(block) * 16 + subBlockIndex] = (byte)(level.TileSet.Tiles.IndexOf(tc.SelectedTile));
+                // Apply to the block object
+                block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
+                // Invalidate its cached image
+                block.ResetImage();
+                // Trigger a redraw of the editor
+                DrawBlockEditor();
+                // And the grid
+                dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
+                // And the rendered level
+                RenderLevel();
+                // Finally apply the data to the cartridge
+                Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
             }
-
-            _cartridge.ReadLevels();
-            var n = listBoxLevels.SelectedIndex;
-            RefreshAll();
-            listBoxLevels.SelectedIndex = n;
         }
 
         private void saveROMToolStripMenuItem_Click(object sender, EventArgs e)
@@ -400,6 +414,15 @@ namespace sth1edwv
         private void dataGridViewBlocks_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             e.ThrowException = false;
+        }
+
+        private void tabControlLevel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tabControlLevel.SelectedTab == tabPageLayout &&
+                pictureBoxRenderedLevel.Image == null)
+            {
+                RenderLevel();
+            }
         }
 
         private void pb3_MouseUp(object sender, MouseEventArgs e)

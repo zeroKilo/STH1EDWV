@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
 namespace sth1edwv
 {
-    public class Block: IDisposable
-    {   
-        private readonly TileSet _tileSet;
+    public class Block: IDisposable, IDataItem
+    {
+        public TileSet TileSet { get; }
         private Bitmap _image;
 
         public byte[] TileIndices { get; } = new byte[16];
@@ -26,7 +27,7 @@ namespace sth1edwv
                         var x = i % 4 * 8;
                         var y = i / 4 * 8;
                         var tileIndex = TileIndices[i];
-                        var tile = _tileSet.Tiles[tileIndex];
+                        var tile = TileSet.Tiles[tileIndex];
                         g.DrawImageUnscaled(tile.Image, x, y);
                     }
                 }
@@ -46,7 +47,9 @@ namespace sth1edwv
 
         public Block(byte[] cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index)
         {
-            _tileSet = tileSet;
+            TileSet = tileSet;
+            Offset = tilesOffset;
+            LengthConsumed = 16;
             SolidityOffset = solidityOffset;
             Index = index;
             Array.Copy(cartridgeMemory, tilesOffset, TileIndices, 0, 16);
@@ -59,6 +62,19 @@ namespace sth1edwv
         public void Dispose()
         {
             _image?.Dispose();
+        }
+
+        public int Offset { get; }
+        public int LengthConsumed { get; }
+        public IList<byte> GetData()
+        {
+            return TileIndices;
+        }
+
+        public void ResetImage()
+        {
+            _image?.Dispose();
+            _image = null;
         }
     }
 }

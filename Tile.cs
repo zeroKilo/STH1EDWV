@@ -10,6 +10,7 @@ namespace sth1edwv
         private readonly Palette _palette;
         private Bitmap _image;
 
+        public int Index { get; }
         public Bitmap Image
         {
             get
@@ -30,9 +31,10 @@ namespace sth1edwv
             }
         }
 
-        public Tile(byte[] data, int offset, Palette palette)
+        public Tile(byte[] data, int offset, Palette palette, int index)
         {
             _palette = palette;
+            Index = index;
             Array.Copy(data, offset, _data, 0, 64);
         }
 
