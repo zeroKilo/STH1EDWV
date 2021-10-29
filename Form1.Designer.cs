@@ -401,7 +401,7 @@
             this.pictureBoxRenderedLevel.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxRenderedLevel.TabIndex = 2;
             this.pictureBoxRenderedLevel.TabStop = false;
-            this.pictureBoxRenderedLevel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseDown);
+            this.pictureBoxRenderedLevel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LevelMapMouseDown);
             this.pictureBoxRenderedLevel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pb3_MouseUp);
             // 
             // toolStrip1

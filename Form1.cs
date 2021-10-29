@@ -33,10 +33,15 @@ namespace sth1edwv
             if (d.ShowDialog(this) == DialogResult.OK)
             {
                 _cartridge?.Dispose();
-                _cartridge = new Cartridge(d.FileName);
-                _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
-                RefreshAll();
+                LoadFile(d.FileName);
             }
+        }
+
+        private void LoadFile(string filename)
+        {
+            _cartridge = new Cartridge(filename);
+            _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
+            RefreshAll();
         }
 
         private void RefreshAll()
@@ -301,7 +306,7 @@ namespace sth1edwv
             }
         }
 
-        private void pb3_MouseDown(object sender, MouseEventArgs e)
+        private void LevelMapMouseDown(object sender, MouseEventArgs e)
         {
             _lastX = e.X;
             _lastY = e.Y;
@@ -309,12 +314,10 @@ namespace sth1edwv
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (File.Exists("C:\\Users\\maxim\\Documents\\code\\SMS\\sonic-genesis\\source\\sonic.sms"))
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length == 2 && File.Exists(args[1]))
             {
-                _cartridge = new Cartridge("C:\\Users\\maxim\\Documents\\code\\SMS\\sonic-genesis\\source\\sonic.sms");
-                _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
-                RefreshAll();
-                tabControl1.SelectedTab = tabPage5;
+                LoadFile(args[1]);
             }
 
             // We do some grid setup here...
