@@ -82,13 +82,23 @@ namespace sth1edwv
 
             tilePicker1.TileSet = level.TileSet;
 
+            LoadLevelData();
+
+            dataGridViewBlocks.DataSource = new BindingListView<Block>(level.BlockMapping.Blocks);
+        }
+
+        private void LoadLevelData()
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
             treeViewLevelData.Nodes.Clear();
             var t = new TreeNode($"{level}");
             t.Nodes.Add(level.ToNode());
             t.Nodes.Add(level.TileSet.ToNode());
             t.Expand();
             treeViewLevelData.Nodes.Add(t);
-            dataGridViewBlocks.DataSource = new BindingListView<Block>(level.BlockMapping.Blocks);
         }
 
         private void LevelRenderModeChanged(object sender, EventArgs e)
@@ -225,56 +235,26 @@ namespace sth1edwv
         private void TreeViewLevelDataItemSelected(object sender, TreeViewEventArgs e)
         {
             var node = treeViewLevelData.SelectedNode;
-            if (node?.Parent == null || node.Parent.Text != "Objects")
-            {
-                return;
-            }
-            if (listBoxLevels.SelectedItem is not Level level)
+            if (node.Tag is not LevelObject levelObject)
             {
                 return;
             }
 
-            using var objc = new ObjectChooser();
-            objc.comboBox1.Items.Clear();
-            objc.comboBox1.Items.AddRange(LevelObjectSet.LevelObject.objNames.Values.ToArray<object>());
-            var obj = level.Objects[node.Index];
-            if (LevelObjectSet.LevelObject.objNames.Keys.Contains(obj.type))
+            using var chooser = new ObjectChooser(levelObject);
+            if (chooser.ShowDialog(this) == DialogResult.OK)
             {
-                string s = LevelObjectSet.LevelObject.objNames[obj.type];
-                for (int i = 0; i < objc.comboBox1.Items.Count; i++)
-                {
-                    if (objc.comboBox1.Items[i].ToString() == s)
-                    {
-                        objc.comboBox1.SelectedIndex = i;
-                        break;
-                    }
-                }
-            }
+                levelObject.X = Convert.ToByte(chooser.textBoxX.Text);
+                levelObject.Y = Convert.ToByte(chooser.textBoxY.Text);
+                levelObject.Type = Convert.ToByte(chooser.textBoxType.Text);
 
-            objc.textBox1.Text = obj.x.ToString();
-            objc.textBox2.Text = obj.y.ToString();
-            objc.textBox3.Text = obj.type.ToString();
-            objc.ShowDialog(this);
-            if (objc.exitOk)
-            {
-                int offset = level.offsetObjectLayout + 0x15581;
-                offset += node.Index * 3;
-                try
-                {
-                    var x = Convert.ToByte(objc.textBox1.Text);
-                    var y = Convert.ToByte(objc.textBox2.Text);
-                    var tp = Convert.ToByte(objc.textBox3.Text);
-                    _cartridge.Memory[offset] = tp;
-                    _cartridge.Memory[offset + 1] = x;
-                    _cartridge.Memory[offset + 2] = y;
-                    _cartridge.ReadLevels();
-                    var n = listBoxLevels.SelectedIndex ;
-                    RefreshAll();
-                    listBoxLevels.SelectedIndex = n;
-                }
-                catch
-                {
-                }
+                // Apply to the cartridge
+                levelObject.GetData().CopyTo(_cartridge.Memory, levelObject.Offset);
+
+                // Refresh the level data
+                LoadLevelData();
+
+                // And the level map may be different
+                RenderLevel();
             }
         }
 

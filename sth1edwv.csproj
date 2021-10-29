@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="GameText.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="LevelObject.cs" />
     <Compile Include="LevelObjectSet.cs" />
     <Compile Include="ObjectChooser.cs">
       <SubType>Form</SubType>

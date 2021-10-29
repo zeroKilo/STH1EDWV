@@ -8,23 +8,27 @@ namespace sth1edwv
     {
         public bool exitOk = false;
 
-        public ObjectChooser()
+        public ObjectChooser(LevelObject levelObject)
         {
             InitializeComponent();
+
+            comboBoxNames.Items.AddRange(LevelObject.Names.Values.ToArray<object>());
+            if (LevelObject.Names.TryGetValue(levelObject.Type, out var name))
+            {
+                comboBoxNames.SelectedItem = name;
+            }
+
+            textBoxX.Text = levelObject.X.ToString();
+            textBoxY.Text = levelObject.Y.ToString();
+            textBoxType.Text = levelObject.Type.ToString();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = comboBox1.SelectedIndex;
+            int n = comboBoxNames.SelectedIndex;
             if (n == -1)
                 return;
-            textBox3.Text = LevelObjectSet.LevelObject.objNames.Keys.ToArray()[n].ToString();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            exitOk = true;
-            this.Close();
+            textBoxType.Text = LevelObject.Names.Keys.ToArray()[n].ToString();
         }
     }
 }

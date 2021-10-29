@@ -151,15 +151,15 @@ namespace sth1edwv
                 // Draw objects
                 foreach (var levelObject in Objects)
                 {
-                    var x = levelObject.x * _blockSize;
-                    var y = levelObject.y * _blockSize;
+                    var x = levelObject.X * _blockSize;
+                    var y = levelObject.Y * _blockSize;
                     g.DrawRectangle(Pens.Blue, x, y, _blockSize, _blockSize);
                     g.DrawImageUnscaled(image, x + _blockSize / 2 - image.Width / 2, y + _blockSize / 2 - image.Height / 2);
 
                     x += _blockSize - labelWidth;
                     y += _blockSize - labelHeight;
                     g.FillRectangle(Brushes.Blue, x, y, labelWidth, labelHeight);
-                    g.DrawString(levelObject.type.ToString("X2"), f, Brushes.White, x - 1, y - 2);
+                    g.DrawString(levelObject.Type.ToString("X2"), f, Brushes.White, x - 1, y - 2);
                 }
             }
 
