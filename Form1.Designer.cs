@@ -362,9 +362,10 @@
             // 
             // pictureBoxBlockEditor
             // 
-            this.pictureBoxBlockEditor.Location = new System.Drawing.Point(3, 3);
+            this.pictureBoxBlockEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxBlockEditor.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxBlockEditor.Name = "pictureBoxBlockEditor";
-            this.pictureBoxBlockEditor.Size = new System.Drawing.Size(128, 128);
+            this.pictureBoxBlockEditor.Size = new System.Drawing.Size(269, 521);
             this.pictureBoxBlockEditor.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxBlockEditor.TabIndex = 3;
             this.pictureBoxBlockEditor.TabStop = false;

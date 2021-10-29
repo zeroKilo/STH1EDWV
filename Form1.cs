@@ -176,8 +176,8 @@ namespace sth1edwv
                 return;
             }
 
-            const int scale = 4;
-            var bmp = new Bitmap(36 * scale, 36 * scale);
+            var scale = pictureBoxBlockEditor.Width / 32;
+            var bmp = new Bitmap(32 * scale, 32 * scale);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -196,9 +196,14 @@ namespace sth1edwv
             {
                 return;
             }
-            var x = e.X / 4 / 9;
-            var y = e.Y / 4 / 9;
+            var scale = pictureBoxBlockEditor.Image.Width / 4;
+            var x = e.X / scale;
+            var y = e.Y / scale;
             var subBlockIndex = x + y * 4;
+            if (subBlockIndex > 15)
+            {
+                return;
+            }
             var tileIndex = block.TileIndices[subBlockIndex];
             using (var tc = new TileChooser(block.TileSet, tileIndex))
             {
