@@ -33,7 +33,10 @@ namespace sth1edwv
                 return _image;
             }
         }
+
         public int Index { get; set; }
+        public int SolidityOffset { get; }
+
         public int SolidityIndex { get; set; }
         // ReSharper disable once MemberCanBePrivate.Global
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
@@ -44,6 +47,7 @@ namespace sth1edwv
         public Block(byte[] cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index)
         {
             _tileSet = tileSet;
+            SolidityOffset = solidityOffset;
             Index = index;
             Array.Copy(cartridgeMemory, tilesOffset, TileIndices, 0, 16);
             var solidityData = cartridgeMemory[solidityOffset];

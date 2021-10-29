@@ -151,14 +151,8 @@ namespace sth1edwv
             {
                 return;
             }
-            // Solidity
-            ushort offset = (ushort)(BitConverter.ToUInt16(_cartridge.Memory, 0x3A65 + level.solidityIndex * 2) + block.Index);
-            byte data = block.Data;
-            _cartridge.Memory[offset] = data;
-            _cartridge.ReadLevels();
-            var n = listBoxLevels.SelectedIndex;
-            RefreshAll();
-            listBoxLevels.SelectedIndex = n;
+
+            _cartridge.Memory[block.SolidityOffset] = block.Data;
         }
 
         private void SelectedBlockChanged(object sender, EventArgs e)
