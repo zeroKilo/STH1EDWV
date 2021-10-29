@@ -79,16 +79,21 @@ namespace sth1edwv
 
         public TreeNode ToNode()
         {
-            TreeNode result = new TreeNode("Header");
-            result.Nodes.Add($"Floor Size           = ({floorWidth} x {floorHeight})");
-            result.Nodes.Add($"Floor Data           = (@0x{floorAddress:X} Size: 0x{floorSize:X})");
-            result.Nodes.Add($"Level Size           = ({levelWidth} x {levelHeight})");
-            result.Nodes.Add($"Level Offset         = (dx:{levelXOffset} dy:{levelYOffset})");
-            result.Nodes.Add($"Extended Height      = {levelExtHeight}");
-            result.Nodes.Add($"Offset Art           = 0x{offsetArt:X8}");
-            result.Nodes.Add($"Offset Object Layout = 0x{offsetObjectLayout:X8}");
-            result.Nodes.Add($"Initial Palette      = {initPalette}");
-            result.Nodes.Add(ObjSet.ToNode());
+            var result = new TreeNode("Header")
+            {
+                Nodes =
+                {
+                    new TreeNode($"Floor Size           = ({floorWidth} x {floorHeight})"),
+                    new TreeNode($"Floor Data           = (@0x{floorAddress:X} Size: 0x{floorSize:X})"),
+                    new TreeNode($"Level Size           = ({levelWidth} x {levelHeight})"),
+                    new TreeNode($"Level Offset         = (dx:{levelXOffset} dy:{levelYOffset})"),
+                    new TreeNode($"Extended Height      = {levelExtHeight}"),
+                    new TreeNode($"Offset Art           = 0x{offsetArt:X8}"),
+                    new TreeNode($"Offset Object Layout = 0x{offsetObjectLayout:X8}"),
+                    new TreeNode($"Initial Palette      = {initPalette}"),
+                    ObjSet.ToNode()
+                }
+            };
             result.Expand();
             return result;
         }

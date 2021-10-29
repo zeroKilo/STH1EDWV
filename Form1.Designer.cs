@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,20 +42,20 @@
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.tilePicker1 = new sth1edwv.TilePicker();
             this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
-            this.listBox5 = new System.Windows.Forms.ListBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBoxTileSolidity = new System.Windows.Forms.TextBox();
+            this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
             this.pictureBoxBlockEditor = new System.Windows.Forms.PictureBox();
             this.tabPage8 = new System.Windows.Forms.TabPage();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.pictureBoxRenderedLevel = new System.Windows.Forms.PictureBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.buttonShowObjects = new System.Windows.Forms.ToolStripButton();
             this.buttonBlockNumbers = new System.Windows.Forms.ToolStripButton();
-            this.buttonTileGaps = new System.Windows.Forms.ToolStripButton();
             this.buttonBlockGaps = new System.Windows.Forms.ToolStripButton();
+            this.buttonTileGaps = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonSaveRenderedLevel = new System.Windows.Forms.ToolStripButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -70,8 +71,10 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.tilePicker1 = new sth1edwv.TilePicker();
+            this.Image = new System.Windows.Forms.DataGridViewImageColumn();
+            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Solidity = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.Foreground = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -91,8 +94,10 @@
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
             this.splitContainer4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewBlocks)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBlockEditor)).BeginInit();
             this.tabPage8.SuspendLayout();
+            this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRenderedLevel)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -109,7 +114,6 @@
             this.tabControl1.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.tabPage9.SuspendLayout();
-            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -183,7 +187,7 @@
             this.listBoxLevels.Name = "listBoxLevels";
             this.listBoxLevels.Size = new System.Drawing.Size(218, 553);
             this.listBoxLevels.TabIndex = 1;
-            this.listBoxLevels.SelectedIndexChanged += new System.EventHandler(this.listBox4_SelectedIndexChanged);
+            this.listBoxLevels.SelectedIndexChanged += new System.EventHandler(this.SelectedLevelChanged);
             // 
             // tabControl2
             // 
@@ -248,6 +252,17 @@
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
             // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 519);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
+            // 
             // pictureBoxTilePreview
             // 
             this.pictureBoxTilePreview.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -277,58 +292,52 @@
             // 
             // splitContainer4.Panel1
             // 
-            this.splitContainer4.Panel1.Controls.Add(this.listBox5);
+            this.splitContainer4.Panel1.Controls.Add(this.dataGridViewBlocks);
             // 
             // splitContainer4.Panel2
             // 
             this.splitContainer4.Panel2.AutoScroll = true;
-            this.splitContainer4.Panel2.Controls.Add(this.button1);
-            this.splitContainer4.Panel2.Controls.Add(this.textBoxTileSolidity);
             this.splitContainer4.Panel2.Controls.Add(this.pictureBoxBlockEditor);
             this.splitContainer4.Size = new System.Drawing.Size(712, 521);
             this.splitContainer4.SplitterDistance = 439;
             this.splitContainer4.TabIndex = 2;
             // 
-            // listBox5
+            // dataGridViewBlocks
             // 
-            this.listBox5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBox5.Font = new System.Drawing.Font("Courier New", 8.25F);
-            this.listBox5.FormattingEnabled = true;
-            this.listBox5.IntegralHeight = false;
-            this.listBox5.ItemHeight = 14;
-            this.listBox5.Location = new System.Drawing.Point(0, 0);
-            this.listBox5.Name = "listBox5";
-            this.listBox5.Size = new System.Drawing.Size(439, 521);
-            this.listBox5.TabIndex = 1;
-            this.listBox5.SelectedIndexChanged += new System.EventHandler(this.ListBoxTilesSelectedIndexChanged);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(44, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(37, 20);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "Set";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // textBoxTileSolidity
-            // 
-            this.textBoxTileSolidity.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBoxTileSolidity.Location = new System.Drawing.Point(2, 3);
-            this.textBoxTileSolidity.Name = "textBoxTileSolidity";
-            this.textBoxTileSolidity.Size = new System.Drawing.Size(36, 20);
-            this.textBoxTileSolidity.TabIndex = 4;
+            this.dataGridViewBlocks.AllowUserToAddRows = false;
+            this.dataGridViewBlocks.AllowUserToDeleteRows = false;
+            this.dataGridViewBlocks.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
+            this.dataGridViewBlocks.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridViewBlocks.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewBlocks.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Image,
+            this.Index,
+            this.Solidity,
+            this.Foreground});
+            this.dataGridViewBlocks.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridViewBlocks.Location = new System.Drawing.Point(0, 0);
+            this.dataGridViewBlocks.MultiSelect = false;
+            this.dataGridViewBlocks.Name = "dataGridViewBlocks";
+            this.dataGridViewBlocks.RowHeadersVisible = false;
+            this.dataGridViewBlocks.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            this.dataGridViewBlocks.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewBlocks.Size = new System.Drawing.Size(439, 521);
+            this.dataGridViewBlocks.TabIndex = 2;
+            this.dataGridViewBlocks.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridViewBlocks_CellPainting);
+            this.dataGridViewBlocks.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.BlockGridCellEdited);
+            this.dataGridViewBlocks.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridViewBlocks_DataError);
+            this.dataGridViewBlocks.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridViewBlocks_EditingControlShowing);
+            this.dataGridViewBlocks.SelectionChanged += new System.EventHandler(this.SelectedBlockChanged);
             // 
             // pictureBoxBlockEditor
             // 
-            this.pictureBoxBlockEditor.Location = new System.Drawing.Point(2, 29);
+            this.pictureBoxBlockEditor.Location = new System.Drawing.Point(3, 3);
             this.pictureBoxBlockEditor.Name = "pictureBoxBlockEditor";
             this.pictureBoxBlockEditor.Size = new System.Drawing.Size(128, 128);
             this.pictureBoxBlockEditor.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxBlockEditor.TabIndex = 3;
             this.pictureBoxBlockEditor.TabStop = false;
-            this.pictureBoxBlockEditor.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pb4_MouseClick);
+            this.pictureBoxBlockEditor.MouseClick += new System.Windows.Forms.MouseEventHandler(this.BlockEditorMouseClick);
             // 
             // tabPage8
             // 
@@ -341,6 +350,16 @@
             this.tabPage8.TabIndex = 2;
             this.tabPage8.Text = "Layout";
             this.tabPage8.UseVisualStyleBackColor = true;
+            // 
+            // panel1
+            // 
+            this.panel1.AutoScroll = true;
+            this.panel1.Controls.Add(this.pictureBoxRenderedLevel);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 28);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(712, 496);
+            this.panel1.TabIndex = 4;
             // 
             // pictureBoxRenderedLevel
             // 
@@ -392,16 +411,6 @@
             this.buttonBlockNumbers.Text = "Block numbers";
             this.buttonBlockNumbers.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
-            // buttonTileGaps
-            // 
-            this.buttonTileGaps.CheckOnClick = true;
-            this.buttonTileGaps.Image = ((System.Drawing.Image)(resources.GetObject("buttonTileGaps.Image")));
-            this.buttonTileGaps.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonTileGaps.Name = "buttonTileGaps";
-            this.buttonTileGaps.Size = new System.Drawing.Size(73, 22);
-            this.buttonTileGaps.Text = "Tile gaps";
-            this.buttonTileGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
-            // 
             // buttonBlockGaps
             // 
             this.buttonBlockGaps.CheckOnClick = true;
@@ -411,6 +420,16 @@
             this.buttonBlockGaps.Size = new System.Drawing.Size(84, 22);
             this.buttonBlockGaps.Text = "Block gaps";
             this.buttonBlockGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
+            // 
+            // buttonTileGaps
+            // 
+            this.buttonTileGaps.CheckOnClick = true;
+            this.buttonTileGaps.Image = ((System.Drawing.Image)(resources.GetObject("buttonTileGaps.Image")));
+            this.buttonTileGaps.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonTileGaps.Name = "buttonTileGaps";
+            this.buttonTileGaps.Size = new System.Drawing.Size(73, 22);
+            this.buttonTileGaps.Text = "Tile gaps";
+            this.buttonTileGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
             // toolStripSeparator1
             // 
@@ -590,28 +609,37 @@
             this.listBoxGameText.Name = "listBoxGameText";
             this.listBoxGameText.Size = new System.Drawing.Size(948, 553);
             this.listBoxGameText.TabIndex = 1;
-            this.listBoxGameText.DoubleClick += new System.EventHandler(this.listBox6_DoubleClick);
+            this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
-            // panel1
+            // Image
             // 
-            this.panel1.AutoScroll = true;
-            this.panel1.Controls.Add(this.pictureBoxRenderedLevel);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 28);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(712, 496);
-            this.panel1.TabIndex = 4;
+            this.Image.DataPropertyName = "Image";
+            this.Image.HeaderText = "Image";
+            this.Image.Name = "Image";
+            this.Image.ReadOnly = true;
             // 
-            // tilePicker1
+            // Index
             // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 519);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
+            this.Index.DataPropertyName = "Index";
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            this.Index.HeaderText = "Index";
+            this.Index.Name = "Index";
+            this.Index.ReadOnly = true;
+            // 
+            // Solidity
+            // 
+            this.Solidity.DataPropertyName = "SolidityIndex";
+            this.Solidity.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.Solidity.HeaderText = "Solidity";
+            this.Solidity.Name = "Solidity";
+            this.Solidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // Foreground
+            // 
+            this.Foreground.DataPropertyName = "IsForeground";
+            this.Foreground.HeaderText = "Foreground";
+            this.Foreground.Name = "Foreground";
             // 
             // Form1
             // 
@@ -623,6 +651,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "STH1 Editor by WV";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabPage5.ResumeLayout(false);
@@ -644,9 +673,12 @@
             this.splitContainer4.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewBlocks)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxBlockEditor)).EndInit();
             this.tabPage8.ResumeLayout(false);
             this.tabPage8.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxRenderedLevel)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
@@ -664,8 +696,6 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage4.ResumeLayout(false);
             this.tabPage9.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -698,11 +728,8 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.SplitContainer splitContainer4;
-        private System.Windows.Forms.ListBox listBox5;
         private System.Windows.Forms.PictureBox pictureBoxBlockEditor;
         private System.Windows.Forms.ToolStripMenuItem saveROMToolStripMenuItem;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBoxTileSolidity;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.RichTextBox _richTextBoxGeneralSummary;
         private System.Windows.Forms.TabPage tabPage9;
@@ -716,6 +743,11 @@
         private System.Windows.Forms.ToolStripButton buttonTileGaps;
         private System.Windows.Forms.ToolStripButton buttonBlockGaps;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.DataGridView dataGridViewBlocks;
+        private System.Windows.Forms.DataGridViewImageColumn Image;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Index;
+        private System.Windows.Forms.DataGridViewComboBoxColumn Solidity;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
     }
 }
 

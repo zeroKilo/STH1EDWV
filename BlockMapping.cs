@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace sth1edwv
 {
-    public class BlockMapping: IDisposable
+    public class BlockMapping: IDisposable, IDataItem
     {
         public List<Block> Blocks { get; } = new List<Block>();
     
         public BlockMapping(Cartridge cartridge, int address, byte solidityIndex, TileSet tileSet)
         {
             // Hard-coded block counts...
-            uint blockCount = 0;
+            int blockCount = 0;
             switch (address)
             {
                 case 0x10000:
@@ -41,8 +41,11 @@ namespace sth1edwv
             var solidityOffset = BitConverter.ToUInt16(cartridge.Memory, 0x3A65 + solidityIndex * 2);
             for (var i = 0; i < blockCount; ++i)
             {
-                Blocks.Add(new Block(cartridge.Memory, address + i * 16, solidityOffset + i, tileSet));
+                Blocks.Add(new Block(cartridge.Memory, address + i * 16, solidityOffset + i, tileSet, i));
             }
+
+            Offset = address;
+            LengthConsumed = blockCount * 16;
         }
 
         public void Dispose()
@@ -52,6 +55,14 @@ namespace sth1edwv
                 block.Dispose();
             }
             Blocks.Clear();
+        }
+
+        public int Offset { get; }
+        public int LengthConsumed { get; }
+
+        public IList<byte> GetData()
+        {
+            throw new NotImplementedException();
         }
     }
 }

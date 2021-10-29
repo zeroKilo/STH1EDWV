@@ -3,9 +3,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Be.Windows.Forms;
+using Equin.ApplicationFramework;
 using Microsoft.VisualBasic;
 
 namespace sth1edwv
@@ -15,6 +15,12 @@ namespace sth1edwv
         public Form1()
         {
             InitializeComponent();
+            _solidityImages = new ImageList
+            {
+                ColorDepth = ColorDepth.Depth4Bit,
+                ImageSize = new Size(32, 32),
+            };
+            _solidityImages.Images.AddStrip(Properties.Resources.SolidityImages);
         }
 
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)
@@ -70,7 +76,7 @@ namespace sth1edwv
             pictureBoxPalette.Image = palette.ToImage(256, 128);
         }
 
-        private void listBox4_SelectedIndexChanged(object sender, EventArgs e)
+        private void SelectedLevelChanged(object sender, EventArgs e)
         {
             if (!(listBoxLevels.SelectedItem is Level level))
             {
@@ -87,15 +93,7 @@ namespace sth1edwv
             t.Nodes.Add(level.TileSet.ToNode());
             t.Expand();
             treeViewLevelData.Nodes.Add(t);
-            listBox5.Items.Clear();
-            for (int i = 0; i < level.BlockMapping.Blocks.Count; i++)
-            {
-                var sb = new StringBuilder();
-                sb.Append($"{i:X2} : ");
-                var block = level.BlockMapping.Blocks[i];
-                sb.Append(block);
-                listBox5.Items.Add(sb.ToString());
-            }
+            dataGridViewBlocks.DataSource = new BindingListView<Block>(level.BlockMapping.Blocks);
         }
 
         private void LevelRenderModeChanged(object sender, EventArgs e)
@@ -132,47 +130,70 @@ namespace sth1edwv
             pictureBoxTilePreview.Image = bmp;
         }
 
-        private void ListBoxTilesSelectedIndexChanged(object sender, EventArgs e)
+        private Block GetSelectedBlock()
+        {
+            if (listBoxLevels.SelectedItem is Level level && 
+                dataGridViewBlocks.SelectedRows.Count != 0)
+            {
+                return level.BlockMapping.Blocks[dataGridViewBlocks.SelectedRows[0].Index];
+            }
+            return null;
+        }
+
+        private void BlockGridCellEdited(object sender, DataGridViewCellEventArgs e)
         {
             if (!(listBoxLevels.SelectedItem is Level level))
             {
                 return;
             }
-            int m = listBox5.SelectedIndex;
-            if (m == -1)
+            var block = GetSelectedBlock();
+            if (block == null)
             {
                 return;
             }
-            var block = level.BlockMapping.Blocks[m];
-            var scale = 4;
+            // Solidity
+            ushort offset = (ushort)(BitConverter.ToUInt16(_cartridge.Memory, 0x3A65 + level.solidityIndex * 2) + block.Index);
+            byte data = block.Data;
+            _cartridge.Memory[offset] = data;
+            _cartridge.ReadLevels();
+            var n = listBoxLevels.SelectedIndex;
+            RefreshAll();
+            listBoxLevels.SelectedIndex = n;
+        }
+
+        private void SelectedBlockChanged(object sender, EventArgs e)
+        {
+            pictureBoxBlockEditor.Image?.Dispose();
+            pictureBoxBlockEditor.Image = null;
+            var block = GetSelectedBlock();
+            if (block == null)
+            {
+                return;
+            }
+            const int scale = 4;
             var bmp = new Bitmap(36*scale, 36*scale);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.ScaleTransform(scale, scale);
-                for (int bx = 0; bx < 4; bx++)
-                for (int by = 0; by < 4; by++)
-                {
-                    var tile = level.GetTile(block.TileIndices[bx + by * 4]);
-                    g.DrawImageUnscaled(tile.Image, bx * 9, by * 9);
-                }
+                g.DrawImageUnscaled(block.Image, 0, 0);
             }
 
             pictureBoxBlockEditor.Image = bmp;
-            textBoxTileSolidity.Text = block.SolidityIndex.ToString("X2");
         }
 
-        private void pb4_MouseClick(object sender, MouseEventArgs e)
+        private void BlockEditorMouseClick(object sender, MouseEventArgs e)
         {
             if (!(listBoxLevels.SelectedItem is Level level))
             {
                 return;
             }
-            int m = listBox5.SelectedIndex;
-            if (m == -1)
+            var block = GetSelectedBlock();
+            if (block == null)
+            {
                 return;
-            var block = level.BlockMapping.Blocks[m];
+            }
             var x = e.X / 4 / 9;
             var y = e.Y / 4 / 9;
             var subBlockIndex = x + y * 4;
@@ -180,14 +201,13 @@ namespace sth1edwv
             using (var tc = new TileChooser(level.TileSet, tileIndex))
             {
                 tc.ShowDialog(this);
-                _cartridge.Memory[level.blockMappingAddress + m * 16 + subBlockIndex] = (byte)(level.TileSet.Tiles.IndexOf(tc.SelectedTile));
+                _cartridge.Memory[level.blockMappingAddress + level.BlockMapping.Blocks.IndexOf(block) * 16 + subBlockIndex] = (byte)(level.TileSet.Tiles.IndexOf(tc.SelectedTile));
             }
 
             _cartridge.ReadLevels();
             var n = listBoxLevels.SelectedIndex;
             RefreshAll();
             listBoxLevels.SelectedIndex = n;
-            listBox5.SelectedIndex = m;
         }
 
         private void saveROMToolStripMenuItem_Click(object sender, EventArgs e)
@@ -200,25 +220,6 @@ namespace sth1edwv
                     MessageBox.Show(this, "Done");
                 }
             }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            if (!(listBoxLevels.SelectedItem is Level level))
-            {
-                return;
-            }
-            int m = listBox5.SelectedIndex;
-            if (m == -1)
-                return;
-            ushort offset = (ushort)(BitConverter.ToUInt16(_cartridge.Memory, 0x3A65 + level.solidityIndex * 2) + m);
-            byte data = Convert.ToByte(textBoxTileSolidity.Text, 16);
-            _cartridge.Memory[offset] = data;
-            _cartridge.ReadLevels();
-            var n = listBoxLevels.SelectedIndex;
-            RefreshAll();
-            listBoxLevels.SelectedIndex = n;
-            listBox5.SelectedIndex = m;
         }
 
         private void tv1_AfterSelect(object sender, TreeViewEventArgs e)
@@ -280,7 +281,7 @@ namespace sth1edwv
             }
         }
 
-        private void listBox6_DoubleClick(object sender, EventArgs e)
+        private void GameTextDoubleClicked(object sender, EventArgs e)
         {
             if (!(listBoxGameText.SelectedItem is GameText text))
             {
@@ -323,11 +324,88 @@ namespace sth1edwv
 
         private int _lastX, _lastY;
         private Cartridge _cartridge;
+        private readonly ImageList _solidityImages;
 
         private void pb3_MouseDown(object sender, MouseEventArgs e)
         {
             _lastX = e.X;
             _lastY = e.Y;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            if (File.Exists("C:\\Users\\maxim\\Documents\\code\\SMS\\sonic-genesis\\source\\sonic.sms"))
+            {
+                _cartridge = new Cartridge("C:\\Users\\maxim\\Documents\\code\\SMS\\sonic-genesis\\source\\sonic.sms");
+                _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
+                RefreshAll();
+                tabControl1.SelectedTab = tabPage5;
+            }
+
+            // We do some grid setup here...
+            dataGridViewBlocks.AutoGenerateColumns = false;
+            foreach (DataGridViewColumn column in dataGridViewBlocks.Columns)
+            {
+                switch (column.DataPropertyName)
+                {
+                    case nameof(Block.SolidityIndex):
+                    {
+                        column.SortMode = DataGridViewColumnSortMode.Automatic;
+                        if (column is DataGridViewComboBoxColumn c)
+                        {
+                            c.DataSource = Enumerable
+                                .Range(0, _solidityImages.Images.Count)
+                                .ToList();
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void dataGridViewBlocks_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (dataGridViewBlocks.Columns[e.ColumnIndex].DataPropertyName == nameof(Block.SolidityIndex) && e.RowIndex >= 0 && e.Value != null)
+            {
+                var g = e.Graphics;
+                var rect = dataGridViewBlocks.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
+
+                e.Paint(e.CellBounds, e.PaintParts & ~DataGridViewPaintParts.ContentForeground);
+
+                var index = (int)e.Value;
+                g.DrawImageUnscaled(_solidityImages.Images[index], rect);
+
+                e.Handled = true;
+            }
+            else
+            {
+                e.Handled = false;
+            }
+        }
+
+        private void dataGridViewBlocks_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (e.Control is ComboBox combo)
+            {
+                combo.DrawMode = DrawMode.OwnerDrawFixed;
+                combo.ItemHeight = _solidityImages.ImageSize.Height + 1;
+                combo.DrawItem -= DrawSolidityComboItem;
+                combo.DrawItem += DrawSolidityComboItem;
+            }
+        }
+
+        private void DrawSolidityComboItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index >= 0)
+            {
+                e.DrawBackground();
+                e.Graphics.DrawImageUnscaled(_solidityImages.Images[e.Index], e.Bounds);
+            }
+        }
+
+        private void dataGridViewBlocks_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.ThrowException = false;
         }
 
         private void pb3_MouseUp(object sender, MouseEventArgs e)

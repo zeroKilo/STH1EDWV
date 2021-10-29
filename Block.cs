@@ -5,11 +5,11 @@ using System.Linq;
 namespace sth1edwv
 {
     public class Block: IDisposable
-    {
+    {   
         private readonly TileSet _tileSet;
         private Bitmap _image;
+
         public byte[] TileIndices { get; } = new byte[16];
-        public byte SolidityIndex { get; }
         public Bitmap Image {
             get
             {
@@ -33,17 +33,23 @@ namespace sth1edwv
                 return _image;
             }
         }
+        public int Index { get; set; }
+        public int SolidityIndex { get; set; }
+        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
+        public bool IsForeground { get; set; }
 
-        public Block(byte[] cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet)
+        public byte Data => (byte)(SolidityIndex | (IsForeground ? 0x80 : 0));
+
+        public Block(byte[] cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index)
         {
             _tileSet = tileSet;
+            Index = index;
             Array.Copy(cartridgeMemory, tilesOffset, TileIndices, 0, 16);
-            SolidityIndex = cartridgeMemory[solidityOffset];
-        }
+            var solidityData = cartridgeMemory[solidityOffset];
+            SolidityIndex = solidityData & 0x3f;
 
-        public override string ToString()
-        {
-            return string.Join("", TileIndices.Select(x => x.ToString("X2"))) + " - " + Convert.ToString(SolidityIndex, 2).PadLeft(8, '0');
+            IsForeground = (solidityData & 0b10000000) != 0;
         }
 
         public void Dispose()
