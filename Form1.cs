@@ -25,37 +25,32 @@ namespace sth1edwv
 
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var d = new OpenFileDialog{Filter = "*.sms|*.sms"})
+            using var d = new OpenFileDialog{Filter = "*.sms|*.sms"};
+            if (d.ShowDialog(this) == DialogResult.OK)
             {
-                if (d.ShowDialog(this) == DialogResult.OK)
-                {
-                    _cartridge?.Dispose();
-                    _cartridge = new Cartridge(d.FileName);
-                    _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
-                    RefreshAll();
-                }
+                _cartridge?.Dispose();
+                _cartridge = new Cartridge(d.FileName);
+                _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
+                RefreshAll();
             }
         }
 
         private void RefreshAll()
         {
+            hexViewer.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
             listBoxMemoryLocations.Items.Clear();
             listBoxMemoryLocations.Items.AddRange(_cartridge.Labels.ToArray<object>());
             listBoxLevels.Items.Clear();
             listBoxLevels.Items.AddRange(_cartridge.Levels.ToArray<object>());
-            hexViewer.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
             listBoxPalettes.Items.Clear();
             listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
             listBoxGameText.Items.Clear();
-            foreach (var text in _cartridge.GameText)
-            {
-                listBoxGameText.Items.Add(text);
-            }
+            listBoxGameText.Items.AddRange(_cartridge.GameText.ToArray<object>());
         }
 
         private void ListBoxMemoryLocationsSelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!(listBoxMemoryLocations.SelectedItem is Cartridge.MemMapEntry label))
+            if (listBoxMemoryLocations.SelectedItem is not Cartridge.MemMapEntry label)
             {
                 return;
             }
@@ -67,7 +62,7 @@ namespace sth1edwv
         private void ListBoxPalettesSelectedIndexChanged(object sender, EventArgs e)
         {
             pictureBoxPalette.Image?.Dispose();
-            if (!(listBoxPalettes.SelectedItem is Palette palette))
+            if (listBoxPalettes.SelectedItem is not Palette palette)
             {
                 pictureBoxPalette.Image = null;
                 return;
@@ -78,7 +73,7 @@ namespace sth1edwv
 
         private void SelectedLevelChanged(object sender, EventArgs e)
         {
-            if (!(listBoxLevels.SelectedItem is Level level))
+            if (listBoxLevels.SelectedItem is not Level level)
             {
                 return;
             }
@@ -148,10 +143,6 @@ namespace sth1edwv
 
         private void BlockGridCellEdited(object sender, DataGridViewCellEventArgs e)
         {
-            if (!(listBoxLevels.SelectedItem is Level level))
-            {
-                return;
-            }
             var block = GetSelectedBlock();
             if (block == null)
             {
@@ -205,98 +196,91 @@ namespace sth1edwv
                 return;
             }
             var tileIndex = block.TileIndices[subBlockIndex];
-            using (var tc = new TileChooser(block.TileSet, tileIndex))
-            {
-                tc.ShowDialog(this);
-                // Apply to the block object
-                block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
-                // Invalidate its cached image
-                block.ResetImage();
-                // Trigger a redraw of the editor
-                DrawBlockEditor();
-                // And the grid
-                dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
-                // And the rendered level
-                RenderLevel();
-                // Finally apply the data to the cartridge
-                Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
-            }
+            using var tc = new TileChooser(block.TileSet, tileIndex);
+            tc.ShowDialog(this);
+            // Apply to the block object
+            block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
+            // Invalidate its cached image
+            block.ResetImage();
+            // Trigger a redraw of the editor
+            DrawBlockEditor();
+            // And the grid
+            dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
+            // And the rendered level
+            RenderLevel();
+            // Finally apply the data to the cartridge
+            Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
         }
 
         private void saveROMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var dialog = new SaveFileDialog { Filter = "*.sms|*.sms" })
+            using var dialog = new SaveFileDialog { Filter = "*.sms|*.sms" };
+            if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                if (dialog.ShowDialog(this) == DialogResult.OK)
-                {
-                    File.WriteAllBytes(dialog.FileName, _cartridge.Memory);
-                    MessageBox.Show(this, "Done");
-                }
+                File.WriteAllBytes(dialog.FileName, _cartridge.Memory);
+                MessageBox.Show(this, "Done");
             }
         }
 
-        private void tv1_AfterSelect(object sender, TreeViewEventArgs e)
+        private void TreeViewLevelDataItemSelected(object sender, TreeViewEventArgs e)
         {
             var node = treeViewLevelData.SelectedNode;
             if (node?.Parent == null || node.Parent.Text != "Objects")
             {
                 return;
             }
-            if (!(listBoxLevels.SelectedItem is Level level))
+            if (listBoxLevels.SelectedItem is not Level level)
             {
                 return;
             }
 
-            using (var objc = new ObjectChooser())
+            using var objc = new ObjectChooser();
+            objc.comboBox1.Items.Clear();
+            objc.comboBox1.Items.AddRange(LevelObjectSet.LevelObject.objNames.Values.ToArray<object>());
+            var obj = level.Objects[node.Index];
+            if (LevelObjectSet.LevelObject.objNames.Keys.Contains(obj.type))
             {
-                objc.comboBox1.Items.Clear();
-                objc.comboBox1.Items.AddRange(LevelObjectSet.LevelObject.objNames.Values.ToArray<object>());
-                LevelObjectSet.LevelObject obj = level.ObjSet.objs[node.Index];
-                if (LevelObjectSet.LevelObject.objNames.Keys.Contains(obj.type))
+                string s = LevelObjectSet.LevelObject.objNames[obj.type];
+                for (int i = 0; i < objc.comboBox1.Items.Count; i++)
                 {
-                    string s = LevelObjectSet.LevelObject.objNames[obj.type];
-                    for (int i = 0; i < objc.comboBox1.Items.Count; i++)
+                    if (objc.comboBox1.Items[i].ToString() == s)
                     {
-                        if (objc.comboBox1.Items[i].ToString() == s)
-                        {
-                            objc.comboBox1.SelectedIndex = i;
-                            break;
-                        }
+                        objc.comboBox1.SelectedIndex = i;
+                        break;
                     }
                 }
+            }
 
-                objc.textBox1.Text = obj.x.ToString();
-                objc.textBox2.Text = obj.y.ToString();
-                objc.textBox3.Text = obj.type.ToString();
-                objc.ShowDialog(this);
-                if (objc.exitOk)
+            objc.textBox1.Text = obj.x.ToString();
+            objc.textBox2.Text = obj.y.ToString();
+            objc.textBox3.Text = obj.type.ToString();
+            objc.ShowDialog(this);
+            if (objc.exitOk)
+            {
+                int offset = level.offsetObjectLayout + 0x15581;
+                offset += node.Index * 3;
+                try
                 {
-                    int offset = level.offsetObjectLayout + 0x15581;
-                    offset += node.Index * 3;
-                    try
-                    {
-                        byte x, y, tp;
-                        x = Convert.ToByte(objc.textBox1.Text);
-                        y = Convert.ToByte(objc.textBox2.Text);
-                        tp = Convert.ToByte(objc.textBox3.Text);
-                        _cartridge.Memory[offset] = tp;
-                        _cartridge.Memory[offset + 1] = x;
-                        _cartridge.Memory[offset + 2] = y;
-                        _cartridge.ReadLevels();
-                        var n = listBoxLevels.SelectedIndex ;
-                        RefreshAll();
-                        listBoxLevels.SelectedIndex = n;
-                    }
-                    catch
-                    {
-                    }
+                    var x = Convert.ToByte(objc.textBox1.Text);
+                    var y = Convert.ToByte(objc.textBox2.Text);
+                    var tp = Convert.ToByte(objc.textBox3.Text);
+                    _cartridge.Memory[offset] = tp;
+                    _cartridge.Memory[offset + 1] = x;
+                    _cartridge.Memory[offset + 2] = y;
+                    _cartridge.ReadLevels();
+                    var n = listBoxLevels.SelectedIndex ;
+                    RefreshAll();
+                    listBoxLevels.SelectedIndex = n;
+                }
+                catch
+                {
                 }
             }
         }
 
         private void GameTextDoubleClicked(object sender, EventArgs e)
         {
-            if (!(listBoxGameText.SelectedItem is GameText text))
+            if (listBoxGameText.SelectedItem is not GameText text)
             {
                 return;
             }
@@ -326,12 +310,10 @@ namespace sth1edwv
                 return;
             }
 
-            using (var d = new SaveFileDialog() { Filter = "*.png|*.png" })
+            using var d = new SaveFileDialog() { Filter = "*.png|*.png" };
+            if (d.ShowDialog(this) == DialogResult.OK)
             {
-                if (d.ShowDialog(this) == DialogResult.OK)
-                {
-                    pictureBoxRenderedLevel.Image.Save(d.FileName);
-                }
+                pictureBoxRenderedLevel.Image.Save(d.FileName);
             }
         }
 
@@ -432,7 +414,7 @@ namespace sth1edwv
 
         private void pb3_MouseUp(object sender, MouseEventArgs e)
         {
-            if (!(listBoxLevels.SelectedItem is Level level))
+            if (listBoxLevels.SelectedItem is not Level level)
             {
                 return;
             }
@@ -446,48 +428,46 @@ namespace sth1edwv
             var maxX = Math.Max(x, _lastX);
             var minY = Math.Min(y, _lastY);
             var maxY = Math.Max(y, _lastY);
-            using (var bc = new BlockChooser(level))
+            using var bc = new BlockChooser(level);
+            var selection = bc.SelectedBlock = level.Floor.BlockIndices[x + y * level.Floor.Width];
+            bc.ShowDialog(this);
+
+            // Make a backup
+            var temp = new byte[level.Floor.BlockIndices.Length];
+            Array.Copy(level.Floor.BlockIndices, temp, level.Floor.BlockIndices.Length);
+
+            if (bc.SelectedBlock != selection && bc.SelectedBlock >= 0)
             {
-                var selection = bc.SelectedBlock = level.Floor.BlockIndices[x + y * level.floorWidth];
-                bc.ShowDialog(this);
-
-                // Make a backup
-                var temp = new byte[level.Floor.BlockIndices.Length];
-                Array.Copy(level.Floor.BlockIndices, temp, level.Floor.BlockIndices.Length);
-
-                if (bc.SelectedBlock != selection && bc.SelectedBlock >= 0)
+                for (var row = minY; row <= maxY; row++)
+                for (var col = minX; col <= maxX; col++)
                 {
-                    for (var row = minY; row <= maxY; row++)
-                    for (var col = minX; col <= maxX; col++)
-                    {
-                        level.Floor.BlockIndices[col + row * level.floorWidth] = (byte)bc.SelectedBlock;
-                    }
-
-                    var newData = level.Floor.CompressData();
-                    if (level.floorSize < newData.Length)
-                    {
-                        MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
-                        level.Floor.BlockIndices = temp;
-                        return;
-                    }
-
-                    for (var i = 0; i < level.floorSize; i++)
-                    {
-                        if (i < newData.Length)
-                        {
-                            _cartridge.Memory[level.floorAddress + i] = newData[i];
-                        }
-                        else
-                        {
-                            _cartridge.Memory[level.floorAddress + i] = 1;
-                        }
-                    }
-
-                    _cartridge.ReadLevels();
-                    var n = listBoxLevels.SelectedIndex;
-                    RefreshAll();
-                    listBoxLevels.SelectedIndex = n;
+                    level.Floor.BlockIndices[col + row * level.Floor.Width] = (byte)bc.SelectedBlock;
                 }
+
+                var newData = level.Floor.CompressData();
+                if (level.floorSize < newData.Length)
+                {
+                    MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
+                    level.Floor.BlockIndices = temp;
+                    return;
+                }
+
+                for (var i = 0; i < level.floorSize; i++)
+                {
+                    if (i < newData.Length)
+                    {
+                        _cartridge.Memory[level.floorAddress + i] = newData[i];
+                    }
+                    else
+                    {
+                        _cartridge.Memory[level.floorAddress + i] = 1;
+                    }
+                }
+
+                _cartridge.ReadLevels();
+                var n = listBoxLevels.SelectedIndex;
+                RefreshAll();
+                listBoxLevels.SelectedIndex = n;
             }
         }
     }

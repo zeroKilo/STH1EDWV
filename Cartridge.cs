@@ -19,7 +19,7 @@ namespace sth1edwv
         int LengthConsumed { get; }
 
         /// <summary>
-        /// BlockIndices now
+        /// Get raw data from the item
         /// </summary>
         IList<byte> GetData();
         /*
@@ -50,6 +50,8 @@ namespace sth1edwv
             }
         }
 
+        private readonly byte[] _originalMemory;
+
         public byte[] Memory { get; }
         public IList<MemMapEntry> Labels { get; }
         public IList<Level> Levels { get; } = new List<Level>();
@@ -59,13 +61,16 @@ namespace sth1edwv
         private readonly IList<MemMapEntry> _levelOffsets;
         private readonly int _artBanksTableOffset;
 
-        private readonly Dictionary<int, TileSet> _tileSets = new Dictionary<int, TileSet>();
-        private readonly Dictionary<int, Floor> _floors = new Dictionary<int, Floor>();
-        private readonly Dictionary<int, BlockMapping> _blockMappings = new Dictionary<int, BlockMapping>();
+        private readonly Dictionary<int, TileSet> _tileSets = new();
+        private readonly Dictionary<int, Floor> _floors = new();
+        private readonly Dictionary<int, BlockMapping> _blockMappings = new();
 
         public Cartridge(string path)
         {
             Memory = File.ReadAllBytes(path);
+
+            _originalMemory = (byte[])Memory.Clone();
+
             Labels = ReadList(Properties.Resources.map);
             _levelOffsets = ReadList(Properties.Resources.levels);
 
@@ -106,9 +111,9 @@ namespace sth1edwv
             return GetItem(_tileSets, offset, () => new TileSet(this, offset, palette));
         }
 
-        public Floor GetFloor(int offset, int size)
+        public Floor GetFloor(int offset, int size, int width)
         {
-            return GetItem(_floors, offset, () => new Floor(this, offset, size));
+            return GetItem(_floors, offset, () => new Floor(this, offset, size, width));
         }
 
         public BlockMapping GetBlockMapping(int offset, byte solidityIndex, TileSet tileSet)
@@ -248,6 +253,34 @@ namespace sth1edwv
                 item.Dispose();
             }
             collection.Clear();
+        }
+
+        private class FreeSpace
+        {
+            public int Start { get; set; }
+            public int End { get; set; }
+        }
+
+        private void Rebuild()
+        {
+            // We clone the original memory...
+            var data = (byte[])_originalMemory.Clone();
+
+            // We walk through the data and "de-allocate" all the parts that we have read into objects
+            var space = _tileSets.Values
+                .Cast<IDataItem>()
+                .Concat(_floors.Values)
+                .Concat(_blockMappings.Values)
+                .Select(x => new FreeSpace{Start = x.Offset, End = x.Offset + x.LengthConsumed})
+                .OrderBy(x => x.Start)
+                .ToList();
+
+            // TODO more here...
+            // - Get data from each item
+            // - Allocate space (with constraints?)
+            // - Rewrite pointers and bank numbers
+            // - Iteratively solve outstanding calculations
+            // - Emit ROM!
         }
     }
 }

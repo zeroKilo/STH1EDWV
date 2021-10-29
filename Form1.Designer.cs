@@ -222,7 +222,7 @@
             this.treeViewLevelData.Name = "treeViewLevelData";
             this.treeViewLevelData.Size = new System.Drawing.Size(712, 521);
             this.treeViewLevelData.TabIndex = 1;
-            this.treeViewLevelData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tv1_AfterSelect);
+            this.treeViewLevelData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewLevelDataItemSelected);
             // 
             // tabPage7
             // 

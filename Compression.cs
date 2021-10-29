@@ -12,82 +12,78 @@ namespace sth1edwv
         {
             // Read into a memory stream
             // Decompress into another one
-            using (var m = new MemoryStream(cartridge.Memory, address, size))
-            using (var result = new MemoryStream())
+            using var m = new MemoryStream(cartridge.Memory, address, size);
+            using var result = new MemoryStream();
+            m.Seek(0, SeekOrigin.Begin);
+            while (m.Position < m.Length)
             {
-                m.Seek(0, SeekOrigin.Begin);
-                while (m.Position < m.Length)
+                var b1 = (byte)m.ReadByte();
+                result.WriteByte(b1);
+                if (m.Position == m.Length)
                 {
-                    var b1 = (byte)m.ReadByte();
-                    result.WriteByte(b1);
-                    if (m.Position == m.Length)
-                    {
-                        // Done
-                        break;
-                    }
-                    var b2 = (byte)m.ReadByte();
-                    if (b1 != b2)
-                    {
-                        // Not RLE, rewind and loop
-                        m.Seek(-1, SeekOrigin.Current);
-                        continue;
-                    }
-
-                    // Duplicate indicates RLE
-                    // Next byte is a count
-                    var count = m.ReadByte();
-                    // 0 means 256
-                    if (count == 0)
-                    {
-                        count = 256;
-                    }
-                    // Emit that many
-                    for (var i = 0; i < count; ++i)
-                    {
-                        result.WriteByte(b1);
-                    }
+                    // Done
+                    break;
                 }
-                return result.ToArray();
+                var b2 = (byte)m.ReadByte();
+                if (b1 != b2)
+                {
+                    // Not RLE, rewind and loop
+                    m.Seek(-1, SeekOrigin.Current);
+                    continue;
+                }
+
+                // Duplicate indicates RLE
+                // Next byte is a count
+                var count = m.ReadByte();
+                // 0 means 256
+                if (count == 0)
+                {
+                    count = 256;
+                }
+                // Emit that many
+                for (var i = 0; i < count; ++i)
+                {
+                    result.WriteByte(b1);
+                }
             }
+            return result.ToArray();
         }
 
         public static byte[] CompressRle(byte[] data)
         {
-            using (var m = new MemoryStream(data))
-            using (var result = new MemoryStream())
+            using var m = new MemoryStream(data);
+            using var result = new MemoryStream();
+            while (m.Position < m.Length)            
             {
-                while (m.Position < m.Length)            
+                // Look for a run of bytes
+                var b = m.ReadByte();
+                var counter = 1;
+                for (; counter < 257; ++counter)
                 {
-                    // Look for a run of bytes
-                    var b = m.ReadByte();
-                    var counter = 1;
-                    for (; counter < 257; ++counter)
+                    var next = m.ReadByte();
+                    if (next == -1)
                     {
-                        var next = m.ReadByte();
-                        if (next == -1)
-                        {
-                            // End of stream
-                            break;
-                        }
-
-                        if (next != b)
-                        {
-                            // Different byte, put it back and stop counting
-                            m.Seek(-1, SeekOrigin.Current);
-                            break;
-                        }
+                        // End of stream
+                        break;
                     }
-                    // And emit
-                    result.WriteByte((byte)b);
-                    if (counter > 1)
+
+                    if (next != b)
                     {
-                        result.WriteByte((byte)b);
-                        --counter; // stored as n-1
-                        result.WriteByte((byte)counter);
+                        // Different byte, put it back and stop counting
+                        m.Seek(-1, SeekOrigin.Current);
+                        break;
                     }
                 }
-                return result.ToArray();
+                // And emit
+                result.WriteByte((byte)b);
+                if (counter > 1)
+                {
+                    result.WriteByte((byte)b);
+                    --counter; // stored as n-1
+                    result.WriteByte((byte)counter);
+                }
             }
+            return result.ToArray();
         }
 
         public static byte[] DecompressArt(byte[] data, int offset, out int lengthConsumed)
@@ -107,48 +103,44 @@ namespace sth1edwv
 
             var nextArtDataOffset = artDataOffset;
             // We work through the data based on these...
-            using (var bitMasks = new MemoryStream(data, offset+8, rowCount / 8))
-            // This one is over-sized - we expect the duplicates data to be smaller than the row count
-            using (var duplicatesData = new MemoryStream(data, duplicateRowsOffset, rowCount))
-            // This is the destination
-            using (var result = new MemoryStream())
+            using var bitMasks = new MemoryStream(data, offset+8, rowCount / 8);
+            using var duplicatesData = new MemoryStream(data, duplicateRowsOffset, rowCount);
+            using var result = new MemoryStream();
+            while (bitMasks.Position != bitMasks.Length)
             {
-                while (bitMasks.Position != bitMasks.Length)
+                var bitmask = bitMasks.ReadByte();
+                for (var i = 0; i < 8; ++i)
                 {
-                    var bitmask = bitMasks.ReadByte();
-                    for (var i = 0; i < 8; ++i)
+                    var bit = bitmask & 1;
+                    bitmask >>= 1;
+                    byte[] row;
+                    if (bit == 1)
                     {
-                        var bit = bitmask & 1;
-                        bitmask >>= 1;
-                        byte[] row;
-                        if (bit == 1)
+                        // Duplicate
+                        var duplicateIndex = duplicatesData.ReadByte();
+                        if ((duplicateIndex & 0xf0) == 0xf0)
                         {
-                            // Duplicate
-                            var duplicateIndex = duplicatesData.ReadByte();
-                            if ((duplicateIndex & 0xf0) == 0xf0)
-                            {
-                                // Higher indices are two bytes
-                                duplicateIndex &= 0xf;
-                                duplicateIndex <<= 8;
-                                duplicateIndex |= duplicatesData.ReadByte();
-                            }
+                            // Higher indices are two bytes
+                            duplicateIndex &= 0xf;
+                            duplicateIndex <<= 8;
+                            duplicateIndex |= duplicatesData.ReadByte();
+                        }
 
-                            row = ReadArt(data, artDataOffset + duplicateIndex * 4);
-                        }
-                        else
-                        {
-                            row = ReadArt(data, nextArtDataOffset);
-                            nextArtDataOffset += 4;
-                        }
-                        result.Write(row, 0, row.Length);
+                        row = ReadArt(data, artDataOffset + duplicateIndex * 4);
                     }
+                    else
+                    {
+                        row = ReadArt(data, nextArtDataOffset);
+                        nextArtDataOffset += 4;
+                    }
+                    result.Write(row, 0, row.Length);
                 }
-
-                // We assume that the data is contiguous from the header to the end of whichever of the art data and duplicates data comes last.
-                lengthConsumed = Math.Max(duplicateRowsOffset + (int)duplicatesData.Position, nextArtDataOffset) - offset;
-
-                return result.ToArray();
             }
+
+            // We assume that the data is contiguous from the header to the end of whichever of the art data and duplicates data comes last.
+            lengthConsumed = Math.Max(duplicateRowsOffset + (int)duplicatesData.Position, nextArtDataOffset) - offset;
+
+            return result.ToArray();
         }
 
         private static byte[] ReadArt(IReadOnlyList<byte> data, int offset)
@@ -212,41 +204,39 @@ namespace sth1edwv
             }
 
             // Now we emit it back...
-            using (var result = new MemoryStream())
-            using (var resultWriter = new BinaryWriter(result, Encoding.ASCII))
+            using var result = new MemoryStream();
+            using var resultWriter = new BinaryWriter(result, Encoding.ASCII);
+            // Header - magic chars
+            resultWriter.Write("HY");
+            // Art offset = 8 + bitmask count
+            // Duplicates offset = 8 + bitmask count + art size
+            var artOffset = 8 + bitMasks.Count;
+            var duplicatesOffset = artOffset + artData.Count * 4;
+            var rowCount = bitMasks.Count / 8;
+
+            resultWriter.Write((ushort)duplicatesOffset);
+            resultWriter.Write((ushort)artOffset);
+            resultWriter.Write((ushort)rowCount);
+
+            // Next the bitmasks
+            resultWriter.Write(bitMasks.ToArray());
+            // And the art data, converting to chunky
+            resultWriter.Write(artData.SelectMany(ChunkyToPlanar).ToArray());
+            // Finally the duplicates data
+            foreach (var index in duplicates)
             {
-                // Header - magic chars
-                resultWriter.Write("HY");
-                // Art offset = 8 + bitmask count
-                // Duplicates offset = 8 + bitmask count + art size
-                var artOffset = 8 + bitMasks.Count;
-                var duplicatesOffset = artOffset + artData.Count * 4;
-                var rowCount = bitMasks.Count / 8;
-
-                resultWriter.Write((ushort)duplicatesOffset);
-                resultWriter.Write((ushort)artOffset);
-                resultWriter.Write((ushort)rowCount);
-
-                // Next the bitmasks
-                resultWriter.Write(bitMasks.ToArray());
-                // And the art data, converting to chunky
-                resultWriter.Write(artData.SelectMany(ChunkyToPlanar).ToArray());
-                // Finally the duplicates data
-                foreach (var index in duplicates)
+                // 1-2 bytes encoding
+                if (index < 0xf0)
                 {
-                    // 1-2 bytes encoding
-                    if (index < 0xf0)
-                    {
-                        resultWriter.Write((byte)index);
-                    }
-                    else
-                    {
-                        resultWriter.Write((byte)(0xf0 | (index >> 8)));
-                        resultWriter.Write((byte)(index & 0xff));
-                    }
+                    resultWriter.Write((byte)index);
                 }
-                return result.ToArray();
+                else
+                {
+                    resultWriter.Write((byte)(0xf0 | (index >> 8)));
+                    resultWriter.Write((byte)(index & 0xff));
+                }
             }
+            return result.ToArray();
         }
 
         private static IEnumerable<byte> ChunkyToPlanar(byte[] data)

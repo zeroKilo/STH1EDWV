@@ -5,7 +5,7 @@ namespace sth1edwv
 {
     public class BlockMapping: IDisposable, IDataItem
     {
-        public List<Block> Blocks { get; } = new List<Block>();
+        public List<Block> Blocks { get; } = new();
     
         public BlockMapping(Cartridge cartridge, int address, byte solidityIndex, TileSet tileSet)
         {

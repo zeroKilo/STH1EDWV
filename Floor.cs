@@ -6,11 +6,12 @@ namespace sth1edwv
     {
         public byte[] BlockIndices { get; set; }
 
-        public Floor(Cartridge cartridge, int address, int size)
+        public Floor(Cartridge cartridge, int address, int size, int width)
         {
             Offset = address;
             LengthConsumed = size;
             BlockIndices = Compression.DecompressRle(cartridge, address, size);
+            Width = width;
         }
 
         public byte[] CompressData()
@@ -20,6 +21,8 @@ namespace sth1edwv
 
         public int Offset { get; }
         public int LengthConsumed { get; }
+        public int Width { get; }
+
         public IList<byte> GetData()
         {
             return Compression.CompressRle(BlockIndices);

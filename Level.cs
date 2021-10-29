@@ -11,24 +11,24 @@ namespace sth1edwv
         //   SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
         //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
         //   SR UW TL 00  MU
-        private byte[] header;
-        public readonly byte   solidityIndex;
-        public readonly ushort floorWidth;
-        public readonly ushort floorHeight;
+        private byte[] _header;
+        private readonly byte   _solidityIndex;
+        private readonly ushort _floorWidth;
+        private readonly ushort _floorHeight;
         public readonly int   floorAddress;
         public readonly ushort floorSize;
-        public readonly int   blockMappingAddress;
-        private readonly ushort levelXOffset;
-        private readonly byte   levelWidth;
-        private readonly ushort levelYOffset;
-        private readonly byte   levelExtHeight;
-        private readonly byte   levelHeight;
-        private readonly ushort offsetArt;
+        private readonly int   _blockMappingAddress;
+        private readonly ushort _levelXOffset;
+        private readonly byte   _levelWidth;
+        private readonly ushort _levelYOffset;
+        private readonly byte   _levelExtHeight;
+        private readonly byte   _levelHeight;
+        private readonly ushort _offsetArt;
         public readonly ushort offsetObjectLayout;
-        private readonly byte   initPalette;
+        private readonly byte   _initPalette;
         public TileSet TileSet { get; }
         public Floor Floor { get; }
-        public LevelObjectSet ObjSet { get; }
+        public LevelObjectSet Objects { get; }
 
         public BlockMapping BlockMapping { get; }
         private readonly string _label;
@@ -38,38 +38,38 @@ namespace sth1edwv
         {
             _label = label;
             var address = BitConverter.ToUInt16(cartridge.Memory, offset);
-            header = new byte[37];
-            Array.Copy(cartridge.Memory, address + 0x15580, header, 0, header.Length);
+            _header = new byte[37];
+            Array.Copy(cartridge.Memory, address + 0x15580, _header, 0, _header.Length);
 
-            solidityIndex = header[0];
-            floorWidth = BitConverter.ToUInt16(header, 1);
-            floorHeight = BitConverter.ToUInt16(header, 3);
+            _solidityIndex = _header[0];
+            _floorWidth = BitConverter.ToUInt16(_header, 1);
+            _floorHeight = BitConverter.ToUInt16(_header, 3);
             if (address == 666)
-                floorHeight /= 2;
-            floorAddress = BitConverter.ToUInt16(header, 15) + 0x14000;
-            floorSize = BitConverter.ToUInt16(header, 17);
-            blockMappingAddress = BitConverter.ToUInt16(header, 19) + 0x10000;
-            levelXOffset = BitConverter.ToUInt16(header, 5);
-            levelWidth = header[8];
-            levelYOffset = BitConverter.ToUInt16(header, 9);
-            levelExtHeight = header[11];
-            levelHeight = header[12];
-            offsetArt = BitConverter.ToUInt16(header, 21);
-            offsetObjectLayout = BitConverter.ToUInt16(header, 30);
-            initPalette = header[26];
+                _floorHeight /= 2;
+            floorAddress = BitConverter.ToUInt16(_header, 15) + 0x14000;
+            floorSize = BitConverter.ToUInt16(_header, 17);
+            _blockMappingAddress = BitConverter.ToUInt16(_header, 19) + 0x10000;
+            _levelXOffset = BitConverter.ToUInt16(_header, 5);
+            _levelWidth = _header[8];
+            _levelYOffset = BitConverter.ToUInt16(_header, 9);
+            _levelExtHeight = _header[11];
+            _levelHeight = _header[12];
+            _offsetArt = BitConverter.ToUInt16(_header, 21);
+            offsetObjectLayout = BitConverter.ToUInt16(_header, 30);
+            _initPalette = _header[26];
             if (artBanksTableOffset > 0)
             {
                 var levelIndex = (offset - 0x15580) / 2;
                 var artBank = cartridge.Memory[artBanksTableOffset + levelIndex];
-                TileSet = cartridge.GetTileSet(offsetArt + artBank * 0x4000, palettes[initPalette]);
+                TileSet = cartridge.GetTileSet(_offsetArt + artBank * 0x4000, palettes[_initPalette]);
             }
             else
             {
-                TileSet = cartridge.GetTileSet(offsetArt + 0x30000, palettes[initPalette]);
+                TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, palettes[_initPalette]);
             }
-            Floor = cartridge.GetFloor(floorAddress, floorSize);
-            BlockMapping = cartridge.GetBlockMapping(blockMappingAddress, solidityIndex, TileSet);
-            ObjSet = new LevelObjectSet(cartridge, 0x15580 + offsetObjectLayout);
+            Floor = cartridge.GetFloor(floorAddress, floorSize, _floorWidth);
+            BlockMapping = cartridge.GetBlockMapping(_blockMappingAddress, _solidityIndex, TileSet);
+            Objects = new LevelObjectSet(cartridge, 0x15580 + offsetObjectLayout);
         }
 
         public override string ToString()
@@ -83,24 +83,19 @@ namespace sth1edwv
             {
                 Nodes =
                 {
-                    new TreeNode($"Floor Size           = ({floorWidth} x {floorHeight})"),
+                    new TreeNode($"Floor Size           = ({_floorWidth} x {_floorHeight})"),
                     new TreeNode($"Floor Data           = (@0x{floorAddress:X} Size: 0x{floorSize:X})"),
-                    new TreeNode($"Level Size           = ({levelWidth} x {levelHeight})"),
-                    new TreeNode($"Level Offset         = (dx:{levelXOffset} dy:{levelYOffset})"),
-                    new TreeNode($"Extended Height      = {levelExtHeight}"),
-                    new TreeNode($"Offset Art           = 0x{offsetArt:X8}"),
+                    new TreeNode($"Level Size           = ({_levelWidth} x {_levelHeight})"),
+                    new TreeNode($"Level Offset         = (dx:{_levelXOffset} dy:{_levelYOffset})"),
+                    new TreeNode($"Extended Height      = {_levelExtHeight}"),
+                    new TreeNode($"Offset Art           = 0x{_offsetArt:X8}"),
                     new TreeNode($"Offset Object Layout = 0x{offsetObjectLayout:X8}"),
-                    new TreeNode($"Initial Palette      = {initPalette}"),
-                    ObjSet.ToNode()
+                    new TreeNode($"Initial Palette      = {_initPalette}"),
+                    Objects.ToNode()
                 }
             };
             result.Expand();
             return result;
-        }
-
-        public Tile GetTile(int index)
-        {
-            return TileSet.Tiles[index];
         }
 
         public Bitmap Render(bool withObjects, bool blockGaps, bool tileGaps, bool blockLabels)
@@ -121,54 +116,50 @@ namespace sth1edwv
             const int labelWidth = 13;
             const int labelHeight = 9;
 
-            var result = new Bitmap(floorWidth * _blockSize, floorHeight * _blockSize);
-            using (var f = new Font("Consolas", 8, FontStyle.Bold))
-            using (var g = Graphics.FromImage(result)) 
+            var result = new Bitmap(_floorWidth * _blockSize, _floorHeight * _blockSize);
+            using var f = new Font("Consolas", 8, FontStyle.Bold);
+            using var g = Graphics.FromImage(result);
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            g.Clear(Color.White);
+
+            for (var blockX = 0; blockX < _floorWidth; ++blockX)
+            for (var blockY = 0; blockY < _floorHeight; ++blockY)
             {
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.Clear(Color.White);
-
-                for (var blockX = 0; blockX < floorWidth; ++blockX)
-                for (var blockY = 0; blockY < floorHeight; ++blockY)
+                var blockIndex = Floor.BlockIndices[blockX + blockY * _floorWidth];
+                var block = BlockMapping.Blocks[blockIndex];
+                for (var tileX = 0; tileX < 4; ++tileX)
+                for (var tileY = 0; tileY < 4; ++tileY)
                 {
-                    var blockIndex = Floor.BlockIndices[blockX + blockY * floorWidth];
-                    var block = BlockMapping.Blocks[blockIndex];
-                    for (var tileX = 0; tileX < 4; ++tileX)
-                    for (var tileY = 0; tileY < 4; ++tileY)
-                    {
-                        var tileIndex = block.TileIndices[tileX + tileY * 4];
-                        var tile = TileSet.Tiles[tileIndex];
-                        var x = blockX * _blockSize + tileX * tileSize;
-                        var y = blockY * _blockSize + tileY * tileSize;
-                        g.DrawImageUnscaled(tile.Image, x, y);
-                    }
-
-                    if (blockLabels)
-                    {
-                        // Draw a rect over it for the label
-//                        g.FillRectangle(Brushes.White, blockX * blockSize, blockY * blockSize, labelWidth, labelHeight);
-                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.Black, blockX * _blockSize, blockY * _blockSize - 1);
-                        g.DrawString(blockIndex.ToString("X2"), f, Brushes.White, blockX * _blockSize - 1, blockY * _blockSize - 2);
-                    }
+                    var tileIndex = block.TileIndices[tileX + tileY * 4];
+                    var tile = TileSet.Tiles[tileIndex];
+                    var x = blockX * _blockSize + tileX * tileSize;
+                    var y = blockY * _blockSize + tileY * tileSize;
+                    g.DrawImageUnscaled(tile.Image, x, y);
                 }
 
-                if (withObjects)
+                if (blockLabels)
                 {
-                    var image = Properties.Resources.package;
-                    // Draw objects
-                    foreach (var obj in ObjSet.objs)
-                    {
-                        var x = obj.x * _blockSize;
-                        var y = obj.y * _blockSize;
-                        g.DrawRectangle(Pens.Blue, x, y, _blockSize, _blockSize);
-                        g.DrawImageUnscaled(image, x + _blockSize / 2 - image.Width / 2, y + _blockSize / 2 - image.Height / 2);
+                    g.DrawString(blockIndex.ToString("X2"), f, Brushes.Black, blockX * _blockSize, blockY * _blockSize - 1);
+                    g.DrawString(blockIndex.ToString("X2"), f, Brushes.White, blockX * _blockSize - 1, blockY * _blockSize - 2);
+                }
+            }
 
-                        x += _blockSize - labelWidth;
-                        y += _blockSize - labelHeight;
-                        g.FillRectangle(Brushes.Blue, x, y, labelWidth, labelHeight);
-                        g.DrawString(obj.type.ToString("X2"), f, Brushes.White, x - 1, y - 2);
-                    }
+            if (withObjects)
+            {
+                var image = Properties.Resources.package;
+                // Draw objects
+                foreach (var levelObject in Objects)
+                {
+                    var x = levelObject.x * _blockSize;
+                    var y = levelObject.y * _blockSize;
+                    g.DrawRectangle(Pens.Blue, x, y, _blockSize, _blockSize);
+                    g.DrawImageUnscaled(image, x + _blockSize / 2 - image.Width / 2, y + _blockSize / 2 - image.Height / 2);
+
+                    x += _blockSize - labelWidth;
+                    y += _blockSize - labelHeight;
+                    g.FillRectangle(Brushes.Blue, x, y, labelWidth, labelHeight);
+                    g.DrawString(levelObject.type.ToString("X2"), f, Brushes.White, x - 1, y - 2);
                 }
             }
 

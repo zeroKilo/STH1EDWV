@@ -1,10 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace sth1edwv
 {
-    public class LevelObjectSet
+    public class LevelObjectSet: IEnumerable<LevelObjectSet.LevelObject>
     {
+        // We thinly wrap a list
+        public IEnumerator<LevelObject> GetEnumerator() => _objects.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => _objects.GetEnumerator();
+        public LevelObject this[int index] => _objects[index];
+
+        private readonly List<LevelObject> _objects;
+
         public class LevelObject
         {
             public byte type;
@@ -20,15 +29,15 @@ namespace sth1edwv
 
             public TreeNode ToNode()
             {
-                string s = $"PosX = {x} PosY = {y} Type = 0x{type}(";
-                if (objNames.ContainsKey(type))
-                    s += $"{objNames[type]})";
-                else
-                    s += "UNKNOWN)";
-                return new TreeNode(s);
+                if (!objNames.TryGetValue(type, out var name))
+                {
+                    name = "UNKNOWN";
+                }
+
+                return new TreeNode($"PosX = {x} PosY = {y} Type = 0x{type} ({name})");
             }
 
-            public static Dictionary<byte, string> objNames = new Dictionary<byte, string>()
+            public static Dictionary<byte, string> objNames = new()
             {
                 {0x00,"NONE"},
                 {0x01,"Super Ring monitor"},
@@ -107,20 +116,21 @@ namespace sth1edwv
             };
         }
 
-        public List<LevelObject> objs;
         public LevelObjectSet(Cartridge cartridge, int offset)
         {
-            objs = new List<LevelObject>();
             byte count = cartridge.Memory[offset];
-            for (int i = 0; i < count; i++)
-                objs.Add(new LevelObject(cartridge.Memory[offset + i * 3 + 1], cartridge.Memory[offset + i * 3 + 2], cartridge.Memory[offset + i * 3 + 3]));
+            _objects = Enumerable.Range(0, count)
+                .Select(i => new LevelObject(
+                    cartridge.Memory[offset + i * 3 + 1], 
+                    cartridge.Memory[offset + i * 3 + 2],
+                    cartridge.Memory[offset + i * 3 + 3]))
+                .ToList();
         }
 
         public TreeNode ToNode()
         {
-            TreeNode result = new TreeNode("Objects");
-            foreach (LevelObject obj in objs)
-                result.Nodes.Add(obj.ToNode());
+            var result = new TreeNode("Objects");
+            result.Nodes.AddRange(_objects.Select(x => x.ToNode()).ToArray());
             return result;
         }
     }

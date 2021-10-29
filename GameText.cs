@@ -49,7 +49,7 @@ namespace sth1edwv
             return _text;
         }
 
-        private static readonly Dictionary<byte, char> LowerChars = new Dictionary<byte, char>()
+        private static readonly Dictionary<byte, char> LowerChars = new()
         {
             {0x34, 'A'},
             {0x35, 'B'},
@@ -81,7 +81,7 @@ namespace sth1edwv
             {0xEB, ' '}
         };
 
-        private static readonly Dictionary<byte, char> UpperChars = new Dictionary<byte, char>()
+        private static readonly Dictionary<byte, char> UpperChars = new()
         {
             {0x1E, 'A'},
             {0x1F, 'B'},

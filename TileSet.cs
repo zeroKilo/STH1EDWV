@@ -12,7 +12,7 @@ namespace sth1edwv
         private readonly ushort _artData;
         private readonly ushort _rowCount;
         private readonly double _compression;
-        public List<Tile> Tiles { get; } = new List<Tile>();
+        public List<Tile> Tiles { get; } = new();
 
         public TileSet(Cartridge cartridge, int offset, Palette palette)
         {
@@ -57,18 +57,16 @@ namespace sth1edwv
 
         public IList<byte> GetData()
         {
-            using (var ms = new MemoryStream())
+            using var ms = new MemoryStream();
+            // We gather our tiles back into a big buffer...
+            foreach (var tile in Tiles)
             {
-                // We gather our tiles back into a big buffer...
-                foreach (var tile in Tiles)
-                {
-                    tile.WriteTo(ms);
-                }
-
-                // Then we compress it...
-                ms.Position = 0;
-                return Compression.CompressArt(ms);
+                tile.WriteTo(ms);
             }
+
+            // Then we compress it...
+            ms.Position = 0;
+            return Compression.CompressArt(ms);
         }
 
         public void Dispose()

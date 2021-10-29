@@ -58,18 +58,14 @@ namespace sth1edwv
             var bmp = new Bitmap(width, height);
             int rectWidth = width / 8;
             int rectHeight = height / 4;
-            using (var g = Graphics.FromImage(bmp))
+            using var g = Graphics.FromImage(bmp);
+            for (int y = 0; y < 4; y++)
             {
-                for (int y = 0; y < 4; y++)
+                for (int x = 0; x < 8; x++)
                 {
-                    for (int x = 0; x < 8; x++)
-                    {
-                        var index = x + y * 8;
-                        using (var b = new SolidBrush(Colors[index]))
-                        {
-                            g.FillRectangle(b, rectWidth*x, rectHeight*y, rectWidth, rectHeight);
-                        }
-                    }
+                    var index = x + y * 8;
+                    using var b = new SolidBrush(Colors[index]);
+                    g.FillRectangle(b, rectWidth*x, rectHeight*y, rectWidth, rectHeight);
                 }
             }
 
