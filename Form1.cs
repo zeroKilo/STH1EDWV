@@ -12,6 +12,10 @@ namespace sth1edwv
 {
     public partial class Form1 : Form
     {
+        private int _lastX, _lastY;
+        private Cartridge _cartridge;
+        private readonly ImageList _solidityImages;
+
         public Form1()
         {
             InitializeComponent();
@@ -297,10 +301,6 @@ namespace sth1edwv
             }
         }
 
-        private int _lastX, _lastY;
-        private Cartridge _cartridge;
-        private readonly ImageList _solidityImages;
-
         private void pb3_MouseDown(object sender, MouseEventArgs e)
         {
             _lastX = e.X;
@@ -409,46 +409,36 @@ namespace sth1edwv
             var minY = Math.Min(y, _lastY);
             var maxY = Math.Max(y, _lastY);
             using var bc = new BlockChooser(level);
-            var selection = bc.SelectedBlock = level.Floor.BlockIndices[x + y * level.Floor.Width];
-            bc.ShowDialog(this);
+            bc.SelectedBlockIndex = level.Floor.BlockIndices[x + y * level.Floor.Width];
+            if (bc.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
 
             // Make a backup
-            var temp = new byte[level.Floor.BlockIndices.Length];
-            Array.Copy(level.Floor.BlockIndices, temp, level.Floor.BlockIndices.Length);
+            var temp = (byte[])level.Floor.BlockIndices.Clone();
 
-            if (bc.SelectedBlock != selection && bc.SelectedBlock >= 0)
+            // Apply the change
+            for (var row = minY; row <= maxY; row++)
+            for (var col = minX; col <= maxX; col++)
             {
-                for (var row = minY; row <= maxY; row++)
-                for (var col = minX; col <= maxX; col++)
-                {
-                    level.Floor.BlockIndices[col + row * level.Floor.Width] = (byte)bc.SelectedBlock;
-                }
-
-                var newData = level.Floor.CompressData();
-                if (level.floorSize < newData.Length)
-                {
-                    MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
-                    level.Floor.BlockIndices = temp;
-                    return;
-                }
-
-                for (var i = 0; i < level.floorSize; i++)
-                {
-                    if (i < newData.Length)
-                    {
-                        _cartridge.Memory[level.floorAddress + i] = newData[i];
-                    }
-                    else
-                    {
-                        _cartridge.Memory[level.floorAddress + i] = 1;
-                    }
-                }
-
-                _cartridge.ReadLevels();
-                var n = listBoxLevels.SelectedIndex;
-                RefreshAll();
-                listBoxLevels.SelectedIndex = n;
+                level.Floor.BlockIndices[col + row * level.Floor.Width] = (byte)bc.SelectedBlockIndex;
             }
+
+            // Try to insert it
+            var newData = level.Floor.GetData();
+            if (newData.Count > level.Floor.LengthConsumed)
+            {
+                MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
+                level.Floor.BlockIndices = temp;
+                return;
+            }
+
+            // Apply to the ROM
+            newData.CopyTo(_cartridge.Memory, level.Floor.Offset);
+
+            // Redraw the level
+            RenderLevel();
         }
     }
 }

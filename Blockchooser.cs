@@ -7,7 +7,7 @@ namespace sth1edwv
 {
     public partial class BlockChooser : Form
     {
-        public int SelectedBlock { get; set; }
+        public int SelectedBlockIndex { get; set; }
         private readonly Level _level;
 
         public BlockChooser(Level level)
@@ -42,9 +42,10 @@ namespace sth1edwv
             int index = x + y * 16;
             if (index < _level.BlockMapping.Blocks.Count)
             {
-                SelectedBlock = index;
+                SelectedBlockIndex = index;
+                DialogResult = DialogResult.OK;
+                Close();
             }
-            Close();
         }
     }
 }
