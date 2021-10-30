@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -395,6 +396,13 @@ namespace sth1edwv
             {
                 RenderLevel();
             }
+        }
+
+        private void quickTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var filename = Path.Combine(Path.GetTempPath(), "test.sms");
+            File.WriteAllBytes(filename, _cartridge.Memory);
+            Process.Start(filename);
         }
 
         private void pb3_MouseUp(object sender, MouseEventArgs e)

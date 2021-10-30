@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,6 +76,7 @@
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
             this.tilePicker1 = new sth1edwv.TilePicker();
+            this.quickTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -132,7 +133,8 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openROMToolStripMenuItem,
-            this.saveROMToolStripMenuItem});
+            this.saveROMToolStripMenuItem,
+            this.quickTestToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -140,15 +142,17 @@
             // openROMToolStripMenuItem
             // 
             this.openROMToolStripMenuItem.Name = "openROMToolStripMenuItem";
-            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+            this.openROMToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
             this.openROMToolStripMenuItem.Text = "Open ROM...";
             this.openROMToolStripMenuItem.Click += new System.EventHandler(this.openROMToolStripMenuItem_Click);
             // 
             // saveROMToolStripMenuItem
             // 
             this.saveROMToolStripMenuItem.Name = "saveROMToolStripMenuItem";
-            this.saveROMToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.saveROMToolStripMenuItem.Text = "Save ROM...";
+            this.saveROMToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.saveROMToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.saveROMToolStripMenuItem.Text = "Save as...";
             this.saveROMToolStripMenuItem.Click += new System.EventHandler(this.saveROMToolStripMenuItem_Click);
             // 
             // tabPage5
@@ -330,8 +334,8 @@
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -655,6 +659,14 @@
             this.tilePicker1.TileSet = null;
             this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
             // 
+            // quickTestToolStripMenuItem
+            // 
+            this.quickTestToolStripMenuItem.Name = "quickTestToolStripMenuItem";
+            this.quickTestToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
+            this.quickTestToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.quickTestToolStripMenuItem.Text = "Quick test";
+            this.quickTestToolStripMenuItem.Click += new System.EventHandler(this.quickTestToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -763,6 +775,7 @@
         private System.Windows.Forms.DataGridViewComboBoxColumn Solidity;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
         private System.Windows.Forms.ToolStripButton buttonLevelBounds;
+        private System.Windows.Forms.ToolStripMenuItem quickTestToolStripMenuItem;
     }
 }
 
