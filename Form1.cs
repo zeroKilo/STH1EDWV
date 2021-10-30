@@ -152,12 +152,9 @@ namespace sth1edwv
 
         private Block GetSelectedBlock()
         {
-            if (listBoxLevels.SelectedItem is Level level && 
-                dataGridViewBlocks.SelectedRows.Count != 0)
-            {
-                return level.BlockMapping.Blocks[dataGridViewBlocks.SelectedRows[0].Index];
-            }
-            return null;
+            return dataGridViewBlocks.SelectedRows.Count == 0 
+                ? null 
+                : (dataGridViewBlocks.SelectedRows[0].DataBoundItem as ObjectView<Block>)?.Object;
         }
 
         private void BlockGridCellEdited(object sender, DataGridViewCellEventArgs e)
@@ -345,13 +342,12 @@ namespace sth1edwv
         {
             if (dataGridViewBlocks.Columns[e.ColumnIndex].DataPropertyName == nameof(Block.SolidityIndex) && e.RowIndex >= 0 && e.Value != null)
             {
-                var g = e.Graphics;
                 var rect = dataGridViewBlocks.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
 
                 e.Paint(e.CellBounds, e.PaintParts & ~DataGridViewPaintParts.ContentForeground);
 
                 var index = (int)e.Value;
-                g.DrawImageUnscaled(_solidityImages.Images[index], rect);
+                DrawSolidityItem(e.Graphics, index, rect);
 
                 e.Handled = true;
             }
@@ -359,6 +355,12 @@ namespace sth1edwv
             {
                 e.Handled = false;
             }
+        }
+
+        private void DrawSolidityItem(Graphics g, int index, Rectangle rect)
+        {
+            g.DrawImageUnscaled(_solidityImages.Images[index], rect);
+            g.DrawString($"{index}", SystemFonts.DefaultFont, SystemBrushes.WindowText, rect.Left + _solidityImages.ImageSize.Width + 4, rect.Top + 8);
         }
 
         private void dataGridViewBlocks_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
@@ -377,7 +379,7 @@ namespace sth1edwv
             if (e.Index >= 0)
             {
                 e.DrawBackground();
-                e.Graphics.DrawImageUnscaled(_solidityImages.Images[e.Index], e.Bounds);
+                DrawSolidityItem(e.Graphics, e.Index, e.Bounds);
             }
         }
 
