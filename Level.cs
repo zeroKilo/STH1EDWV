@@ -101,7 +101,7 @@ namespace sth1edwv
             return result;
         }
 
-        public Bitmap Render(bool withObjects, bool blockGaps, bool tileGaps, bool blockLabels)
+        public Bitmap Render(bool withObjects, bool blockGaps, bool tileGaps, bool blockLabels, bool levelBounds)
         {
             _blockSize = 32;
             var tileSize = 8;
@@ -124,7 +124,7 @@ namespace sth1edwv
             using var g = Graphics.FromImage(result);
             g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.Clear(Color.White);
+            g.Clear(SystemColors.Window);
 
             for (var blockX = 0; blockX < _floorWidth; ++blockX)
             for (var blockY = 0; blockY < _floorHeight; ++blockY)
@@ -164,6 +164,25 @@ namespace sth1edwv
                     g.FillRectangle(Brushes.Blue, x, y, labelWidth, labelHeight);
                     g.DrawString(levelObject.Type.ToString("X2"), f, Brushes.White, x - 1, y - 2);
                 }
+            }
+
+            if (levelBounds)
+            {
+                var x = _levelXOffset + (_levelXOffset / 32 * (_blockSize - 32));
+                var y = _levelYOffset + (_levelYOffset / 32 * (_blockSize - 32));
+                var w = (_levelWidth * 8 + 14) * _blockSize;
+                var h = (_levelHeight * 8 + 6) * _blockSize + _levelExtHeight;
+                using var brush = new SolidBrush(Color.FromArgb(128, Color.Black));
+                // Top
+                g.FillRectangle(brush, 0, 0, result.Width, y);
+                // Bottom
+                g.FillRectangle(brush, 0, y + h, result.Width, result.Height - y - h);
+                // Left chunk
+                g.FillRectangle(brush, 0, y, x, h);
+                // Right chunk
+                g.FillRectangle(brush, x + w, y, result.Width - x - w, h);
+
+                g.DrawRectangle(Pens.Red, x, y, w, h);
             }
 
             return result;

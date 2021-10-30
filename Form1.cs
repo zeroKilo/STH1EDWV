@@ -121,7 +121,7 @@ namespace sth1edwv
             {
                 pictureBoxRenderedLevel.Image?.Dispose();
                 pictureBoxRenderedLevel.Image = level.Render(buttonShowObjects.Checked, buttonBlockGaps.Checked,
-                    buttonTileGaps.Checked, buttonBlockNumbers.Checked);
+                    buttonTileGaps.Checked, buttonBlockNumbers.Checked, buttonLevelBounds.Checked);
             }
             else
             {

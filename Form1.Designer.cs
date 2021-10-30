@@ -42,7 +42,6 @@
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.tilePicker1 = new sth1edwv.TilePicker();
             this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
@@ -60,6 +59,7 @@
             this.buttonBlockNumbers = new System.Windows.Forms.ToolStripButton();
             this.buttonBlockGaps = new System.Windows.Forms.ToolStripButton();
             this.buttonTileGaps = new System.Windows.Forms.ToolStripButton();
+            this.buttonLevelBounds = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonSaveRenderedLevel = new System.Windows.Forms.ToolStripButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -75,6 +75,7 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
+            this.tilePicker1 = new sth1edwv.TilePicker();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -253,17 +254,6 @@
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
             // 
-            // tilePicker1
-            // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 519);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
-            // 
             // pictureBoxTilePreview
             // 
             this.pictureBoxTilePreview.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -411,6 +401,7 @@
             this.buttonBlockNumbers,
             this.buttonBlockGaps,
             this.buttonTileGaps,
+            this.buttonLevelBounds,
             this.toolStripSeparator1,
             this.toolStripButtonSaveRenderedLevel});
             this.toolStrip1.Location = new System.Drawing.Point(3, 3);
@@ -462,6 +453,16 @@
             this.buttonTileGaps.Size = new System.Drawing.Size(73, 22);
             this.buttonTileGaps.Text = "Tile gaps";
             this.buttonTileGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
+            // 
+            // buttonLevelBounds
+            // 
+            this.buttonLevelBounds.CheckOnClick = true;
+            this.buttonLevelBounds.Image = ((System.Drawing.Image)(resources.GetObject("buttonLevelBounds.Image")));
+            this.buttonLevelBounds.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonLevelBounds.Name = "buttonLevelBounds";
+            this.buttonLevelBounds.Size = new System.Drawing.Size(97, 22);
+            this.buttonLevelBounds.Text = "Level bounds";
+            this.buttonLevelBounds.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
             // toolStripSeparator1
             // 
@@ -643,6 +644,17 @@
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 519);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -750,6 +762,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Index;
         private System.Windows.Forms.DataGridViewComboBoxColumn Solidity;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
+        private System.Windows.Forms.ToolStripButton buttonLevelBounds;
     }
 }
 
