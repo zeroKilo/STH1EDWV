@@ -26,6 +26,12 @@ namespace sth1edwv
                 ImageSize = new Size(32, 32),
             };
             _solidityImages.Images.AddStrip(Properties.Resources.SolidityImages);
+
+            typeof(DataGridView).InvokeMember("DoubleBuffered", 
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, 
+                null,
+                dataGridViewBlocks, 
+                new object[] { true });
         }
 
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)
