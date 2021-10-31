@@ -28,12 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.quickTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listBoxLevels = new System.Windows.Forms.ListBox();
@@ -42,6 +43,7 @@
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.tilePicker1 = new sth1edwv.TilePicker();
             this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
@@ -62,6 +64,7 @@
             this.buttonLevelBounds = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonSaveRenderedLevel = new System.Windows.Forms.ToolStripButton();
+            this.buttonCopyFloor = new System.Windows.Forms.ToolStripButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.listBoxPalettes = new System.Windows.Forms.ListBox();
@@ -75,8 +78,7 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
-            this.tilePicker1 = new sth1edwv.TilePicker();
-            this.quickTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buttonPasteFloor = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -154,6 +156,14 @@
             this.saveROMToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
             this.saveROMToolStripMenuItem.Text = "Save as...";
             this.saveROMToolStripMenuItem.Click += new System.EventHandler(this.saveROMToolStripMenuItem_Click);
+            // 
+            // quickTestToolStripMenuItem
+            // 
+            this.quickTestToolStripMenuItem.Name = "quickTestToolStripMenuItem";
+            this.quickTestToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
+            this.quickTestToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.quickTestToolStripMenuItem.Text = "Quick test";
+            this.quickTestToolStripMenuItem.Click += new System.EventHandler(this.quickTestToolStripMenuItem_Click);
             // 
             // tabPage5
             // 
@@ -258,6 +268,17 @@
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
             // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 519);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
+            // 
             // pictureBoxTilePreview
             // 
             this.pictureBoxTilePreview.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -334,8 +355,8 @@
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle4.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -407,7 +428,9 @@
             this.buttonTileGaps,
             this.buttonLevelBounds,
             this.toolStripSeparator1,
-            this.toolStripButtonSaveRenderedLevel});
+            this.toolStripButtonSaveRenderedLevel,
+            this.buttonCopyFloor,
+            this.buttonPasteFloor});
             this.toolStrip1.Location = new System.Drawing.Point(3, 3);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(712, 25);
@@ -481,6 +504,15 @@
             this.toolStripButtonSaveRenderedLevel.Size = new System.Drawing.Size(60, 22);
             this.toolStripButtonSaveRenderedLevel.Text = "Save...";
             this.toolStripButtonSaveRenderedLevel.Click += new System.EventHandler(this.toolStripButtonSaveRenderedLevel_Click);
+            // 
+            // buttonCopyFloor
+            // 
+            this.buttonCopyFloor.Image = ((System.Drawing.Image)(resources.GetObject("buttonCopyFloor.Image")));
+            this.buttonCopyFloor.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonCopyFloor.Name = "buttonCopyFloor";
+            this.buttonCopyFloor.Size = new System.Drawing.Size(55, 22);
+            this.buttonCopyFloor.Text = "Copy";
+            this.buttonCopyFloor.Click += new System.EventHandler(this.buttonCopyFloor_Click);
             // 
             // tabPage2
             // 
@@ -648,24 +680,14 @@
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
-            // tilePicker1
+            // buttonPasteFloor
             // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 519);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
-            // 
-            // quickTestToolStripMenuItem
-            // 
-            this.quickTestToolStripMenuItem.Name = "quickTestToolStripMenuItem";
-            this.quickTestToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.quickTestToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.quickTestToolStripMenuItem.Text = "Quick test";
-            this.quickTestToolStripMenuItem.Click += new System.EventHandler(this.quickTestToolStripMenuItem_Click);
+            this.buttonPasteFloor.Image = ((System.Drawing.Image)(resources.GetObject("buttonPasteFloor.Image")));
+            this.buttonPasteFloor.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonPasteFloor.Name = "buttonPasteFloor";
+            this.buttonPasteFloor.Size = new System.Drawing.Size(55, 22);
+            this.buttonPasteFloor.Text = "Paste";
+            this.buttonPasteFloor.Click += new System.EventHandler(this.buttonPasteFloor_Click);
             // 
             // Form1
             // 
@@ -776,6 +798,8 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
         private System.Windows.Forms.ToolStripButton buttonLevelBounds;
         private System.Windows.Forms.ToolStripMenuItem quickTestToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton buttonCopyFloor;
+        private System.Windows.Forms.ToolStripButton buttonPasteFloor;
     }
 }
 

@@ -40,6 +40,165 @@ namespace sth1edwv
 
     public class Cartridge: IDisposable
     {
+        private class Reference
+        {
+            public int Location { get; set; }
+
+            public enum Types
+            {
+                Bank,
+                OffsetInBank,
+                RelativeOffset
+            }
+
+            public Types Type { get; set; }
+            public int RelativeTo { get; set; }
+        }
+
+        private class MemoryItem
+        {
+            public int Offset { get; set; }
+            public int Length { get; set; }
+
+            public List<Reference> References { get; } = new();
+        }
+
+        private class Game
+        {
+            public class Level : MemoryItem
+            {
+                public string Name { get; set; }
+            }
+
+            public List<Level> Levels;
+
+            public class Palette: MemoryItem
+            {}
+
+            public List<Palette> Palettes;
+
+            public class TileSet : MemoryItem
+            {}
+
+            public List<TileSet> TileSets;
+
+            public class Floor : MemoryItem
+            {}
+
+            public List<Floor> Floors;
+        }
+
+        private static Game _sonic1MasterSystem = new()
+        {
+            Levels = new List<Game.Level>
+            {
+                new() {
+                    Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15580 } }
+                }, new() {
+                    Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15582 } }
+                }, new() {
+                    Name = "Green Hill Act 3", Offset = 0x15580 + 0x94, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15584 } }
+                }, new() {
+                    Name = "Bridge Act 1",
+                    Offset = 0x15580 + 0xde,
+                    Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15586 } }
+                }, new() {
+                    Name = "Bridge Act 2",
+                    Offset = 0x15580 + 0x103,
+                    Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15588 } }
+                }, new() {
+                    Name = "Bridge Act 3", Offset = 0x15580 + 0x128, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558a } }
+                }, new() {
+                    Name = "Jungle Act 1", Offset = 0x15580 + 0x14d, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558c } }
+                }, new() {
+                    Name = "Jungle Act 2", Offset = 0x15580 + 0x172, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558e } }
+                }, new() {
+                    Name = "Jungle Act 3", Offset = 0x15580 + 0x197, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15590 } }
+                }, new() {
+                    Name = "Labyrinth Act 1", Offset = 0x15580 + 0x1bc, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15592 } }
+                }, new() {
+                    Name = "Labyrinth Act 2", Offset = 0x15580 + 0x1e1, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15594 } }
+                }, new() {
+                    Name = "Labyrinth Act 3", Offset = 0x15580 + 0x206, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15596 } }
+                }, new() {
+                    Name = "Scrap Brain Act 1", Offset = 0x15580 + 0x22b, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15598 } }
+                }, new() {
+                    Name = "Scrap Brain Act 2", Offset = 0x15580 + 0x250, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559a } }
+                }, new() {
+                    Name = "Scrap Brain Act 3", Offset = 0x15580 + 0x2bf, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559c } }
+                }, new() {
+                    Name = "Sky Base Act 1", Offset = 0x15580 + 0x378, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559e } }
+                }, new() {
+                    Name = "Sky Base Act 2", Offset = 0x15580 + 0x39d, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a0 } }
+                }, new() {
+                    Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a2 } }
+                }, new() {
+                    Name = "Ending Sequence", Offset = 0x15580 + 0xb9, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a4 } }
+                }, new() {
+                    Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a8 } }
+                }, new() {
+                    Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155aa } }
+                }, new() {
+                    Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155ac } }
+                }, new() {
+                    Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b0 } }
+                }, new() {
+                    Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b2 } }
+                }, new() {
+                    Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b4 } }
+                }, new() {
+                    Name = "Special Stage 1", Offset = 0x15580 + 0x40c, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b8 } }
+                }, new() {
+                    Name = "Special Stage 2", Offset = 0x15580 + 0x431, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155ba } }
+                }, new() {
+                    Name = "Special Stage 3", Offset = 0x15580 + 0x456, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155bc } }
+                }, new() {
+                    Name = "Special Stage 4", Offset = 0x15580 + 0x47b, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155be } }
+                }, new() {
+                    Name = "Special Stage 5", Offset = 0x15580 + 0x4a0, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c0 } }
+                }, new() {
+                    Name = "Special Stage 6", Offset = 0x15580 + 0x4c5, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c2 } }
+                }, new() {
+                    Name = "Special Stage 7", Offset = 0x15580 + 0x4ea, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c4 } }
+                }, new() {
+                    Name = "Special Stage 8", Offset = 0x15580 + 0x50f, Length = 37,
+                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c6 } }
+                }
+            }
+        };
+
         public class MemMapEntry
         {
             public int Offset { get; set; }
@@ -100,9 +259,9 @@ namespace sth1edwv
             DisposeAll(_blockMappings);
             DisposeAll(_tileSets);
             Levels.Clear();
-            foreach (var e in _levelOffsets)
+            foreach (var level in _sonic1MasterSystem.Levels)
             {
-                Levels.Add(new Level(this, e.Offset, _artBanksTableOffset, Palettes, e.Label));
+                Levels.Add(new Level(this, level.Offset, _artBanksTableOffset, Palettes, level.Name));
             }
         }
 
@@ -135,11 +294,11 @@ namespace sth1edwv
         private void ReadGameText()
         {
             GameText.Clear();
-            for (int i = 0; i < 6; i++)
+            for (var i = 0; i < 6; i++)
             {
                 GameText.Add(new GameText(this, 0x122D + i * 0xF, i < 3));
             }
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 GameText.Add(new GameText(this, 0x197E + i * 0x10, true));
             }
@@ -156,7 +315,7 @@ namespace sth1edwv
 
         private string RomSizes(int size)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append(" (");
             switch (size)
             {
@@ -194,7 +353,7 @@ namespace sth1edwv
 
         private string Regions(int region)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append(" (");
             switch (region)
             {
@@ -220,22 +379,22 @@ namespace sth1edwv
 
         public string MakeSummary()
         {
-            StringBuilder sb = new StringBuilder();
-            MemoryStream m = new MemoryStream(Memory);
+            var sb = new StringBuilder();
+            var m = new MemoryStream(Memory);
             m.Seek(0x7FF0, 0);
-            byte[] header = new byte[16];
+            var header = new byte[16];
             m.Read(header, 0, 16);
             sb.AppendLine("Cartridge Header");
             sb.Append("Magic        : \"");
-            for (int i = 0; i < 8; i++)
+            for (var i = 0; i < 8; i++)
                 sb.Append((char)header[i]);
             sb.AppendLine("\"");
             sb.AppendLine($"Reserved     : 0x{header[8]:X2}{header[9]:X2}");
             sb.AppendLine($"Checksum     : 0x{header[10]:X2}{header[11]:X2}");
-            sb.AppendLine($"Product code : {(header[14] >> 4):X1}{header[13]:X2}{header[12]:X2}");
-            sb.AppendLine($"Version      : 0x{(header[14] & 7):X1}");
-            sb.AppendLine($"Region       : 0x{(header[15] >> 4):X1}{Regions(header[15] >> 4)}");
-            sb.AppendLine($"ROM Size     : 0x{(header[15] & 7):X1}{RomSizes(header[15] & 7)}");
+            sb.AppendLine($"Product code : {header[14] >> 4:X1}{header[13]:X2}{header[12]:X2}");
+            sb.AppendLine($"Version      : 0x{header[14] & 7:X1}");
+            sb.AppendLine($"Region       : 0x{header[15] >> 4:X1}{Regions(header[15] >> 4)}");
+            sb.AppendLine($"ROM Size     : 0x{header[15] & 7:X1}{RomSizes(header[15] & 7)}");
             sb.AppendLine($"ROM Header   : \"{Encoding.UTF7.GetString(Memory, 0x3B, 0x2A)}\"");
             return sb.ToString();
         }

@@ -37,18 +37,21 @@ namespace sth1edwv
         public Level(Cartridge cartridge, int offset, int artBanksTableOffset, IList<Palette> palettes, string label)
         {
             _label = label;
-            var address = BitConverter.ToUInt16(cartridge.Memory, offset);
-            Offset = address + 0x15580;
+            Offset = offset;
             LengthConsumed = 37;
             _header = new byte[37];
-            Array.Copy(cartridge.Memory, address + 0x15580, _header, 0, _header.Length);
+            Array.Copy(cartridge.Memory, offset, _header, 0, _header.Length);
 
 
             _solidityIndex = _header[0];
             _floorWidth = BitConverter.ToUInt16(_header, 1);
             _floorHeight = BitConverter.ToUInt16(_header, 3);
-            if (address == 666)
+            if (Offset == 0x15580 + 666)
+            {
+                // Scrap Brain 2 (BallHog area) has only enough data to fill 2KB 
                 _floorHeight /= 2;
+            }
+
             floorAddress = BitConverter.ToUInt16(_header, 15) + 0x14000;
             floorSize = BitConverter.ToUInt16(_header, 17);
             _blockMappingAddress = BitConverter.ToUInt16(_header, 19) + 0x10000;
@@ -82,12 +85,13 @@ namespace sth1edwv
 
         public TreeNode ToNode()
         {
+            var uncompressedSize = _floorWidth * _floorHeight;
             var result = new TreeNode("Header")
             {
                 Nodes =
                 {
-                    new TreeNode($"Floor Size           = ({_floorWidth} x {_floorHeight})"),
-                    new TreeNode($"Floor Data           = (@0x{floorAddress:X} Size: 0x{floorSize:X})"),
+                    new TreeNode($"Floor Size           = {_floorWidth} x {_floorHeight} ({uncompressedSize}B)"),
+                    new TreeNode($"Floor Data           = @0x{floorAddress:X} Size: 0x{floorSize:X} ({(double)(uncompressedSize-floorSize)/uncompressedSize:P})"),
                     new TreeNode($"Level Size           = ({_levelWidth} x {_levelHeight})"),
                     new TreeNode($"Level Offset         = (dx:{_levelXOffset} dy:{_levelYOffset})"),
                     new TreeNode($"Extended Height      = {_levelExtHeight}"),
@@ -168,8 +172,8 @@ namespace sth1edwv
 
             if (levelBounds)
             {
-                var x = _levelXOffset + (_levelXOffset / 32 * (_blockSize - 32));
-                var y = _levelYOffset + (_levelYOffset / 32 * (_blockSize - 32));
+                var x = _levelXOffset + _levelXOffset / 32 * (_blockSize - 32);
+                var y = _levelYOffset + _levelYOffset / 32 * (_blockSize - 32);
                 var w = (_levelWidth * 8 + 14) * _blockSize;
                 var h = (_levelHeight * 8 + 6) * _blockSize + _levelExtHeight;
                 using var brush = new SolidBrush(Color.FromArgb(128, Color.Black));
