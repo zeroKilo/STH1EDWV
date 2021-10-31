@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using Be.Windows.Forms;
 using Equin.ApplicationFramework;
@@ -23,7 +24,7 @@ namespace sth1edwv
             _solidityImages = new ImageList
             {
                 ColorDepth = ColorDepth.Depth16Bit,
-                ImageSize = new Size(32, 32),
+                ImageSize = new Size(32, 32)
             };
             _solidityImages.Images.AddStrip(Properties.Resources.SolidityImages);
 
@@ -277,7 +278,7 @@ namespace sth1edwv
             {
                 return;
             }
-            string input = Interaction.InputBox(
+            var input = Interaction.InputBox(
                 "Please enter new game text, format X;Y;TEXT\n(TEXT can be 'A'-'Z', ' ' and '©')", "Edit game text",
                 text.AsSerialized);
             if (input != "")
@@ -411,6 +412,40 @@ namespace sth1edwv
             Process.Start(filename);
         }
 
+        private void buttonCopyFloor_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+            Clipboard.SetText(Convert.ToBase64String(level.Floor.BlockIndices));
+        }
+
+        private void buttonPasteFloor_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (listBoxLevels.SelectedItem is not Level level)
+                {
+                    return;
+                }
+
+                var text = Clipboard.GetText();
+                var data = Convert.FromBase64String(text);
+                if (data.Length != level.Floor.BlockIndices.Length)
+                {
+                    return;
+                }
+                data.CopyTo(level.Floor.BlockIndices, 0);
+                // Need to redraw
+                RenderLevel();
+            }
+            catch (Exception)
+            {
+                // Ignore it
+            }
+        }
+
         private void pb3_MouseUp(object sender, MouseEventArgs e)
         {
             if (listBoxLevels.SelectedItem is not Level level)
@@ -449,7 +484,7 @@ namespace sth1edwv
             if (newData.Count > level.Floor.LengthConsumed)
             {
                 MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
-                level.Floor.BlockIndices = temp;
+                temp.CopyTo(level.Floor.BlockIndices, 0);
                 return;
             }
 
