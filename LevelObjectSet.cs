@@ -16,7 +16,7 @@ namespace sth1edwv
 
         public LevelObjectSet(Cartridge cartridge, int offset)
         {
-            byte count = cartridge.Memory[offset];
+            var count = cartridge.Memory[offset];
             _objects = Enumerable.Range(0, count)
                 .Select(i => new LevelObject(cartridge.Memory, offset + i * 3 + 1))
                 .ToList();

@@ -25,7 +25,7 @@ namespace sth1edwv
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int n = comboBoxNames.SelectedIndex;
+            var n = comboBoxNames.SelectedIndex;
             if (n == -1)
                 return;
             textBoxType.Text = LevelObject.Names.Keys.ToArray()[n].ToString();

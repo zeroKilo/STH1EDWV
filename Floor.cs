@@ -4,7 +4,7 @@ namespace sth1edwv
 {
     public class Floor: IDataItem
     {
-        public byte[] BlockIndices { get; set; }
+        public byte[] BlockIndices { get; }
 
         public Floor(Cartridge cartridge, int address, int size, int width)
         {
@@ -12,11 +12,6 @@ namespace sth1edwv
             LengthConsumed = size;
             BlockIndices = Compression.DecompressRle(cartridge, address, size);
             Width = width;
-        }
-
-        public byte[] CompressData()
-        {
-            return Compression.CompressRle(BlockIndices);
         }
 
         public int Offset { get; }

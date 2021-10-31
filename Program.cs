@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace sth1edwv
 {
-    static class Program
+    internal static class Program
     {
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.

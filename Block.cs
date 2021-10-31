@@ -22,7 +22,7 @@ namespace sth1edwv
                 _image = new Bitmap(32, 32);
                 using (var g = Graphics.FromImage(_image))
                 {
-                    for (int i = 0; i < 16; ++i)
+                    for (var i = 0; i < 16; ++i)
                     {
                         var x = i % 4 * 8;
                         var y = i / 4 * 8;

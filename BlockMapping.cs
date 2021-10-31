@@ -10,7 +10,7 @@ namespace sth1edwv
         public BlockMapping(Cartridge cartridge, int address, byte solidityIndex, TileSet tileSet)
         {
             // Hard-coded block counts...
-            int blockCount = 0;
+            var blockCount = 0;
             switch (address)
             {
                 case 0x10000:

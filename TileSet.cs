@@ -22,7 +22,7 @@ namespace sth1edwv
             _artData = BitConverter.ToUInt16(cartridge.Memory, offset + 4);
             _rowCount = BitConverter.ToUInt16(cartridge.Memory, offset + 6);
             var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
-            for (int i = 0; i < decompressed.Length; i += 64)
+            for (var i = 0; i < decompressed.Length; i += 64)
             {
                 Tiles.Add(new Tile(decompressed, i, palette, i / 64));
             }
@@ -43,12 +43,12 @@ namespace sth1edwv
                             new TreeNode($"Magic           = 0x{_magic:X4}"),
                             new TreeNode($"Duplicate Rows  = 0x{_dupRows:X4}"),
                             new TreeNode($"Art Data Offset = 0x{_artData:X4}"),
-                            new TreeNode($"Row Count       = 0x{_rowCount:X4}"),
+                            new TreeNode($"Row Count       = 0x{_rowCount:X4}")
                         }
                     },
                     new TreeNode($"{Tiles.Count} tiles"),
                     new TreeNode($"{_compression:P} compression")
-                },
+                }
             };
         }
 

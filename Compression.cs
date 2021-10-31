@@ -171,7 +171,7 @@ namespace sth1edwv
             // We work through it one row at a time...
             source.Position = 0;
             byte bitmask = 0;
-            int linesConsumed = 0;
+            var linesConsumed = 0;
             while (source.Position < source.Length)
             {
                 // Read a line
@@ -241,10 +241,10 @@ namespace sth1edwv
 
         private static IEnumerable<byte> ChunkyToPlanar(byte[] data)
         {
-            for (int plane = 0; plane < 4; ++plane)
+            for (var plane = 0; plane < 4; ++plane)
             {
                 var b = 0;
-                for (int i = 0; i < 8; ++i)
+                for (var i = 0; i < 8; ++i)
                 {
                     var bit = (data[i] >> plane) & 1;
                     b |= bit << (7 - i);

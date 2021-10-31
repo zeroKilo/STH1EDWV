@@ -40,7 +40,7 @@ namespace sth1edwv
             // Draw all tiles overlapping the rect
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            for (int index = 0; index < TileSet.Tiles.Count; ++index)
+            for (var index = 0; index < TileSet.Tiles.Count; ++index)
             {
                 // Is this tile in the clip rectangle?
                 var tileRect = ScreenRectFromIndex(index);
@@ -72,8 +72,8 @@ namespace sth1edwv
             {
                 return new Rectangle();
             }
-            int x = (index % 16) * (_tileSize + 1) + 1;
-            int y = (index / 16) * (_tileSize + 1) + 1;
+            var x = index % 16 * (_tileSize + 1) + 1;
+            var y = index / 16 * (_tileSize + 1) + 1;
             return new Rectangle(x, y, _tileSize, _tileSize);
         }
 

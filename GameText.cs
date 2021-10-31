@@ -24,7 +24,7 @@ namespace sth1edwv
             _y = cartridge.Memory[offset++];
             _map = isLowerMap ? LowerChars : UpperChars;
             _text = "";
-            int length = 0;
+            var length = 0;
             for (;;)
             {
                 var b = cartridge.Memory[offset++];
@@ -35,7 +35,7 @@ namespace sth1edwv
                     break;
                 }
                 ++length;
-                if (_map.TryGetValue(b, out char c))
+                if (_map.TryGetValue(b, out var c))
                 {
                     _text += c;
                 }

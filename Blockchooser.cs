@@ -24,7 +24,7 @@ namespace sth1edwv
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                for (int i = 0; i < _level.BlockMapping.Blocks.Count; ++i)
+                for (var i = 0; i < _level.BlockMapping.Blocks.Count; ++i)
                 {
                     var x = i % 16;
                     var y = i / 16;
@@ -37,9 +37,9 @@ namespace sth1edwv
 
         private void pb1_MouseClick(object sender, MouseEventArgs e)
         {
-            int x = e.X / 33;
-            int y = e.Y / 33;
-            int index = x + y * 16;
+            var x = e.X / 33;
+            var y = e.Y / 33;
+            var index = x + y * 16;
             if (index < _level.BlockMapping.Blocks.Count)
             {
                 SelectedBlockIndex = index;

@@ -21,7 +21,7 @@ namespace sth1edwv
                 }
                 // Lazy rendering
                 _image = new Bitmap(8, 8);
-                for (int i = 0; i < _data.Length; ++i)
+                for (var i = 0; i < _data.Length; ++i)
                 {
                     var x = i % 8;
                     var y = i / 8;
