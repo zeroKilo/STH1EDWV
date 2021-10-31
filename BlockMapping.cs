@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace sth1edwv
 {
@@ -63,6 +64,19 @@ namespace sth1edwv
         public IList<byte> GetData()
         {
             throw new NotImplementedException();
+        }
+
+        public void UpdateUsageForLevel(Level level)
+        {
+            foreach (var block in Blocks)
+            {
+                block.UsageCount = 0;
+            }
+
+            foreach (var index in level.Floor.BlockIndices)
+            {
+                ++Blocks[index].UsageCount;
+            }
         }
     }
 }

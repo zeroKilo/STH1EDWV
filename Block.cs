@@ -35,7 +35,7 @@ namespace sth1edwv
             }
         }
 
-        public int Index { get; set; }
+        public int Index { get; }
         public int SolidityOffset { get; }
 
         public int SolidityIndex { get; set; }
@@ -66,6 +66,8 @@ namespace sth1edwv
 
         public int Offset { get; }
         public int LengthConsumed { get; }
+        public int UsageCount { get; set; }
+
         public IList<byte> GetData()
         {
             return TileIndices;

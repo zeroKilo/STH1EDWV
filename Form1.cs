@@ -49,11 +49,6 @@ namespace sth1edwv
         {
             _cartridge = new Cartridge(filename);
             _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
-            RefreshAll();
-        }
-
-        private void RefreshAll()
-        {
             hexViewer.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
             listBoxMemoryLocations.Items.Clear();
             listBoxMemoryLocations.Items.AddRange(_cartridge.Labels.ToArray<object>());
@@ -100,6 +95,8 @@ namespace sth1edwv
             tilePicker1.TileSet = level.TileSet;
 
             LoadLevelData();
+
+            level.BlockMapping.UpdateUsageForLevel(level);
 
             dataGridViewBlocks.DataSource = new BindingListView<Block>(level.BlockMapping.Blocks);
         }
