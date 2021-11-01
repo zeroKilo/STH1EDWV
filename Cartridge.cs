@@ -1,9 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using sth1edwv.Properties;
 
 namespace sth1edwv
 {
@@ -22,20 +23,6 @@ namespace sth1edwv
         /// Get raw data from the item
         /// </summary>
         IList<byte> GetData();
-        /*
-        /// <summary>
-        /// Addresses of pointers to this data, along with the slot used for the pointer
-        /// </summary>
-        IEnumerable<Tuple<int, int>> Pointers { get; }
-        /// <summary>
-        /// Addresses of bank numbers used to access this data
-        /// </summary>
-        IEnumerable<int> BankReferences { get; }
-        /// <summary>
-        /// Addresses of relative references to this data, along with the reference point they are relative to
-        /// </summary>
-        IEnumerable<Tuple<int, int>> RelativeReferences { get; }
-        */
     }
 
     public class Cartridge: IDisposable
@@ -52,7 +39,8 @@ namespace sth1edwv
             }
 
             public Types Type { get; set; }
-            public int RelativeTo { get; set; }
+            public int RelativeTo { get; set; } // for RelativeOffset
+            public int Bank { get; set; } // for OffsetInBank
         }
 
         private class MemoryItem
@@ -61,6 +49,14 @@ namespace sth1edwv
             public int Length { get; set; }
 
             public List<Reference> References { get; } = new();
+
+            public enum PlacementOptions
+            {
+                Fixed,
+                SameBank,
+                Free
+            }
+            public PlacementOptions Placement { get; set; }
         }
 
         private class Game
@@ -73,7 +69,9 @@ namespace sth1edwv
             public List<Level> Levels;
 
             public class Palette: MemoryItem
-            {}
+            {
+                public string Name { get; set; }
+            }
 
             public List<Palette> Palettes;
 
@@ -88,114 +86,160 @@ namespace sth1edwv
             public List<Floor> Floors;
         }
 
-        private static Game _sonic1MasterSystem = new()
+        private static readonly Game Sonic1MasterSystem = new()
         {
             Levels = new List<Game.Level>
             {
                 new() {
-                    Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15580 } }
+                    Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15580 } }
                 }, new() {
-                    Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15582 } }
+                    Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15582 } }
                 }, new() {
-                    Name = "Green Hill Act 3", Offset = 0x15580 + 0x94, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15584 } }
+                    Name = "Green Hill Act 3", Offset = 0x15580 + 0x94, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15584 } }
                 }, new() {
-                    Name = "Bridge Act 1",
-                    Offset = 0x15580 + 0xde,
-                    Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15586 } }
+                    Name = "Bridge Act 1", Offset = 0x15580 + 0xde, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15586 } }
                 }, new() {
-                    Name = "Bridge Act 2",
-                    Offset = 0x15580 + 0x103,
-                    Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15588 } }
+                    Name = "Bridge Act 2", Offset = 0x15580 + 0x103, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15588 } }
                 }, new() {
-                    Name = "Bridge Act 3", Offset = 0x15580 + 0x128, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558a } }
+                    Name = "Bridge Act 3", Offset = 0x15580 + 0x128, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558a } }
                 }, new() {
-                    Name = "Jungle Act 1", Offset = 0x15580 + 0x14d, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558c } }
+                    Name = "Jungle Act 1", Offset = 0x15580 + 0x14d, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558c } }
                 }, new() {
-                    Name = "Jungle Act 2", Offset = 0x15580 + 0x172, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558e } }
+                    Name = "Jungle Act 2", Offset = 0x15580 + 0x172, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1558e } }
                 }, new() {
-                    Name = "Jungle Act 3", Offset = 0x15580 + 0x197, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15590 } }
+                    Name = "Jungle Act 3", Offset = 0x15580 + 0x197, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15590 } }
                 }, new() {
-                    Name = "Labyrinth Act 1", Offset = 0x15580 + 0x1bc, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15592 } }
+                    Name = "Labyrinth Act 1", Offset = 0x15580 + 0x1bc, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15592 } }
                 }, new() {
-                    Name = "Labyrinth Act 2", Offset = 0x15580 + 0x1e1, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15594 } }
+                    Name = "Labyrinth Act 2", Offset = 0x15580 + 0x1e1, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15594 } }
                 }, new() {
-                    Name = "Labyrinth Act 3", Offset = 0x15580 + 0x206, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15596 } }
+                    Name = "Labyrinth Act 3", Offset = 0x15580 + 0x206, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15596 } }
                 }, new() {
-                    Name = "Scrap Brain Act 1", Offset = 0x15580 + 0x22b, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15598 } }
+                    Name = "Scrap Brain Act 1", Offset = 0x15580 + 0x22b, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x15598 } }
                 }, new() {
-                    Name = "Scrap Brain Act 2", Offset = 0x15580 + 0x250, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559a } }
+                    Name = "Scrap Brain Act 2", Offset = 0x15580 + 0x250, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559a } }
                 }, new() {
-                    Name = "Scrap Brain Act 3", Offset = 0x15580 + 0x2bf, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559c } }
+                    Name = "Scrap Brain Act 3", Offset = 0x15580 + 0x2bf, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559c } }
                 }, new() {
-                    Name = "Sky Base Act 1", Offset = 0x15580 + 0x378, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559e } }
+                    Name = "Sky Base Act 1", Offset = 0x15580 + 0x378, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x1559e } }
                 }, new() {
-                    Name = "Sky Base Act 2", Offset = 0x15580 + 0x39d, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a0 } }
+                    Name = "Sky Base Act 2", Offset = 0x15580 + 0x39d, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a0 } }
                 }, new() {
-                    Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a2 } }
+                    Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a2 } }
                 }, new() {
-                    Name = "Ending Sequence", Offset = 0x15580 + 0xb9, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a4 } }
+                    Name = "Ending Sequence", Offset = 0x15580 + 0xb9, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a4 } }
                 }, new() {
-                    Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a8 } }
+                    Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155a8 } }
                 }, new() {
-                    Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155aa } }
+                    Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155aa } }
                 }, new() {
-                    Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155ac } }
+                    Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155ac } }
                 }, new() {
-                    Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b0 } }
+                    Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b0 } }
                 }, new() {
-                    Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b2 } }
+                    Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b2 } }
                 }, new() {
-                    Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b4 } }
+                    Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b4 } }
                 }, new() {
-                    Name = "Special Stage 1", Offset = 0x15580 + 0x40c, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b8 } }
+                    Name = "Special Stage 1", Offset = 0x15580 + 0x40c, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155b8 } }
                 }, new() {
-                    Name = "Special Stage 2", Offset = 0x15580 + 0x431, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155ba } }
+                    Name = "Special Stage 2", Offset = 0x15580 + 0x431, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155ba } }
                 }, new() {
-                    Name = "Special Stage 3", Offset = 0x15580 + 0x456, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155bc } }
+                    Name = "Special Stage 3", Offset = 0x15580 + 0x456, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155bc } }
                 }, new() {
-                    Name = "Special Stage 4", Offset = 0x15580 + 0x47b, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155be } }
+                    Name = "Special Stage 4", Offset = 0x15580 + 0x47b, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155be } }
                 }, new() {
-                    Name = "Special Stage 5", Offset = 0x15580 + 0x4a0, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c0 } }
+                    Name = "Special Stage 5", Offset = 0x15580 + 0x4a0, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c0 } }
                 }, new() {
-                    Name = "Special Stage 6", Offset = 0x15580 + 0x4c5, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c2 } }
+                    Name = "Special Stage 6", Offset = 0x15580 + 0x4c5, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c2 } }
                 }, new() {
-                    Name = "Special Stage 7", Offset = 0x15580 + 0x4ea, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c4 } }
+                    Name = "Special Stage 7", Offset = 0x15580 + 0x4ea, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c4 } }
                 }, new() {
-                    Name = "Special Stage 8", Offset = 0x15580 + 0x50f, Length = 37,
-                    References = { new Reference() { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c6 } }
+                    Name = "Special Stage 8", Offset = 0x15580 + 0x50f, Length = 37, Placement = MemoryItem.PlacementOptions.Fixed,
+                    References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c6 } }
                 }
+            },
+            Palettes = new List<Game.Palette>()
+            {
+                new() {
+                    Name = "Green Hill", Length = 16*5, Offset = 0x629e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x627c } }
+                }, new() {
+                    Name = "Bridge", Length = 16*5, Offset = 0x62ee, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x627e } }
+                }, new() {
+                    Name = "Jungle", Length = 16*5, Offset = 0x633e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6280 } }
+                }, new() {
+                    Name = "Labyrinth", Length = 16*5, Offset = 0x638e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References =
+                    {
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6282 }, // Table
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x01EA }, // Raster split
+                    }
+                }, new() {
+                    Name = "Scrap Brain", Length = 16*6, Offset = 0x63de, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6284 } }
+                }, new() {
+                    Name = "Sky Base 1/2", Length = 16*6, Offset = 0x643e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6286 } }
+                }, new() {
+                    Name = "Sky Base 3/2 interior", Length = 32, Offset = 0x658e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6288 } }
+                }, new() {
+                    Name = "Bonus", Length = 32, Offset = 0x655e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x628a } }
+                }, 
+                // 0x629E 
+                // 0x62EE 
+                // 0x633E 
+                // 0x638E 
+                // 0x63DE 
+                // 0x643E 
+                // 0x658E 
+                // 0x655E 
+                // 0x62BE 
+                // 0x630E 
+                // 0x635E 
+                // 0x63AE 
+                // 0x63FE 
+                // 0x645E 
+                // 0x65AE 
+                // 0x657E 
+                // 0x651E
+
             }
         };
 
@@ -230,8 +274,8 @@ namespace sth1edwv
 
             _originalMemory = (byte[])Memory.Clone();
 
-            Labels = ReadList(Properties.Resources.map);
-            _levelOffsets = ReadList(Properties.Resources.levels);
+            Labels = ReadList(Resources.map);
+            _levelOffsets = ReadList(Resources.levels);
 
             _artBanksTableOffset = 0;
             var symbolsFilePath = Path.ChangeExtension(path, "sym");
@@ -249,17 +293,17 @@ namespace sth1edwv
                 }
             }
 
-            Palettes = Palette.ReadPalettes(Memory, 0x627C, 8).ToList();
+            Palettes = Palette.ReadPalettes(Memory, 0x627C, 8+9).ToList();
             ReadLevels();
             ReadGameText();
         }
 
-        public void ReadLevels()
+        private void ReadLevels()
         {
             DisposeAll(_blockMappings);
             DisposeAll(_tileSets);
             Levels.Clear();
-            foreach (var level in _sonic1MasterSystem.Levels)
+            foreach (var level in Sonic1MasterSystem.Levels)
             {
                 Levels.Add(new Level(this, level.Offset, _artBanksTableOffset, Palettes, level.Name));
             }
@@ -426,13 +470,28 @@ namespace sth1edwv
             var data = (byte[])_originalMemory.Clone();
 
             // We walk through the data and "de-allocate" all the parts that we have read into objects
-            var space = _tileSets.Values
-                .Cast<IDataItem>()
-                .Concat(_floors.Values)
-                .Concat(_blockMappings.Values)
-                .Select(x => new FreeSpace{Start = x.Offset, End = x.Offset + x.LengthConsumed})
+            var space = Sonic1MasterSystem.Levels
+                .Cast<MemoryItem>()
+                .Concat(Sonic1MasterSystem.Palettes)
+                .Concat(Sonic1MasterSystem.Floors)
+                .Concat(Sonic1MasterSystem.TileSets)
+                .Select(x => new FreeSpace{Start = x.Offset, End = x.Offset + x.Length})
                 .OrderBy(x => x.Start)
                 .ToList();
+
+            // We then merge consecutive ones together
+            for (int i = 0; i < space.Count - 1; /* increment in loop */)
+            {
+                if (space[i].End == space[i + 1].Start)
+                {
+                    space[i].End = space[i + 1].End;
+                    space.RemoveAt(i + 1);
+                }
+                else
+                {
+                    ++i;
+                }
+            }
 
             // TODO more here...
             // - Get data from each item

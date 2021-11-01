@@ -85,7 +85,7 @@ namespace sth1edwv
                 return;
             }
 
-            pictureBoxPalette.Image = palette.ToImage(256, 128);
+            pictureBoxPalette.Image = palette.ToImage(512);
         }
 
         private void SelectedLevelChanged(object sender, EventArgs e)
