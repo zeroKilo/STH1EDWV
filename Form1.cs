@@ -176,7 +176,7 @@ namespace sth1edwv
             }
 
             var image = new Bitmap(blocks.Count * 33 - 1, 48);
-            int x = 0;
+            var x = 0;
             using (var g = Graphics.FromImage(image))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -187,7 +187,7 @@ namespace sth1edwv
                     g.DrawImageUnscaled(block.Image, x, 0);
                     g.DrawString(block.Index.ToString("X2"), SystemFonts.DefaultFont, SystemBrushes.WindowText, 
                         new RectangleF(x, 32, 32, 16),
-                        new StringFormat()
+                        new StringFormat
                         {
                             Alignment = StringAlignment.Center
                         });
@@ -349,7 +349,7 @@ namespace sth1edwv
                 return;
             }
 
-            using var d = new SaveFileDialog() { Filter = "*.png|*.png" };
+            using var d = new SaveFileDialog { Filter = "*.png|*.png" };
             if (d.ShowDialog(this) == DialogResult.OK)
             {
                 pictureBoxRenderedLevel.Image.Save(d.FileName);
@@ -499,7 +499,7 @@ namespace sth1edwv
             }
 
             // We write the tileset to an image and put that on the clipboard
-            int rows = level.TileSet.Tiles.Count / 16;
+            var rows = level.TileSet.Tiles.Count / 16;
             using var image = new Bitmap(128, rows * 8);
             using var g = Graphics.FromImage(image);
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;

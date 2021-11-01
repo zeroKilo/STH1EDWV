@@ -6,8 +6,6 @@ namespace sth1edwv
 {
     public partial class ObjectChooser : Form
     {
-        public bool exitOk = false;
-
         public ObjectChooser(LevelObject levelObject)
         {
             InitializeComponent();

@@ -11,34 +11,19 @@ namespace sth1edwv
         public BlockMapping(Cartridge cartridge, int address, byte solidityIndex, TileSet tileSet)
         {
             // Hard-coded block counts...
-            var blockCount = 0;
-            switch (address)
+            // TODO: why?
+            var blockCount = address switch
             {
-                case 0x10000:
-                    blockCount = 184;
-                    break;
-                case 0x10B80:
-                    blockCount = 144;
-                    break;
-                case 0x11480:
-                    blockCount = 160;
-                    break;
-                case 0x11E80:
-                    blockCount = 176;
-                    break;
-                case 0x12980:
-                    blockCount = 192;
-                    break;
-                case 0x13580:
-                    blockCount = 216;
-                    break;
-                case 0x14300:
-                    blockCount = 104;
-                    break;
-                case 0x14980:
-                    blockCount = 132;
-                    break;
-            }
+                0x10000 => 184,
+                0x10B80 => 144,
+                0x11480 => 160,
+                0x11E80 => 176,
+                0x12980 => 192,
+                0x13580 => 216,
+                0x14300 => 104,
+                0x14980 => 132,
+                _ => 0
+            };
             var solidityOffset = BitConverter.ToUInt16(cartridge.Memory, 0x3A65 + solidityIndex * 2);
             for (var i = 0; i < blockCount; ++i)
             {

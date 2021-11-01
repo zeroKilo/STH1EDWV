@@ -16,7 +16,7 @@ namespace sth1edwv
             InitializeComponent();
         }
 
-        private void Blockchooser_Load(object sender, EventArgs e)
+        private void FormLoad(object sender, EventArgs e)
         {
             var bmp = new Bitmap(528, 528);
             using (var g = Graphics.FromImage(bmp))

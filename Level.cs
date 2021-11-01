@@ -15,8 +15,8 @@ namespace sth1edwv
         private readonly byte   _solidityIndex;
         private readonly ushort _floorWidth;
         private readonly ushort _floorHeight;
-        public readonly int   floorAddress;
-        public ushort floorSize;
+        private readonly int   _floorAddress;
+        private readonly ushort _floorSize;
         private readonly int   _blockMappingAddress;
         private readonly ushort _levelXOffset;
         private readonly byte   _levelWidth;
@@ -24,11 +24,11 @@ namespace sth1edwv
         private readonly byte   _levelExtHeight;
         private readonly byte   _levelHeight;
         private readonly ushort _offsetArt;
-        public readonly ushort offsetObjectLayout;
+        private readonly ushort _offsetObjectLayout;
         private readonly byte   _initPalette;
         public TileSet TileSet { get; }
         public Floor Floor { get; }
-        public LevelObjectSet Objects { get; }
+        private LevelObjectSet Objects { get; }
 
         public BlockMapping BlockMapping { get; }
         private readonly string _label;
@@ -52,8 +52,8 @@ namespace sth1edwv
                 _floorHeight /= 2;
             }
 
-            floorAddress = BitConverter.ToUInt16(_header, 15) + 0x14000;
-            floorSize = BitConverter.ToUInt16(_header, 17);
+            _floorAddress = BitConverter.ToUInt16(_header, 15) + 0x14000;
+            _floorSize = BitConverter.ToUInt16(_header, 17);
             _blockMappingAddress = BitConverter.ToUInt16(_header, 19) + 0x10000;
             _levelXOffset = BitConverter.ToUInt16(_header, 5);
             _levelWidth = _header[8];
@@ -61,7 +61,7 @@ namespace sth1edwv
             _levelExtHeight = _header[11];
             _levelHeight = _header[12];
             _offsetArt = BitConverter.ToUInt16(_header, 21);
-            offsetObjectLayout = BitConverter.ToUInt16(_header, 30);
+            _offsetObjectLayout = BitConverter.ToUInt16(_header, 30);
             _initPalette = _header[26];
             if (artBanksTableOffset > 0)
             {
@@ -73,9 +73,9 @@ namespace sth1edwv
             {
                 TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, palettes[_initPalette]);
             }
-            Floor = cartridge.GetFloor(floorAddress, floorSize, _floorWidth);
+            Floor = cartridge.GetFloor(_floorAddress, _floorSize, _floorWidth);
             BlockMapping = cartridge.GetBlockMapping(_blockMappingAddress, _solidityIndex, TileSet);
-            Objects = new LevelObjectSet(cartridge, 0x15580 + offsetObjectLayout);
+            Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
 
         public override string ToString()
@@ -91,12 +91,12 @@ namespace sth1edwv
                 Nodes =
                 {
                     new TreeNode($"Floor Size           = {_floorWidth} x {_floorHeight} ({uncompressedSize}B)"),
-                    new TreeNode($"Floor Data           = @0x{floorAddress:X} Size: 0x{floorSize:X} ({(double)(uncompressedSize-floorSize)/uncompressedSize:P})"),
+                    new TreeNode($"Floor Data           = @0x{_floorAddress:X} Size: 0x{_floorSize:X} ({(double)(uncompressedSize-_floorSize)/uncompressedSize:P})"),
                     new TreeNode($"Level Size           = ({_levelWidth} x {_levelHeight})"),
                     new TreeNode($"Level Offset         = (dx:{_levelXOffset} dy:{_levelYOffset})"),
                     new TreeNode($"Extended Height      = {_levelExtHeight}"),
                     new TreeNode($"Offset Art           = 0x{_offsetArt:X8}"),
-                    new TreeNode($"Offset Object Layout = 0x{offsetObjectLayout:X8}"),
+                    new TreeNode($"Offset Object Layout = 0x{_offsetObjectLayout:X8}"),
                     new TreeNode($"Initial Palette      = {_initPalette}"),
                     Objects.ToNode()
                 }

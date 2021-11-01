@@ -9,7 +9,7 @@ namespace sth1edwv
         private readonly string _label;
         public IList<Color> Colors { get; } = new List<Color>();
 
-        private Palette(byte[] mem, int offset, string label, int paletteCount)
+        private Palette(IReadOnlyList<byte> mem, int offset, string label, int paletteCount)
         {
             _label = label;
             for (var i = 0; i < 16*paletteCount; i++)
@@ -29,18 +29,14 @@ namespace sth1edwv
 
         private static int ScaleColor(int c)
         {
-            switch (c)
+            return c switch
             {
-                case 0:
-                    return 0;
-                case 1:
-                    return 80;
-                case 2:
-                    return 175;
-                case 3:
-                    return 255;
-            }
-            return 0;
+                0 => 0,
+                1 => 80,
+                2 => 175,
+                3 => 255,
+                _ => 0
+            };
         }
 
         public static IEnumerable<Palette> ReadPalettes(byte[] mem, int offset, int count)

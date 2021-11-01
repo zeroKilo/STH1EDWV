@@ -8,7 +8,6 @@ namespace sth1edwv
     public sealed partial class TilePicker : UserControl
     {
         private int _tileSize;
-        private int _selectedTileIndex = -1;
         private TileSet _tileSet;
         private const int TilesPerRow = 16;
 
@@ -52,10 +51,10 @@ namespace sth1edwv
                 e.Graphics.DrawImage(tile.Image, tileRect);
             }
 
-            if (_selectedTileIndex > -1)
+            if (SelectedIndex > -1)
             {
                 // Is this tile in the clip rectangle?
-                var tileRect = ScreenRectFromIndex(_selectedTileIndex);
+                var tileRect = ScreenRectFromIndex(SelectedIndex);
                 if (tileRect.IntersectsWith(e.ClipRectangle))
                 {
                     tileRect.Width += 1;
@@ -111,12 +110,12 @@ namespace sth1edwv
 
         private void ChangeSelection(int newSelection)
         {
-            if (_selectedTileIndex != newSelection)
+            if (SelectedIndex != newSelection)
             {
-                var previousSelection = _selectedTileIndex;
-                _selectedTileIndex = newSelection;
+                var previousSelection = SelectedIndex;
+                SelectedIndex = newSelection;
                 InvalidateTile(previousSelection);
-                InvalidateTile(_selectedTileIndex);
+                InvalidateTile(SelectedIndex);
                 SelectionChanged?.Invoke(this, SelectedTile);
             }
         }
@@ -132,7 +131,7 @@ namespace sth1edwv
             }
         }
 
-        public Tile SelectedTile => _selectedTileIndex == -1 ? null : TileSet?.Tiles[_selectedTileIndex];
+        public Tile SelectedTile => SelectedIndex == -1 ? null : TileSet?.Tiles[SelectedIndex];
 
         public TileSet TileSet
         {
@@ -145,15 +144,7 @@ namespace sth1edwv
             }
         }
 
-        public int SelectedIndex
-        {
-            get => _selectedTileIndex;
-            set
-            {
-                _selectedTileIndex = value;
-
-            }
-        }
+        public int SelectedIndex { get; set; } = -1;
 
         public event EventHandler<Tile> SelectionChanged;
     }

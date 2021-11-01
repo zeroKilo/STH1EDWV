@@ -66,24 +66,24 @@ namespace sth1edwv
                 public string Name { get; set; }
             }
 
-            public List<Level> Levels;
+            public List<Level> Levels { get; set; }
 
             public class Palette: MemoryItem
             {
                 public string Name { get; set; }
             }
 
-            public List<Palette> Palettes;
+            public List<Palette> Palettes { get; set; }
 
             public class TileSet : MemoryItem
             {}
 
-            public List<TileSet> TileSets;
+            public List<TileSet> TileSets { get; set; }
 
             public class Floor : MemoryItem
             {}
 
-            public List<Floor> Floors;
+            public List<Floor> Floors { get; set; }
         }
 
         private static readonly Game Sonic1MasterSystem = new()
@@ -207,7 +207,7 @@ namespace sth1edwv
                     References =
                     {
                         new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6282 }, // Table
-                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x01EA }, // Raster split
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x01EA } // Raster split
                     }
                 }, new() {
                     Name = "Scrap Brain", Length = 16*6, Offset = 0x63de, Placement = MemoryItem.PlacementOptions.SameBank, 
@@ -258,7 +258,7 @@ namespace sth1edwv
                 },  new() {
                     Name = "Sky Base 2 cycle", Length = 16*4, Offset = 0x651e, Placement = MemoryItem.PlacementOptions.SameBank, 
                     References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x629c } }
-                },
+                }
                 // TODO: there is a "regular palette" table and a "palette cycle" table implied by the above, it'd be better to make those tables flexible?
                 // TODO: palette editing at all :)
             }
@@ -343,7 +343,7 @@ namespace sth1edwv
             return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet));
         }
 
-        private T GetItem<T>(Dictionary<int, T> dictionary, int offset, Func<T> generatorFunc) 
+        private static T GetItem<T>(IDictionary<int, T> dictionary, int offset, Func<T> generatorFunc) 
         {
             if (!dictionary.TryGetValue(offset, out var result))
             {
@@ -376,7 +376,7 @@ namespace sth1edwv
                 .ToList();
         }
 
-        private string RomSizes(int size)
+        private static string RomSizes(int size)
         {
             var sb = new StringBuilder();
             sb.Append(" (");
@@ -414,7 +414,7 @@ namespace sth1edwv
             return sb.ToString();
         }
 
-        private string Regions(int region)
+        private static string Regions(int region)
         {
             var sb = new StringBuilder();
             sb.Append(" (");
@@ -468,7 +468,7 @@ namespace sth1edwv
             DisposeAll(_blockMappings);
         }
 
-        private void DisposeAll<T>(Dictionary<int, T> collection) where T: IDisposable
+        private static void DisposeAll<T>(Dictionary<int, T> collection) where T: IDisposable
         {
             foreach (var item in collection.Values)
             {
@@ -499,7 +499,7 @@ namespace sth1edwv
                 .ToList();
 
             // We then merge consecutive ones together
-            for (int i = 0; i < space.Count - 1; /* increment in loop */)
+            for (var i = 0; i < space.Count - 1; /* increment in loop */)
             {
                 if (space[i].End == space[i + 1].Start)
                 {

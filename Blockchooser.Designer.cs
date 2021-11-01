@@ -50,7 +50,7 @@
             this.Name = "BlockChooser";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Block Chooser";
-            this.Load += new System.EventHandler(this.Blockchooser_Load);
+            this.Load += new System.EventHandler(this.FormLoad);
             ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
             this.ResumeLayout(false);
 
