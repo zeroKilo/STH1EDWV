@@ -191,7 +191,7 @@ namespace sth1edwv
                     References = { new Reference { Type = Reference.Types.RelativeOffset, RelativeTo = 0x15580, Location = 0x155c6 } }
                 }
             },
-            Palettes = new List<Game.Palette>()
+            Palettes = new List<Game.Palette>
             {
                 new() {
                     Name = "Green Hill", Length = 16*5, Offset = 0x629e, Placement = MemoryItem.PlacementOptions.SameBank, 
@@ -216,30 +216,51 @@ namespace sth1edwv
                     Name = "Sky Base 1/2", Length = 16*6, Offset = 0x643e, Placement = MemoryItem.PlacementOptions.SameBank, 
                     References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6286 } }
                 }, new() {
-                    Name = "Sky Base 3/2 interior", Length = 32, Offset = 0x658e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    Name = "Sky Base 3/2 interior", Length = 16*2, Offset = 0x658e, Placement = MemoryItem.PlacementOptions.SameBank, 
                     References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6288 } }
                 }, new() {
-                    Name = "Bonus", Length = 32, Offset = 0x655e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    Name = "Special stage", Length = 16*2, Offset = 0x655e, Placement = MemoryItem.PlacementOptions.SameBank, 
                     References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x628a } }
-                }, 
-                // 0x629E 
-                // 0x62EE 
-                // 0x633E 
-                // 0x638E 
-                // 0x63DE 
-                // 0x643E 
-                // 0x658E 
-                // 0x655E 
-                // 0x62BE 
-                // 0x630E 
-                // 0x635E 
-                // 0x63AE 
-                // 0x63FE 
-                // 0x645E 
-                // 0x65AE 
-                // 0x657E 
-                // 0x651E
-
+                }, new() {
+                    Name = "Green Hill cycle", Length = 16*3, Offset = 0x62be, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x628c } }
+                }, new() {
+                    Name = "Bridge cycle", Length = 16*3, Offset = 0x630e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x628e } }
+                }, new() {
+                    Name = "Jungle cycle", Length = 16*3, Offset = 0x635e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6290 } }
+                }, new() {
+                    Name = "Labyrinth cycle", Length = 16*3, Offset = 0x63ae, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6292 } }
+                }, new() {
+                    Name = "Scrap Brain cycle", Length = 16*4, Offset = 0x63fe, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6294 } }
+                }, new() {
+                    Name = "Sky Base 1 cycle", Length = 16*4, Offset = 0x645e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References =
+                    {
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6296 },
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x1f9f }
+                    }
+                }, new() {
+                    Name = "Sky Base lightning 1", Length = 16*4, Offset = 0x649e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x1fa3 } }
+                }, new() {
+                    Name = "Sky Base lightning 2", Length = 16*4, Offset = 0x64de, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x1fa7 } }
+                }, new() {
+                    Name = "Sky Base interior cycle", Length = 16*4, Offset = 0x65ae, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6298 } }
+                }, new() {
+                    Name = "Special stage cycle", Length = 16*1, Offset = 0x657e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x629a } }
+                },  new() {
+                    Name = "Sky Base 2 cycle", Length = 16*4, Offset = 0x651e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x629c } }
+                },
+                // TODO: there is a "regular palette" table and a "palette cycle" table implied by the above, it'd be better to make those tables flexible?
+                // TODO: palette editing at all :)
             }
         };
 
@@ -261,7 +282,6 @@ namespace sth1edwv
         public IList<GameText> GameText { get; } = new List<GameText>();
         public IList<Palette> Palettes { get; }
 
-        private readonly IList<MemMapEntry> _levelOffsets;
         private readonly int _artBanksTableOffset;
 
         private readonly Dictionary<int, TileSet> _tileSets = new();
@@ -275,7 +295,6 @@ namespace sth1edwv
             _originalMemory = (byte[])Memory.Clone();
 
             Labels = ReadList(Resources.map);
-            _levelOffsets = ReadList(Resources.levels);
 
             _artBanksTableOffset = 0;
             var symbolsFilePath = Path.ChangeExtension(path, "sym");
