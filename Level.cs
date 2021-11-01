@@ -139,10 +139,13 @@ namespace sth1edwv
                 for (var tileY = 0; tileY < 4; ++tileY)
                 {
                     var tileIndex = block.TileIndices[tileX + tileY * 4];
-                    var tile = TileSet.Tiles[tileIndex];
-                    var x = blockX * _blockSize + tileX * tileSize;
-                    var y = blockY * _blockSize + tileY * tileSize;
-                    g.DrawImageUnscaled(tile.Image, x, y);
+                    if (tileIndex < TileSet.Tiles.Count)
+                    {
+                        var tile = TileSet.Tiles[tileIndex];
+                        var x = blockX * _blockSize + tileX * tileSize;
+                        var y = blockY * _blockSize + tileY * tileSize;
+                        g.DrawImageUnscaled(tile.Image, x, y);
+                    }
                 }
 
                 if (blockLabels)

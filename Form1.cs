@@ -17,6 +17,7 @@ namespace sth1edwv
         private int _lastX, _lastY;
         private Cartridge _cartridge;
         private readonly ImageList _solidityImages;
+        private int _blockEditorTileSize;
 
         public Form1()
         {
@@ -99,6 +100,7 @@ namespace sth1edwv
             level.BlockMapping.UpdateUsageForLevel(level);
 
             dataGridViewBlocks.DataSource = new BindingListView<Block>(level.BlockMapping.Blocks);
+            dataGridViewBlocks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
         }
 
         private void LoadLevelData()
@@ -153,6 +155,43 @@ namespace sth1edwv
             }
 
             pictureBoxTilePreview.Image = bmp;
+
+            pictureBoxTileUsedIn.Image?.Dispose();
+            pictureBoxTileUsedIn.Image = null;
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+
+            var blocks = level.BlockMapping.Blocks
+                .Where(block => block.TileIndices.Contains((byte)tile.Index))
+                .ToList();
+            if (blocks.Count == 0)
+            {
+                return;
+            }
+
+            var image = new Bitmap(blocks.Count * 33 - 1, 48);
+            int x = 0;
+            using (var g = Graphics.FromImage(image))
+            {
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.Clear(SystemColors.Window);
+                foreach (var block in blocks)
+                {
+                    g.DrawImageUnscaled(block.Image, x, 0);
+                    g.DrawString(block.Index.ToString("X2"), SystemFonts.DefaultFont, SystemBrushes.WindowText, 
+                        new RectangleF(x, 32, 32, 16),
+                        new StringFormat()
+                        {
+                            Alignment = StringAlignment.Center
+                        });
+                    x += 33;
+                }
+            }
+
+            pictureBoxTileUsedIn.Image = image;
         }
 
         private Block GetSelectedBlock()
@@ -188,14 +227,20 @@ namespace sth1edwv
                 return;
             }
 
-            var scale = pictureBoxBlockEditor.Width / 32;
-            var bmp = new Bitmap(32 * scale, 32 * scale);
+            var scale = (pictureBoxBlockEditor.Width - 3) / 32;
+            var bmp = new Bitmap(32 * scale + 3, 32 * scale + 3);
+            _blockEditorTileSize = scale * 8 + 1;
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.ScaleTransform(scale, scale);
-                g.DrawImageUnscaled(block.Image, 0, 0);
+                for (var i = 0; i < 16; ++i)
+                {
+                    var tile = block.TileSet.Tiles[block.TileIndices[i]];
+                    var x = i % 4 * _blockEditorTileSize - 1;
+                    var y = i / 4 * _blockEditorTileSize - 1;
+                    g.DrawImage(tile.Image, x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
+                }
             }
 
             pictureBoxBlockEditor.Image = bmp;
@@ -208,14 +253,13 @@ namespace sth1edwv
             {
                 return;
             }
-            var scale = pictureBoxBlockEditor.Image.Width / 4;
-            var x = e.X / scale;
-            var y = e.Y / scale;
-            var subBlockIndex = x + y * 4;
-            if (subBlockIndex > 15)
+            var x = e.X / _blockEditorTileSize;
+            var y = e.Y / _blockEditorTileSize;
+            if (x > 3 || y > 3)
             {
                 return;
             }
+            var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
             using var tc = new TileChooser(block.TileSet, tileIndex);
             tc.ShowDialog(this);
@@ -443,6 +487,27 @@ namespace sth1edwv
             }
         }
 
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+
+            // We write the tileset to an image and put that on the clipboard
+            int rows = level.TileSet.Tiles.Count / 16;
+            using var image = new Bitmap(128, rows * 8);
+            using var g = Graphics.FromImage(image);
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            foreach (var tile in level.TileSet.Tiles)
+            {
+                var x = tile.Index % 16 * 8;
+                var y = tile.Index / 16 * 8;
+                g.DrawImageUnscaled(tile.Image, x, y);
+            }
+            Clipboard.SetImage(image);
+        }
+
         private void pb3_MouseUp(object sender, MouseEventArgs e)
         {
             if (listBoxLevels.SelectedItem is not Level level)
@@ -493,6 +558,10 @@ namespace sth1edwv
 
             // Redraw the level
             RenderLevel();
+
+            // Update counts
+            level.BlockMapping.UpdateUsageForLevel(level);
+            dataGridViewBlocks.ResetBindings();
         }
     }
 }
