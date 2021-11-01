@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Be.Windows.Forms;
 using Equin.ApplicationFramework;
@@ -59,6 +60,9 @@ namespace sth1edwv
             listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
             listBoxGameText.Items.Clear();
             listBoxGameText.Items.AddRange(_cartridge.GameText.ToArray<object>());
+
+            // Add or replace filename in title bar
+            Text = $"{Regex.Replace(Text, " \\[.+\\]$", "")} [{Path.GetFileName(filename)}]";
         }
 
         private void ListBoxMemoryLocationsSelectedIndexChanged(object sender, EventArgs e)
