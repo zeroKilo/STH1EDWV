@@ -134,18 +134,25 @@ namespace sth1edwv
             for (var blockY = 0; blockY < _floorHeight; ++blockY)
             {
                 var blockIndex = Floor.BlockIndices[blockX + blockY * _floorWidth];
-                var block = BlockMapping.Blocks[blockIndex];
-                for (var tileX = 0; tileX < 4; ++tileX)
-                for (var tileY = 0; tileY < 4; ++tileY)
+                if (blockIndex < BlockMapping.Blocks.Count)
                 {
-                    var tileIndex = block.TileIndices[tileX + tileY * 4];
-                    if (tileIndex < TileSet.Tiles.Count)
+                    var block = BlockMapping.Blocks[blockIndex];
+                    for (var tileX = 0; tileX < 4; ++tileX)
+                    for (var tileY = 0; tileY < 4; ++tileY)
                     {
-                        var tile = TileSet.Tiles[tileIndex];
-                        var x = blockX * _blockSize + tileX * tileSize;
-                        var y = blockY * _blockSize + tileY * tileSize;
-                        g.DrawImageUnscaled(tile.Image, x, y);
+                        var tileIndex = block.TileIndices[tileX + tileY * 4];
+                        if (tileIndex < TileSet.Tiles.Count)
+                        {
+                            var tile = TileSet.Tiles[tileIndex];
+                            var x = blockX * _blockSize + tileX * tileSize;
+                            var y = blockY * _blockSize + tileY * tileSize;
+                            g.DrawImageUnscaled(tile.Image, x, y);
+                        }
                     }
+                }
+                else
+                {
+                    g.DrawIcon(SystemIcons.Error, new Rectangle(blockX*_blockSize, blockY*_blockSize, 32, 32));
                 }
 
                 if (blockLabels)

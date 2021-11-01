@@ -73,7 +73,7 @@ namespace sth1edwv
                 block.UsageCount = 0;
             }
 
-            foreach (var index in level.Floor.BlockIndices)
+            foreach (var index in level.Floor.BlockIndices.Where(x => x < Blocks.Count))
             {
                 ++Blocks[index].UsageCount;
             }
