@@ -67,11 +67,11 @@ namespace sth1edwv
             {
                 var levelIndex = (offset - 0x15580) / 2;
                 var artBank = cartridge.Memory[artBanksTableOffset + levelIndex];
-                TileSet = cartridge.GetTileSet(_offsetArt + artBank * 0x4000, palettes[_initPalette]);
+                TileSet = cartridge.GetTileSet(_offsetArt + artBank * 0x4000, palettes[_initPalette], true);
             }
             else
             {
-                TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, palettes[_initPalette]);
+                TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, palettes[_initPalette], true);
             }
             Floor = cartridge.GetFloor(_floorAddress, _floorSize, _floorWidth);
             BlockMapping = cartridge.GetBlockMapping(_blockMappingAddress, _solidityIndex, TileSet);

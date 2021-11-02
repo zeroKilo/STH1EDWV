@@ -126,11 +126,11 @@ namespace sth1edwv
                             duplicateIndex |= duplicatesData.ReadByte();
                         }
 
-                        row = ReadArt(data, artDataOffset + duplicateIndex * 4);
+                        row = PlanarToChunky(data, artDataOffset + duplicateIndex * 4, 1).ToArray();
                     }
                     else
                     {
-                        row = ReadArt(data, nextArtDataOffset);
+                        row = PlanarToChunky(data, nextArtDataOffset, 1).ToArray();
                         nextArtDataOffset += 4;
                     }
                     result.Write(row, 0, row.Length);
@@ -143,23 +143,23 @@ namespace sth1edwv
             return result.ToArray();
         }
 
-        private static byte[] ReadArt(IReadOnlyList<byte> data, int offset)
+        public static IEnumerable<byte> PlanarToChunky(IReadOnlyList<byte> data, int offset, int rowCount)
         {
-            var result = new byte[8];
-            // We convert to chunky
-            for (var i = 0; i < 8; ++i)
+            for (int row = 0; row < rowCount; ++row)
             {
-                var value = 0;
-                for (var b = 0; b < 4; ++b)
+                // Each pixel is from four bitplanes
+                for (var i = 0; i < 8; ++i)
                 {
-                    var bit = (data[offset + b] >> (7-i)) & 1;
-                    value |= bit << b;
+                    var value = 0;
+                    for (var b = 0; b < 4; ++b)
+                    {
+                        var bit = (data[offset + row * 4 + b] >> (7 - i)) & 1;
+                        value |= bit << b;
+                    }
+
+                    yield return (byte)value;
                 }
-
-                result[i] = (byte)value;
             }
-
-            return result;
         }
 
         public static byte[] CompressArt(MemoryStream source)

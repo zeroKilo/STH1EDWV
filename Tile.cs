@@ -9,6 +9,7 @@ namespace sth1edwv
         private readonly byte[] _data = new byte[8 * 8];
         private readonly Palette _palette;
         private Bitmap _image;
+        private Bitmap _imageWithoutRings;
 
         public int Index { get; }
         public Bitmap Image
@@ -31,6 +32,8 @@ namespace sth1edwv
             }
         }
 
+        public Image ImageWithoutRings => _imageWithoutRings ?? Image;
+
         public Tile(byte[] data, int offset, Palette palette, int index)
         {
             _palette = palette;
@@ -46,6 +49,13 @@ namespace sth1edwv
         public void Dispose()
         {
             _image?.Dispose();
+            _imageWithoutRings?.Dispose();
+        }
+
+        public void SetRingImage(Bitmap image)
+        {
+            _imageWithoutRings = Image;
+            _image = (Bitmap)image.Clone();
         }
     }
 }

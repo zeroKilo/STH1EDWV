@@ -51,7 +51,7 @@
             this.pictureBoxTileUsedIn = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.buttonCopyTileset = new System.Windows.Forms.ToolStripButton();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
@@ -356,21 +356,21 @@
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1});
+            this.buttonCopyTileset});
             this.toolStrip2.Location = new System.Drawing.Point(3, 3);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(712, 25);
             this.toolStrip2.TabIndex = 2;
             this.toolStrip2.Text = "toolStrip2";
             // 
-            // toolStripButton1
+            // buttonCopyTileset
             // 
-            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
-            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton1.Name = "toolStripButton1";
-            this.toolStripButton1.Size = new System.Drawing.Size(89, 22);
-            this.toolStripButton1.Text = "Copy tileset";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.buttonCopyTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonCopyTileset.Image")));
+            this.buttonCopyTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonCopyTileset.Name = "buttonCopyTileset";
+            this.buttonCopyTileset.Size = new System.Drawing.Size(89, 22);
+            this.buttonCopyTileset.Text = "Copy tileset";
+            this.buttonCopyTileset.Click += new System.EventHandler(this.buttonCopyTileset_Click);
             // 
             // tabPage3
             // 
@@ -906,7 +906,7 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
         private System.Windows.Forms.DataGridViewTextBoxColumn Used;
         private System.Windows.Forms.ToolStrip toolStrip2;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
+        private System.Windows.Forms.ToolStripButton buttonCopyTileset;
         private System.Windows.Forms.SplitContainer splitContainer5;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.PictureBox pictureBoxTileUsedIn;

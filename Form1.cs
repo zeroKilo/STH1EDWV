@@ -491,7 +491,7 @@ namespace sth1edwv
             }
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void buttonCopyTileset_Click(object sender, EventArgs e)
         {
             if (listBoxLevels.SelectedItem is not Level level)
             {
@@ -507,7 +507,7 @@ namespace sth1edwv
             {
                 var x = tile.Index % 16 * 8;
                 var y = tile.Index / 16 * 8;
-                g.DrawImageUnscaled(tile.Image, x, y);
+                g.DrawImageUnscaled(tile.ImageWithoutRings, x, y);
             }
             Clipboard.SetImage(image);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace sth1edwv
@@ -14,7 +15,7 @@ namespace sth1edwv
         private readonly double _compression;
         public List<Tile> Tiles { get; } = new();
 
-        public TileSet(Cartridge cartridge, int offset, Palette palette)
+        public TileSet(Cartridge cartridge, int offset, Palette palette, bool addRings)
         {
             Offset = offset;
             _magic = BitConverter.ToUInt16(cartridge.Memory, offset);
@@ -28,6 +29,20 @@ namespace sth1edwv
             }
             LengthConsumed = lengthConsumed;
             _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
+
+            if (addRings)
+            {
+                // We replace the last 4 tiles' image
+                for (var i = 0; i < 4; ++i)
+                {
+                    var index = 252 + i;
+                    // We want to convert the data from raw VDP to one byte per pixel
+                    const int ringOffset = 0x2FD70 + 32 * 4 * 3; // Frame 3 of the animation looks good
+                    var buffer = Compression.PlanarToChunky(cartridge.Memory, ringOffset + i * 32, 8).ToArray();
+                    using var ringTile = new Tile(buffer, 0, palette, index);
+                    Tiles[index].SetRingImage(ringTile.Image);
+                }
+            }
         }
 
         public TreeNode ToNode()

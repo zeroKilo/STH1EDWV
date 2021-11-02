@@ -375,9 +375,9 @@ namespace sth1edwv
             }
         }
 
-        public TileSet GetTileSet(int offset, Palette palette)
+        public TileSet GetTileSet(int offset, Palette palette, bool addRings)
         {
-            return GetItem(_tileSets, offset, () => new TileSet(this, offset, palette));
+            return GetItem(_tileSets, offset, () => new TileSet(this, offset, palette, addRings));
         }
 
         public Floor GetFloor(int offset, int size, int width)
