@@ -33,14 +33,15 @@ namespace sth1edwv
 
             public enum Types
             {
-                Bank,
-                OffsetInBank,
-                RelativeOffset
+                Bank, // Bank number
+                OffsetInBank, // Absolute offset in Z80 address space when mapped in bank Bank
+                RelativeOffset // Relative offset from OffsetInChunk
             }
 
             public Types Type { get; set; }
             public int RelativeTo { get; set; } // for RelativeOffset
             public int Bank { get; set; } // for OffsetInBank
+            public int OffsetInChunk { get; set; } // Pointer is to this far inside the MemoryItem
         }
 
         private class MemoryItem
@@ -207,7 +208,7 @@ namespace sth1edwv
                     References =
                     {
                         new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x6282 }, // Table
-                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x01EA } // Raster split
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x01EA, OffsetInChunk = 16 }, // Raster split
                     }
                 }, new() {
                     Name = "Scrap Brain", Length = 16*6, Offset = 0x63de, Placement = MemoryItem.PlacementOptions.SameBank, 
@@ -258,6 +259,52 @@ namespace sth1edwv
                 },  new() {
                     Name = "Sky Base 2 cycle", Length = 16*4, Offset = 0x651e, Placement = MemoryItem.PlacementOptions.SameBank, 
                     References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x629c } }
+                },  new() {
+                    Name = "Underwater", Length = 16*2, Offset = 0x024b, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References =
+                    {
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x01c5},
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x0224}
+                    }
+                },  new() {
+                    Name = "Underwater (boss)", Length = 16*2, Offset = 0x024b, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References =
+                    {
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x01ce},
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x022d}
+                    }
+                },  new() {
+                    Name = "Map screen 1", Length = 16*2, Offset = 0x0f0e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x0cd5} }
+                },  new() {
+                    Name = "Map screen 2", Length = 16*2, Offset = 0x0f2e, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x0d37} }
+                },  new() {
+                    Name = "Title screen", Length = 16*2, Offset = 0x13e1, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x12cd} }
+                },  new() {
+                    Name = "Act complete screen", Length = 16*2, Offset = 0x1b8d, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x1605} }
+                },  new() {
+                    Name = "Credits screen", Length = 16*2, Offset = 0x2ad6, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x2703} }
+                },  new() {
+                    Name = "End sign sprites", Length = 16, Offset = 0x626c, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x5f39} }
+                },  new() {
+                    Name = "Boss sprites #1", Length = 16, Offset = 0x731c, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References =
+                    {
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x703d}, // Green Hill
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x8080}, // Jungle
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x84c8}, // Bridge
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0x929d}, // Labyrinth
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0xa822}, // Scrap Brain
+                        new Reference { Type = Reference.Types.OffsetInBank, Bank = 1, Location = 0xbe08}, // Ending
+                    }
+                },  new() {
+                    Name = "Act complete", Length = 16*2, Offset = 0x14fc, Placement = MemoryItem.PlacementOptions.SameBank, 
+                    References = { new Reference { Type = Reference.Types.OffsetInBank, Bank = 0, Location = 0x143d} }
                 }
                 // TODO: there is a "regular palette" table and a "palette cycle" table implied by the above, it'd be better to make those tables flexible?
                 // TODO: palette editing at all :)
