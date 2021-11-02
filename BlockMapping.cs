@@ -11,7 +11,7 @@ namespace sth1edwv
         public BlockMapping(Cartridge cartridge, int address, byte solidityIndex, TileSet tileSet)
         {
             // Hard-coded block counts...
-            // TODO: why?
+            // TODO: make these safer
             var blockCount = address switch
             {
                 0x10000 => 184,
@@ -21,7 +21,7 @@ namespace sth1edwv
                 0x12980 => 192,
                 0x13580 => 216,
                 0x14300 => 104,
-                0x14980 => 132,
+                0x14980 => 128,
                 _ => 0
             };
             var solidityOffset = BitConverter.ToUInt16(cartridge.Memory, 0x3A65 + solidityIndex * 2);
