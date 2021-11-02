@@ -18,7 +18,12 @@ namespace sth1edwv
 
         private void FormLoad(object sender, EventArgs e)
         {
-            var bmp = new Bitmap(528, 528);
+            var rows = _level.BlockMapping.Blocks.Count / 8;
+            if (_level.BlockMapping.Blocks.Count % 8 != 0)
+            {
+                ++rows;
+            }
+            var bmp = new Bitmap(33*8-1, 33*rows-1);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -26,8 +31,8 @@ namespace sth1edwv
 
                 for (var i = 0; i < _level.BlockMapping.Blocks.Count; ++i)
                 {
-                    var x = i % 16;
-                    var y = i / 16;
+                    var x = i % 8;
+                    var y = i / 8;
                     g.DrawImageUnscaled(_level.BlockMapping.Blocks[i].Image, x*33, y*33);
                 }
             }

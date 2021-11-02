@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,7 +45,6 @@
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.tilePicker1 = new sth1edwv.TilePicker();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -55,11 +55,6 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
-            this.Image = new System.Windows.Forms.DataGridViewImageColumn();
-            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Solidity = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.Foreground = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.Used = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.pictureBoxBlockEditor = new System.Windows.Forms.PictureBox();
             this.tabPageLayout = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -87,6 +82,13 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
+            this.tilePicker1 = new sth1edwv.TilePicker();
+            this.Image = new System.Windows.Forms.DataGridViewImageColumn();
+            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Solidity = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.Foreground = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Used = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.UsedGlobal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -284,17 +286,6 @@
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
             // 
-            // tilePicker1
-            // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 494);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
-            // 
             // splitContainer5
             // 
             this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -413,7 +404,8 @@
             this.Index,
             this.Solidity,
             this.Foreground,
-            this.Used});
+            this.Used,
+            this.UsedGlobal});
             this.dataGridViewBlocks.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewBlocks.Location = new System.Drawing.Point(0, 0);
             this.dataGridViewBlocks.MultiSelect = false;
@@ -428,45 +420,6 @@
             this.dataGridViewBlocks.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridViewBlocks_DataError);
             this.dataGridViewBlocks.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridViewBlocks_EditingControlShowing);
             this.dataGridViewBlocks.SelectionChanged += new System.EventHandler(this.SelectedBlockChanged);
-            // 
-            // Image
-            // 
-            this.Image.DataPropertyName = "Image";
-            this.Image.HeaderText = "Image";
-            this.Image.Name = "Image";
-            this.Image.ReadOnly = true;
-            // 
-            // Index
-            // 
-            this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
-            this.Index.HeaderText = "Index";
-            this.Index.Name = "Index";
-            this.Index.ReadOnly = true;
-            // 
-            // Solidity
-            // 
-            this.Solidity.DataPropertyName = "SolidityIndex";
-            this.Solidity.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            this.Solidity.HeaderText = "Solidity";
-            this.Solidity.Name = "Solidity";
-            this.Solidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // Foreground
-            // 
-            this.Foreground.DataPropertyName = "IsForeground";
-            this.Foreground.HeaderText = "Foreground";
-            this.Foreground.Name = "Foreground";
-            // 
-            // Used
-            // 
-            this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
-            this.Used.HeaderText = "Used";
-            this.Used.Name = "Used";
-            this.Used.ReadOnly = true;
             // 
             // pictureBoxBlockEditor
             // 
@@ -782,6 +735,65 @@
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 494);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
+            // 
+            // Image
+            // 
+            this.Image.DataPropertyName = "Image";
+            this.Image.HeaderText = "Image";
+            this.Image.Name = "Image";
+            this.Image.ReadOnly = true;
+            // 
+            // Index
+            // 
+            this.Index.DataPropertyName = "Index";
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            this.Index.HeaderText = "Index";
+            this.Index.Name = "Index";
+            this.Index.ReadOnly = true;
+            // 
+            // Solidity
+            // 
+            this.Solidity.DataPropertyName = "SolidityIndex";
+            this.Solidity.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.Solidity.HeaderText = "Solidity";
+            this.Solidity.Name = "Solidity";
+            this.Solidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // Foreground
+            // 
+            this.Foreground.DataPropertyName = "IsForeground";
+            this.Foreground.HeaderText = "Foreground";
+            this.Foreground.Name = "Foreground";
+            // 
+            // Used
+            // 
+            this.Used.DataPropertyName = "UsageCount";
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
+            this.Used.HeaderText = "Used";
+            this.Used.Name = "Used";
+            this.Used.ReadOnly = true;
+            // 
+            // UsedGlobal
+            // 
+            this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
+            this.UsedGlobal.HeaderText = "Total used";
+            this.UsedGlobal.Name = "UsedGlobal";
+            this.UsedGlobal.ReadOnly = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -900,17 +912,18 @@
         private System.Windows.Forms.ToolStripMenuItem quickTestToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton buttonCopyFloor;
         private System.Windows.Forms.ToolStripButton buttonPasteFloor;
-        private System.Windows.Forms.DataGridViewImageColumn Image;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Index;
-        private System.Windows.Forms.DataGridViewComboBoxColumn Solidity;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Used;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripButton buttonCopyTileset;
         private System.Windows.Forms.SplitContainer splitContainer5;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.PictureBox pictureBoxTileUsedIn;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.DataGridViewImageColumn Image;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Index;
+        private System.Windows.Forms.DataGridViewComboBoxColumn Solidity;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Used;
+        private System.Windows.Forms.DataGridViewTextBoxColumn UsedGlobal;
     }
 }
 

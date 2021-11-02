@@ -63,5 +63,24 @@ namespace sth1edwv
                 ++Blocks[index].UsageCount;
             }
         }
+
+        public void UpdateGlobalUsage(IEnumerable<Level> levels)
+        {
+            foreach (var block in Blocks)
+            {
+                block.GlobalUsageCount = 0;
+            }
+
+            // TODO: consider level bounds?
+            foreach (var index in levels
+                .Where(l => l.BlockMapping == this)
+                .Select(l => l.Floor)
+                .Distinct()
+                .SelectMany(f => f.BlockIndices)
+                .Where(x => x < Blocks.Count))
+            {
+                ++Blocks[index].GlobalUsageCount;
+            }
+        }
     }
 }

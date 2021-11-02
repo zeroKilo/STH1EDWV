@@ -66,6 +66,7 @@ namespace sth1edwv
         public int Offset { get; }
         public int LengthConsumed { get; }
         public int UsageCount { get; set; }
+        public int GlobalUsageCount { get; set; }
 
         public IList<byte> GetData()
         {

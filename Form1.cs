@@ -102,6 +102,7 @@ namespace sth1edwv
             LoadLevelData();
 
             level.BlockMapping.UpdateUsageForLevel(level);
+            level.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
 
             dataGridViewBlocks.DataSource = new BindingListView<Block>(level.BlockMapping.Blocks);
             dataGridViewBlocks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
@@ -565,6 +566,7 @@ namespace sth1edwv
 
             // Update counts
             level.BlockMapping.UpdateUsageForLevel(level);
+            level.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
             dataGridViewBlocks.ResetBindings();
         }
     }
