@@ -600,7 +600,7 @@
             // listBoxPalettes
             // 
             this.listBoxPalettes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxPalettes.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBoxPalettes.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.listBoxPalettes.FormattingEnabled = true;
             this.listBoxPalettes.IntegralHeight = false;
             this.listBoxPalettes.ItemHeight = 14;
@@ -650,7 +650,7 @@
             // listBoxMemoryLocations
             // 
             this.listBoxMemoryLocations.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxMemoryLocations.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBoxMemoryLocations.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.listBoxMemoryLocations.FormattingEnabled = true;
             this.listBoxMemoryLocations.IntegralHeight = false;
             this.listBoxMemoryLocations.ItemHeight = 14;
@@ -663,7 +663,7 @@
             // hexViewer
             // 
             this.hexViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hexViewer.Font = new System.Drawing.Font("Courier New", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.hexViewer.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.hexViewer.LineInfoVisible = true;
             this.hexViewer.Location = new System.Drawing.Point(0, 0);
             this.hexViewer.Name = "hexViewer";
@@ -703,7 +703,7 @@
             // 
             this._richTextBoxGeneralSummary.DetectUrls = false;
             this._richTextBoxGeneralSummary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._richTextBoxGeneralSummary.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this._richTextBoxGeneralSummary.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this._richTextBoxGeneralSummary.Location = new System.Drawing.Point(3, 3);
             this._richTextBoxGeneralSummary.Name = "_richTextBoxGeneralSummary";
             this._richTextBoxGeneralSummary.Size = new System.Drawing.Size(948, 553);
@@ -725,7 +725,7 @@
             // listBoxGameText
             // 
             this.listBoxGameText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxGameText.Font = new System.Drawing.Font("Courier New", 8.25F);
+            this.listBoxGameText.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.listBoxGameText.FormattingEnabled = true;
             this.listBoxGameText.IntegralHeight = false;
             this.listBoxGameText.ItemHeight = 14;

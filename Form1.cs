@@ -22,6 +22,7 @@ namespace sth1edwv
 
         public Form1()
         {
+            Font = SystemFonts.MessageBoxFont;
             InitializeComponent();
             _solidityImages = new ImageList
             {
@@ -186,7 +187,7 @@ namespace sth1edwv
                 foreach (var block in blocks)
                 {
                     g.DrawImageUnscaled(block.Image, x, 0);
-                    g.DrawString(block.Index.ToString("X2"), SystemFonts.DefaultFont, SystemBrushes.WindowText, 
+                    g.DrawString(block.Index.ToString("X2"), Font, SystemBrushes.WindowText, 
                         new RectangleF(x, 32, 32, 16),
                         new StringFormat
                         {
@@ -414,7 +415,7 @@ namespace sth1edwv
         private void DrawSolidityItem(Graphics g, int index, Rectangle rect)
         {
             g.DrawImageUnscaled(_solidityImages.Images[index], rect);
-            g.DrawString($"{index}", SystemFonts.DefaultFont, SystemBrushes.WindowText, rect.Left + _solidityImages.ImageSize.Width + 4, rect.Top + 8);
+            g.DrawString($"{index}", Font, SystemBrushes.WindowText, rect.Left + _solidityImages.ImageSize.Width + 4, rect.Top + 8);
         }
 
         private void dataGridViewBlocks_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
