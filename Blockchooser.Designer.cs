@@ -36,7 +36,7 @@
             // 
             this.pb1.Location = new System.Drawing.Point(3, 3);
             this.pb1.Name = "pb1";
-            this.pb1.Size = new System.Drawing.Size(528, 528);
+            this.pb1.Size = new System.Drawing.Size(100, 50);
             this.pb1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pb1.TabIndex = 0;
             this.pb1.TabStop = false;
@@ -48,7 +48,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(385, 890);
+            this.ClientSize = new System.Drawing.Size(247, 204);
             this.Controls.Add(this.pb1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "BlockChooser";

@@ -102,6 +102,8 @@ namespace sth1edwv
 
             LoadLevelData();
 
+            propertyGridLevel.SelectedObject = level;
+
             level.BlockMapping.UpdateUsageForLevel(level);
             level.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
 

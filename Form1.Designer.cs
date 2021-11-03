@@ -42,9 +42,12 @@
             this.listBoxLevels = new System.Windows.Forms.ListBox();
             this.tabControlLevel = new System.Windows.Forms.TabControl();
             this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.propertyGridLevel = new System.Windows.Forms.PropertyGrid();
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
+            this.tabPagePalettes = new System.Windows.Forms.TabPage();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.tilePicker1 = new sth1edwv.TilePicker();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -55,6 +58,12 @@
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
+            this.Image = new System.Windows.Forms.DataGridViewImageColumn();
+            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Solidity = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.Foreground = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Used = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.UsedGlobal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.pictureBoxBlockEditor = new System.Windows.Forms.PictureBox();
             this.tabPageLayout = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -82,13 +91,6 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
-            this.tilePicker1 = new sth1edwv.TilePicker();
-            this.Image = new System.Windows.Forms.DataGridViewImageColumn();
-            this.Index = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Solidity = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.Foreground = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.Used = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.UsedGlobal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -224,6 +226,7 @@
             // tabControlLevel
             // 
             this.tabControlLevel.Controls.Add(this.tabPage6);
+            this.tabControlLevel.Controls.Add(this.tabPagePalettes);
             this.tabControlLevel.Controls.Add(this.tabPage7);
             this.tabControlLevel.Controls.Add(this.tabPage3);
             this.tabControlLevel.Controls.Add(this.tabPageLayout);
@@ -237,6 +240,7 @@
             // 
             // tabPage6
             // 
+            this.tabPage6.Controls.Add(this.propertyGridLevel);
             this.tabPage6.Controls.Add(this.treeViewLevelData);
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
@@ -246,15 +250,36 @@
             this.tabPage6.Text = "Level metadata";
             this.tabPage6.UseVisualStyleBackColor = true;
             // 
+            // propertyGridLevel
+            // 
+            this.propertyGridLevel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.propertyGridLevel.Location = new System.Drawing.Point(449, 6);
+            this.propertyGridLevel.Name = "propertyGridLevel";
+            this.propertyGridLevel.Size = new System.Drawing.Size(263, 515);
+            this.propertyGridLevel.TabIndex = 2;
+            // 
             // treeViewLevelData
             // 
-            this.treeViewLevelData.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeViewLevelData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.treeViewLevelData.Font = new System.Drawing.Font("Consolas", 8.25F);
-            this.treeViewLevelData.Location = new System.Drawing.Point(3, 3);
+            this.treeViewLevelData.Location = new System.Drawing.Point(3, 6);
             this.treeViewLevelData.Name = "treeViewLevelData";
-            this.treeViewLevelData.Size = new System.Drawing.Size(712, 521);
+            this.treeViewLevelData.Size = new System.Drawing.Size(440, 515);
             this.treeViewLevelData.TabIndex = 1;
             this.treeViewLevelData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewLevelDataItemSelected);
+            // 
+            // tabPagePalettes
+            // 
+            this.tabPagePalettes.Location = new System.Drawing.Point(4, 22);
+            this.tabPagePalettes.Name = "tabPagePalettes";
+            this.tabPagePalettes.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPagePalettes.Size = new System.Drawing.Size(718, 527);
+            this.tabPagePalettes.TabIndex = 4;
+            this.tabPagePalettes.Text = "Palettes";
+            this.tabPagePalettes.UseVisualStyleBackColor = true;
             // 
             // tabPage7
             // 
@@ -285,6 +310,17 @@
             this.splitContainer2.Size = new System.Drawing.Size(712, 496);
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
+            // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 494);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.TileSet = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
             // 
             // splitContainer5
             // 
@@ -420,6 +456,54 @@
             this.dataGridViewBlocks.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridViewBlocks_DataError);
             this.dataGridViewBlocks.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridViewBlocks_EditingControlShowing);
             this.dataGridViewBlocks.SelectionChanged += new System.EventHandler(this.SelectedBlockChanged);
+            // 
+            // Image
+            // 
+            this.Image.DataPropertyName = "Image";
+            this.Image.HeaderText = "Image";
+            this.Image.Name = "Image";
+            this.Image.ReadOnly = true;
+            // 
+            // Index
+            // 
+            this.Index.DataPropertyName = "Index";
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            this.Index.HeaderText = "Index";
+            this.Index.Name = "Index";
+            this.Index.ReadOnly = true;
+            // 
+            // Solidity
+            // 
+            this.Solidity.DataPropertyName = "SolidityIndex";
+            this.Solidity.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.Solidity.HeaderText = "Solidity";
+            this.Solidity.Name = "Solidity";
+            this.Solidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            // 
+            // Foreground
+            // 
+            this.Foreground.DataPropertyName = "IsForeground";
+            this.Foreground.HeaderText = "Foreground";
+            this.Foreground.Name = "Foreground";
+            // 
+            // Used
+            // 
+            this.Used.DataPropertyName = "UsageCount";
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
+            this.Used.HeaderText = "Used";
+            this.Used.Name = "Used";
+            this.Used.ReadOnly = true;
+            // 
+            // UsedGlobal
+            // 
+            this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
+            this.UsedGlobal.HeaderText = "Total used";
+            this.UsedGlobal.Name = "UsedGlobal";
+            this.UsedGlobal.ReadOnly = true;
             // 
             // pictureBoxBlockEditor
             // 
@@ -603,7 +687,6 @@
             this.listBoxPalettes.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.listBoxPalettes.FormattingEnabled = true;
             this.listBoxPalettes.IntegralHeight = false;
-            this.listBoxPalettes.ItemHeight = 14;
             this.listBoxPalettes.Location = new System.Drawing.Point(0, 0);
             this.listBoxPalettes.Name = "listBoxPalettes";
             this.listBoxPalettes.Size = new System.Drawing.Size(314, 553);
@@ -653,7 +736,6 @@
             this.listBoxMemoryLocations.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.listBoxMemoryLocations.FormattingEnabled = true;
             this.listBoxMemoryLocations.IntegralHeight = false;
-            this.listBoxMemoryLocations.ItemHeight = 14;
             this.listBoxMemoryLocations.Location = new System.Drawing.Point(0, 0);
             this.listBoxMemoryLocations.Name = "listBoxMemoryLocations";
             this.listBoxMemoryLocations.Size = new System.Drawing.Size(314, 553);
@@ -728,71 +810,11 @@
             this.listBoxGameText.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.listBoxGameText.FormattingEnabled = true;
             this.listBoxGameText.IntegralHeight = false;
-            this.listBoxGameText.ItemHeight = 14;
             this.listBoxGameText.Location = new System.Drawing.Point(3, 3);
             this.listBoxGameText.Name = "listBoxGameText";
             this.listBoxGameText.Size = new System.Drawing.Size(948, 553);
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
-            // 
-            // tilePicker1
-            // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 494);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
-            // 
-            // Image
-            // 
-            this.Image.DataPropertyName = "Image";
-            this.Image.HeaderText = "Image";
-            this.Image.Name = "Image";
-            this.Image.ReadOnly = true;
-            // 
-            // Index
-            // 
-            this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
-            this.Index.HeaderText = "Index";
-            this.Index.Name = "Index";
-            this.Index.ReadOnly = true;
-            // 
-            // Solidity
-            // 
-            this.Solidity.DataPropertyName = "SolidityIndex";
-            this.Solidity.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-            this.Solidity.HeaderText = "Solidity";
-            this.Solidity.Name = "Solidity";
-            this.Solidity.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            // 
-            // Foreground
-            // 
-            this.Foreground.DataPropertyName = "IsForeground";
-            this.Foreground.HeaderText = "Foreground";
-            this.Foreground.Name = "Foreground";
-            // 
-            // Used
-            // 
-            this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
-            this.Used.HeaderText = "Used";
-            this.Used.Name = "Used";
-            this.Used.ReadOnly = true;
-            // 
-            // UsedGlobal
-            // 
-            this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
-            this.UsedGlobal.HeaderText = "Total used";
-            this.UsedGlobal.Name = "UsedGlobal";
-            this.UsedGlobal.ReadOnly = true;
             // 
             // Form1
             // 
@@ -924,6 +946,8 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
         private System.Windows.Forms.DataGridViewTextBoxColumn Used;
         private System.Windows.Forms.DataGridViewTextBoxColumn UsedGlobal;
+        private System.Windows.Forms.TabPage tabPagePalettes;
+        private System.Windows.Forms.PropertyGrid propertyGridLevel;
     }
 }
 
