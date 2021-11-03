@@ -1,7 +1,7 @@
 ﻿
 namespace sth1edwv
 {
-    sealed partial class TilePicker
+    sealed partial class ItemPicker
     {
         /// <summary> 
         /// Required designer variable.
@@ -31,17 +31,17 @@ namespace sth1edwv
         {
             this.SuspendLayout();
             // 
-            // TilePicker
+            // ItemPicker
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.DoubleBuffered = true;
-            this.Name = "TilePicker";
+            this.Name = "ItemPicker";
             this.Size = new System.Drawing.Size(227, 217);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.TilePicker_Paint);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TilePicker_KeyUp);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TilePicker_MouseClick);
-            this.Resize += new System.EventHandler(this.TilePicker_Resize);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUp);
+            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnMouseClick);
+            this.Resize += new System.EventHandler(this.OnResize);
             this.ResumeLayout(false);
 
         }

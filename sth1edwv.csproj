@@ -85,11 +85,11 @@
     <Compile Include="TileChooser.Designer.cs">
       <DependentUpon>TileChooser.cs</DependentUpon>
     </Compile>
-    <Compile Include="TilePicker.cs">
+    <Compile Include="ItemPicker.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TilePicker.Designer.cs">
-      <DependentUpon>TilePicker.cs</DependentUpon>
+    <Compile Include="ItemPicker.Designer.cs">
+      <DependentUpon>ItemPicker.cs</DependentUpon>
     </Compile>
     <Compile Include="TileSet.cs" />
     <EmbeddedResource Include="BlockChooser.resx">
@@ -114,8 +114,8 @@
     <EmbeddedResource Include="TileChooser.resx">
       <DependentUpon>TileChooser.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TilePicker.resx">
-      <DependentUpon>TilePicker.cs</DependentUpon>
+    <EmbeddedResource Include="ItemPicker.resx">
+      <DependentUpon>ItemPicker.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

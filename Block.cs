@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace sth1edwv
 {
-    public class Block: IDisposable, IDataItem
+    public class Block: IDisposable, IDataItem, IDrawableBlock
     {
         public TileSet TileSet { get; }
         private Bitmap _image;

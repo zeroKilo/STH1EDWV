@@ -98,7 +98,7 @@ namespace sth1edwv
 
             RenderLevel();
 
-            tilePicker1.TileSet = level.TileSet;
+            tilePicker1.Items = level.TileSet.Tiles.Cast<IDrawableBlock>().ToList();
 
             LoadLevelData();
 
@@ -144,8 +144,9 @@ namespace sth1edwv
             }
         }
 
-        private void tilePicker1_SelectionChanged(object sender, Tile tile)
+        private void tilePicker1_SelectionChanged(object sender, IDrawableBlock b)
         {
+            var tile = b as Tile;
             pictureBoxTilePreview.Image?.Dispose();
             if (tile == null)
             {

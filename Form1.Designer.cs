@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,7 +47,6 @@
             this.tabPagePalettes = new System.Windows.Forms.TabPage();
             this.tabPage7 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.tilePicker1 = new sth1edwv.TilePicker();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -91,6 +90,7 @@
             this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
+            this.tilePicker1 = new sth1edwv.ItemPicker();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -311,20 +311,10 @@
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
             // 
-            // tilePicker1
-            // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 494);
-            this.tilePicker1.TabIndex = 0;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
-            // 
             // splitContainer5
             // 
             this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer5.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.splitContainer5.Location = new System.Drawing.Point(0, 0);
             this.splitContainer5.Name = "splitContainer5";
             this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -467,8 +457,8 @@
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -490,8 +480,8 @@
             // Used
             // 
             this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle5;
             this.Used.HeaderText = "Used";
             this.Used.Name = "Used";
             this.Used.ReadOnly = true;
@@ -499,8 +489,8 @@
             // UsedGlobal
             // 
             this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle6;
             this.UsedGlobal.HeaderText = "Total used";
             this.UsedGlobal.Name = "UsedGlobal";
             this.UsedGlobal.ReadOnly = true;
@@ -816,6 +806,19 @@
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
+            // tilePicker1
+            // 
+            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tilePicker1.FixedItemsPerRow = true;
+            this.tilePicker1.Items = null;
+            this.tilePicker1.ItemsPerRow = 16;
+            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(286, 494);
+            this.tilePicker1.TabIndex = 0;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.IDrawableBlock>(this.tilePicker1_SelectionChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -920,7 +923,7 @@
         private System.Windows.Forms.RichTextBox _richTextBoxGeneralSummary;
         private System.Windows.Forms.TabPage tabPage9;
         private System.Windows.Forms.ListBox listBoxGameText;
-        private TilePicker tilePicker1;
+        private ItemPicker tilePicker1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton toolStripButtonSaveRenderedLevel;

@@ -28,19 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pb1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pb1)).BeginInit();
+            this.itemPicker1 = new sth1edwv.ItemPicker();
             this.SuspendLayout();
             // 
-            // pb1
+            // itemPicker1
             // 
-            this.pb1.Location = new System.Drawing.Point(3, 3);
-            this.pb1.Name = "pb1";
-            this.pb1.Size = new System.Drawing.Size(100, 50);
-            this.pb1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pb1.TabIndex = 0;
-            this.pb1.TabStop = false;
-            this.pb1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pb1_MouseClick);
+            this.itemPicker1.AutoSize = true;
+            this.itemPicker1.FixedItemsPerRow = true;
+            this.itemPicker1.Items = null;
+            this.itemPicker1.ItemsPerRow = 8;
+            this.itemPicker1.Location = new System.Drawing.Point(3, 3);
+            this.itemPicker1.Name = "itemPicker1";
+            this.itemPicker1.SelectedIndex = -1;
+            this.itemPicker1.Size = new System.Drawing.Size(100, 100);
+            this.itemPicker1.TabIndex = 0;
+            this.itemPicker1.SelectionChanged += new System.EventHandler<sth1edwv.IDrawableBlock>(this.itemPicker1_SelectionChanged);
             // 
             // BlockChooser
             // 
@@ -48,13 +50,13 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(247, 204);
-            this.Controls.Add(this.pb1);
+            this.ClientSize = new System.Drawing.Size(376, 392);
+            this.Controls.Add(this.itemPicker1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "BlockChooser";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Block Chooser";
-            ((System.ComponentModel.ISupportInitialize)(this.pb1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -62,6 +64,6 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pb1;
+        private ItemPicker itemPicker1;
     }
 }

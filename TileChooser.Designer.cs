@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tilePicker1 = new sth1edwv.TilePicker();
+            this.tilePicker1 = new sth1edwv.ItemPicker();
             this.SuspendLayout();
             // 
             // tilePicker1
@@ -39,8 +39,8 @@
             this.tilePicker1.SelectedIndex = -1;
             this.tilePicker1.Size = new System.Drawing.Size(527, 527);
             this.tilePicker1.TabIndex = 1;
-            this.tilePicker1.TileSet = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.Tile>(this.tilePicker1_SelectionChanged);
+            this.tilePicker1.Items = null;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<IDrawableBlock>(this.tilePicker1_SelectionChanged);
             // 
             // TileChooser
             // 
@@ -60,6 +60,6 @@
 
         #endregion
 
-        private TilePicker tilePicker1;
+        private ItemPicker tilePicker1;
     }
 }

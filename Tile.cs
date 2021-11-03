@@ -4,7 +4,7 @@ using System.IO;
 
 namespace sth1edwv
 {
-    public class Tile: IDisposable
+    public class Tile: IDisposable, IDrawableBlock
     {
         private readonly byte[] _data = new byte[8 * 8];
         private readonly Palette _palette;
