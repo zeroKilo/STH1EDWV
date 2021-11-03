@@ -33,7 +33,7 @@ namespace sth1edwv
             e.Graphics.FillRectangle(SystemBrushes.Window, e.ClipRectangle);
             if (TileSet == null)
             {
-                e.Graphics.DrawString("No tiles", SystemFonts.DefaultFont, SystemBrushes.WindowText, 0, 0);
+                e.Graphics.DrawString("No tiles", SystemFonts.MessageBoxFont, SystemBrushes.WindowText, 0, 0);
                 return;
             }
             // Draw all tiles overlapping the rect
