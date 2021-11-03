@@ -33,7 +33,7 @@ namespace sth1edwv
             e.Graphics.FillRectangle(SystemBrushes.Window, e.ClipRectangle);
             if (TileSet == null)
             {
-                e.Graphics.DrawString("No tiles", SystemFonts.MessageBoxFont, SystemBrushes.WindowText, 0, 0);
+                e.Graphics.DrawString("No tiles", Font, SystemBrushes.WindowText, 0, 0);
                 return;
             }
             // Draw all tiles overlapping the rect
@@ -71,8 +71,8 @@ namespace sth1edwv
             {
                 return new Rectangle();
             }
-            var x = index % 16 * (_tileSize + 1) + 1;
-            var y = index / 16 * (_tileSize + 1) + 1;
+            var x = index % TilesPerRow  * (_tileSize + 1) + 1;
+            var y = index / TilesPerRow  * (_tileSize + 1) + 1;
             return new Rectangle(x, y, _tileSize, _tileSize);
         }
 
@@ -94,7 +94,7 @@ namespace sth1edwv
                 }
 
                 var y = e.Y / (_tileSize + 1);
-                var tileIndex = x + y * 16;
+                var tileIndex = x + y * TilesPerRow;
                 if (tileIndex >= TileSet.Tiles.Count)
                 {
                     return;
@@ -147,5 +147,28 @@ namespace sth1edwv
         public int SelectedIndex { get; set; } = -1;
 
         public event EventHandler<Tile> SelectionChanged;
+
+        private void TilePicker_KeyUp(object sender, KeyEventArgs e)
+        {
+            var newSelection = SelectedIndex;
+            switch (e.KeyCode)
+            {
+                case Keys.Up:
+                    newSelection -= TilesPerRow;
+                    break;
+                case Keys.Down:
+                    newSelection += TilesPerRow;
+                    break;
+                case Keys.Left:
+                    --newSelection;
+                    break;
+                case Keys.Right:
+                    ++newSelection;
+                    break;
+            }
+
+            newSelection = Math.Max(0, Math.Min(_tileSet.Tiles.Count - 1, newSelection));
+            ChangeSelection(newSelection);
+        }
     }
 }

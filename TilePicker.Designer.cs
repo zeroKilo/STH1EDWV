@@ -39,6 +39,7 @@ namespace sth1edwv
             this.Name = "TilePicker";
             this.Size = new System.Drawing.Size(227, 217);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.TilePicker_Paint);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TilePicker_KeyUp);
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TilePicker_MouseClick);
             this.Resize += new System.EventHandler(this.TilePicker_Resize);
             this.ResumeLayout(false);
