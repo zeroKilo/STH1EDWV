@@ -532,8 +532,7 @@ namespace sth1edwv
             var maxX = Math.Max(x, _lastX);
             var minY = Math.Min(y, _lastY);
             var maxY = Math.Max(y, _lastY);
-            using var bc = new BlockChooser(level);
-            bc.SelectedBlockIndex = level.Floor.BlockIndices[x + y * level.Floor.Width];
+            using var bc = new BlockChooser(level.BlockMapping.Blocks, level.Floor.BlockIndices[x + y * level.Floor.Width]);
             if (bc.ShowDialog(this) != DialogResult.OK)
             {
                 return;
