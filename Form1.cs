@@ -152,8 +152,9 @@ namespace sth1edwv
                 pictureBoxTilePreview.Image = null;
                 return;
             }
-            var zoom = pictureBoxTilePreview.Width / 8.0f;
-            var bmp = new Bitmap(pictureBoxTilePreview.Width, pictureBoxTilePreview.Width);
+            var shortestSize = Math.Min(pictureBoxTilePreview.Width, pictureBoxTilePreview.Height);
+            var zoom = shortestSize / 8.0f;
+            var bmp = new Bitmap(shortestSize, shortestSize);
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
