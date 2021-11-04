@@ -16,6 +16,7 @@ namespace sth1edwv
 
         private void tilePicker1_SelectionChanged(object sender, IDrawableBlock e)
         {
+            DialogResult = e == null ? DialogResult.Cancel : DialogResult.OK;
             Close();
         }
     }

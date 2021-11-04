@@ -272,19 +272,21 @@ namespace sth1edwv
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
             using var tc = new TileChooser(block.TileSet, tileIndex);
-            tc.ShowDialog(this);
-            // Apply to the block object
-            block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
-            // Invalidate its cached image
-            block.ResetImage();
-            // Trigger a redraw of the editor
-            DrawBlockEditor();
-            // And the grid
-            dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
-            // And the rendered level
-            RenderLevel();
-            // Finally apply the data to the cartridge
-            Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
+            if (tc.ShowDialog(this) == DialogResult.OK)
+            {
+                // Apply to the block object
+                block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
+                // Invalidate its cached image
+                block.ResetImage();
+                // Trigger a redraw of the editor
+                DrawBlockEditor();
+                // And the grid
+                dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
+                // And the rendered level
+                RenderLevel();
+                // Finally apply the data to the cartridge
+                Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
+            }
         }
 
         private void saveROMToolStripMenuItem_Click(object sender, EventArgs e)

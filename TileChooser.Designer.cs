@@ -33,19 +33,23 @@
             // 
             // tilePicker1
             // 
-            this.tilePicker1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tilePicker1.Location = new System.Drawing.Point(0, 0);
-            this.tilePicker1.Name = "tilePicker1";
-            this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(527, 527);
-            this.tilePicker1.TabIndex = 1;
+            this.tilePicker1.FixedItemsPerRow = true;
             this.tilePicker1.Items = null;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<IDrawableBlock>(this.tilePicker1_SelectionChanged);
+            this.tilePicker1.ItemsPerRow = 16;
+            this.tilePicker1.Location = new System.Drawing.Point(3, 3);
+            this.tilePicker1.Name = "tilePicker1";
+            this.tilePicker1.Scaling = 1;
+            this.tilePicker1.SelectedIndex = -1;
+            this.tilePicker1.Size = new System.Drawing.Size(522, 524);
+            this.tilePicker1.TabIndex = 1;
+            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.IDrawableBlock>(this.tilePicker1_SelectionChanged);
             // 
             // TileChooser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(527, 527);
             this.Controls.Add(this.tilePicker1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;

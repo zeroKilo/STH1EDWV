@@ -27,25 +27,20 @@ namespace sth1edwv
             set
             {
                 _items = value;
+                if (AutoSize && FixedItemsPerRow && ItemsPerRow > 0 && Items is { Count: > 0 })
+                {
+                    // We want to auto-size
+                    var rowCount = Items.Count / ItemsPerRow + (Items.Count % ItemsPerRow == 0 ? 0 : 1);
+                    var pixelsPerItem = Items[0].Image.Width * Math.Max(1, Scaling) + 1;
+                    Size = new Size(ItemsPerRow * pixelsPerItem + 1, rowCount * pixelsPerItem + 1);
+                }
                 CheckDrawingSettings();
                 Invalidate();
             }
         }
 
-        public override Size GetPreferredSize(Size proposedSize)
-        {
-            if (FixedItemsPerRow && ItemsPerRow > 0 && Items is { Count: > 0 })
-            {
-                // We want to auto-size
-                var rowCount = Items.Count / ItemsPerRow + (Items.Count % ItemsPerRow == 0 ? 0 : 1);
-                var pixelsPerItem = Items[0].Image.Width + 1;
-                return new Size(ItemsPerRow * pixelsPerItem + 1, rowCount * pixelsPerItem + 1);
-            }
-
-            return proposedSize;
-        }
-
         public bool FixedItemsPerRow { get; set; }
+        public int Scaling { get; set; } = 1;
         public int ItemsPerRow { get; set; }
 
         private void OnResize(object sender, EventArgs e)
