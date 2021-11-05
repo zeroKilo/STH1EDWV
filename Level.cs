@@ -91,7 +91,7 @@ namespace sth1edwv
 
         [Category("Palette")]
         [Description("Number of frames between palette changes, 0 to disable")]
-        public byte PaletteCycleRate { get; set; }
+        public int PaletteCycleRate { get; set; }
 
         [Category("Palette")]
         [Description("Use the boss underwater palette (like Labyrinth Act 3)")]
@@ -111,7 +111,7 @@ namespace sth1edwv
                 return true;
             }
 
-            // Disable freeform text
+            // Disable free-form text
             public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
             {
                 return true;
@@ -186,6 +186,8 @@ namespace sth1edwv
         [Category("General")] private LevelObjectSet Objects { get; }
         [Category("General")] public BlockMapping BlockMapping { get; }
 
+        [Category("General")] public int Offset { get; }
+
         //   SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
         //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
         //   SR UW TL 00  MU
@@ -216,7 +218,6 @@ namespace sth1edwv
         {
             _label = label;
             Offset = offset;
-            LengthConsumed = 37;
 
             using (var stream = new MemoryStream(cartridge.Memory, offset, 37, false))
             using (var reader = new BinaryReader(stream))
@@ -438,9 +439,6 @@ namespace sth1edwv
             x /= _blockSize;
             y /= _blockSize;
         }
-
-        public int Offset { get; }
-        public int LengthConsumed { get; }
 
         public IList<byte> GetData()
         {

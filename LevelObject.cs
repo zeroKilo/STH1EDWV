@@ -12,14 +12,12 @@ namespace sth1edwv
         public LevelObject(IReadOnlyList<byte> memory, int offset)
         {
             Offset = offset;
-            LengthConsumed = 3;
             Type = memory[offset++];
             X = memory[offset++];
             Y = memory[offset];
         }
 
         public int Offset { get; }
-        public int LengthConsumed { get; }
         public IList<byte> GetData()
         {
             return new List<byte> { Type, X, Y };

@@ -31,7 +31,6 @@ namespace sth1edwv
             }
 
             Offset = address;
-            LengthConsumed = blockCount * 16;
         }
 
         public void Dispose()
@@ -44,7 +43,6 @@ namespace sth1edwv
         }
 
         public int Offset { get; }
-        public int LengthConsumed { get; }
 
         public IList<byte> GetData()
         {

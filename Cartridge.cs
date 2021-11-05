@@ -14,10 +14,6 @@ namespace sth1edwv
         /// Offset data was read from
         /// </summary>
         int Offset { get; }
-        /// <summary>
-        /// Length of data read from there
-        /// </summary>
-        int LengthConsumed { get; }
 
         /// <summary>
         /// Get raw data from the item

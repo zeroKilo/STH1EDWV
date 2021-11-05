@@ -25,7 +25,7 @@ namespace sth1edwv
 
         public List<RomBuilder.DataChunk.Reference> GetReferences()
         {
-            // Floors contains no references
+            // Floors contain no references
             return new List<RomBuilder.DataChunk.Reference>();
         }
     }

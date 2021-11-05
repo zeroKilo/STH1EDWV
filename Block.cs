@@ -48,7 +48,6 @@ namespace sth1edwv
         {
             TileSet = tileSet;
             Offset = tilesOffset;
-            LengthConsumed = 16;
             SolidityOffset = solidityOffset;
             Index = index;
             Array.Copy(cartridgeMemory, tilesOffset, TileIndices, 0, 16);
@@ -64,7 +63,6 @@ namespace sth1edwv
         }
 
         public int Offset { get; }
-        public int LengthConsumed { get; }
         public int UsageCount { get; set; }
         public int GlobalUsageCount { get; set; }
 

@@ -27,7 +27,6 @@ namespace sth1edwv
             {
                 Tiles.Add(new Tile(decompressed, i, palette, i / 64));
             }
-            LengthConsumed = lengthConsumed;
             _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
 
             if (addRings)
@@ -68,7 +67,6 @@ namespace sth1edwv
         }
 
         public int Offset { get; }
-        public int LengthConsumed { get; }
 
         public IList<byte> GetData()
         {
