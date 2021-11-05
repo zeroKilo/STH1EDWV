@@ -22,5 +22,11 @@ namespace sth1edwv
         {
             return Compression.CompressRle(BlockIndices);
         }
+
+        public List<RomBuilder.DataChunk.Reference> GetReferences()
+        {
+            // Floors contains no references
+            return new List<RomBuilder.DataChunk.Reference>();
+        }
     }
 }

@@ -258,6 +258,7 @@
             this.propertyGridLevel.Name = "propertyGridLevel";
             this.propertyGridLevel.Size = new System.Drawing.Size(263, 515);
             this.propertyGridLevel.TabIndex = 2;
+            this.propertyGridLevel.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridLevel_PropertyValueChanged);
             // 
             // treeViewLevelData
             // 

@@ -8,10 +8,10 @@ namespace sth1edwv
     {
         public List<Block> Blocks { get; } = new();
     
-        public BlockMapping(Cartridge cartridge, int address, byte solidityIndex, TileSet tileSet)
+        public BlockMapping(Cartridge cartridge, int address, int solidityIndex, TileSet tileSet)
         {
             // Hard-coded block counts...
-            // TODO: make these safer
+            // TODO: make these safer?
             var blockCount = address switch
             {
                 0x10000 => 184,
@@ -47,6 +47,11 @@ namespace sth1edwv
         public int LengthConsumed { get; }
 
         public IList<byte> GetData()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<RomBuilder.DataChunk.Reference> GetReferences()
         {
             throw new NotImplementedException();
         }

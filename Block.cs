@@ -73,6 +73,11 @@ namespace sth1edwv
             return TileIndices;
         }
 
+        public List<RomBuilder.DataChunk.Reference> GetReferences()
+        {
+            return new List<RomBuilder.DataChunk.Reference>();
+        }
+
         public void ResetImage()
         {
             _image?.Dispose();

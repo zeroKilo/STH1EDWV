@@ -520,6 +520,19 @@ namespace sth1edwv
             Clipboard.SetImage(image);
         }
 
+        private void propertyGridLevel_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            // Apply the level to the ROM
+            if (propertyGridLevel.SelectedObject is not Level level)
+            {
+                return;
+            }
+            
+            level.GetData().CopyTo(_cartridge.Memory, level.Offset);
+            // Invalidate the level map
+            RenderLevel();
+        }
+
         private void pb3_MouseUp(object sender, MouseEventArgs e)
         {
             if (listBoxLevels.SelectedItem is not Level level)

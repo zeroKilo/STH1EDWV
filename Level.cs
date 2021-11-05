@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -16,31 +15,31 @@ namespace sth1edwv
 
         [Category("Level bounds")]
         [Description("Pixel location of the left of the level")]
-        public ushort Left { get; set; }
+        public int LeftPixels { get; set; }
 
         [Category("Level bounds")]
         [Description("Pixel location of the top of the level")]
-        public ushort Top { get; set; }
+        public int TopPixels { get; set; }
 
         [Category("Level bounds")]
-        [Description("Block width of the level, minus 14 and divided by 8")] // TODO: encapsulate this?
-        public byte WidthFactor { get; set; }
+        [Description("Right side of the level in blocks, divided by 8. The screen shows 256px more than this.")] // TODO: encapsulate this?
+        public int RightEdgeFactor { get; set; }
 
         [Category("Level bounds")]
-        [Description("Block height of the level, minus 6 and divided by 8")] // TODO: encapsulate this?
-        public byte HeightFactor { get; set; }
+        [Description("Bottom edge of the level in blocks, divided by 8. The screen shows 192px more than this.")] // TODO: encapsulate this?
+        public int BottomEdgeFactor { get; set; }
 
         [Category("Level bounds")]
         [Description("Extra pixels to add to the level height")] // TODO: encapsulate this?
-        public byte ExtraHeight { get; set; }
+        public int ExtraHeight { get; set; }
 
         [Category("Start location")] 
         [Description("Block location of Sonic's start position")]
-        public byte StartX { get; set; }
+        public int StartX { get; set; }
         
         [Category("Start location")] 
         [Description("Block location of Sonic's start position")]
-        public byte StartY { get; set; }
+        public int StartY { get; set; }
 
         [Category("Level flags")]
         [Description("The level automatically scrolls to the right (like Bridge Act 2)")]
@@ -100,7 +99,82 @@ namespace sth1edwv
 
         [Category("General")] 
         [Description("Which music track to play")]
-        public byte MusicIndex { get; set; }
+        //[TypeConverter(typeof(MusicConverter))]
+        public int MusicIndex { get; set; }
+
+        /*
+        public class MusicConverter : StringConverter
+        {
+            // Enable a combo
+            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            // Disable freeform text
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            // Get values
+            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+            {
+                return new StandardValuesCollection(_musicTracks);
+            }
+
+            public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+            {
+                return (value as MusicItem)?.ToString();
+            }
+
+            public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+            {
+                if (value is int i && destinationType == typeof(string))
+                {
+                    return _musicTracks.First(x => x.Index == i).ToString();
+                }
+
+                if (value is MusicItem mi && destinationType == typeof(string))
+                {
+                    return mi.ToString();
+                }
+                return null;
+            }
+        }
+
+        private class MusicItem
+        {
+            public int Index { get; }
+            private readonly string _name;
+
+            public MusicItem(int index, string name)
+            {
+                Index = index;
+                _name = name;
+            }
+
+            public override string ToString()
+            {
+                return $"{Index}: {_name}";
+            }
+        }
+
+        private static List<MusicItem> _musicTracks = new()
+        {
+            new(0, "Green Hill"),
+            new(1, "Bridge"),
+            new(2, "Jungle"),
+            new(3, "Labyrinth"),
+            new(4, "Scrap Brain"),
+            new(5, "Sky Base"),
+            new(6, "Title"),
+            new(8, "Invincibility"),
+            new(9, "Level Complete"),
+            new(10, "Death"),
+            new(11, "Boss"),
+        };
+*/
 
         // ReSharper restore UnusedAutoPropertyAccessor.Global
         // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
@@ -116,29 +190,30 @@ namespace sth1edwv
         //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
         //   SR UW TL 00  MU
         private readonly string _label;
-        private readonly ushort _floorWidth;
-        private readonly ushort _floorHeight;
+        private readonly int _floorWidth;
+        private readonly int _floorHeight;
         private readonly int _floorAddress;
-        private readonly ushort _floorSize;
-        private readonly ushort _offsetArt;
-        private readonly ushort _offsetObjectLayout;
-        private readonly byte _initPalette;
+        private readonly int _floorSize;
+        private readonly int _offsetArt;
+        private readonly int _offsetObjectLayout;
+        private readonly int _initPalette;
 
         // Size of blocks used when last rendered, used for turning clicks back into block locations
         private int _blockSize;
 
         // These should be encapsulated by a sprite art object
-        private readonly ushort _spriteArtAddress;
-        private readonly byte _spriteArtPage;
+        private readonly int _spriteArtAddress;
+        private readonly int _spriteArtPage;
 
         // These should be encapsulated by a cycling palette object
-        private readonly byte _paletteCycleCount;
-        private readonly byte _paletteCycleIndex;
+        private readonly int _paletteCycleCount;
+        private readonly int _paletteCycleIndex;
+
+        private readonly int _solidityIndex;
+        private readonly int _blockMappingAddress;
 
         public Level(Cartridge cartridge, int offset, int artBanksTableOffset, IList<Palette> palettes, string label)
         {
-            int blockMappingAddress;
-            byte solidityIndex;
             _label = label;
             Offset = offset;
             LengthConsumed = 37;
@@ -146,21 +221,21 @@ namespace sth1edwv
             using (var stream = new MemoryStream(cartridge.Memory, offset, 37, false))
             using (var reader = new BinaryReader(stream))
             {
-                solidityIndex = reader.ReadByte();
+                _solidityIndex = reader.ReadByte();
                 _floorWidth = reader.ReadUInt16();
                 _floorHeight = reader.ReadUInt16();
-                Left = reader.ReadUInt16();
+                LeftPixels = reader.ReadUInt16();
                 // Skip unknown byte
                 reader.ReadByte();
-                WidthFactor = reader.ReadByte();
-                Top = reader.ReadUInt16();
+                RightEdgeFactor = reader.ReadByte();
+                TopPixels = reader.ReadUInt16();
                 ExtraHeight = reader.ReadByte();
-                HeightFactor = reader.ReadByte();
+                BottomEdgeFactor = reader.ReadByte();
                 StartX = reader.ReadByte();
                 StartY = reader.ReadByte();
                 _floorAddress = reader.ReadUInt16(); // relative to 0x14000
                 _floorSize = reader.ReadUInt16(); // compressed size in bytes
-                blockMappingAddress = reader.ReadUInt16(); // relative to 0x10000
+                _blockMappingAddress = reader.ReadUInt16(); // relative to 0x10000
                 _offsetArt = reader.ReadUInt16(); // Relative to 0x30000
                 _spriteArtAddress = reader.ReadUInt16(); // CPU address when paged in
                 _spriteArtPage = reader.ReadByte(); // Page for the above, using slot 2
@@ -212,10 +287,9 @@ namespace sth1edwv
             }
 
             Floor = cartridge.GetFloor(_floorAddress + 0x14000, _floorSize, _floorWidth);
-            BlockMapping = cartridge.GetBlockMapping(blockMappingAddress + 0x10000, solidityIndex, TileSet);
+            BlockMapping = cartridge.GetBlockMapping(_blockMappingAddress + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
-
 
         public override string ToString()
         {
@@ -231,8 +305,8 @@ namespace sth1edwv
                 {
                     new TreeNode($"Floor Size           = {_floorWidth} x {_floorHeight} ({uncompressedSize}B)"),
                     new TreeNode($"Floor Data           = @0x{_floorAddress:X} Size: 0x{_floorSize:X} ({(double)(uncompressedSize - _floorSize) / uncompressedSize:P})"),
-                    new TreeNode($"Level Size           = ({WidthFactor} x {HeightFactor})"),
-                    new TreeNode($"Level Offset         = (dx:{Left} dy:{Top})"),
+                    new TreeNode($"Level Size           = ({RightEdgeFactor} x {BottomEdgeFactor})"),
+                    new TreeNode($"Level Offset         = (dx:{LeftPixels} dy:{TopPixels})"),
                     new TreeNode($"Extended Height      = {ExtraHeight}"),
                     new TreeNode($"Offset Art           = 0x{_offsetArt:X8}"),
                     new TreeNode($"Offset Object Layout = 0x{_offsetObjectLayout:X8}"),
@@ -341,21 +415,19 @@ namespace sth1edwv
 
             if (levelBounds)
             {
-                var x = Left + Left / 32 * (_blockSize - 32);
-                var y = Top + Top / 32 * (_blockSize - 32);
-                var w = (WidthFactor * 8 + 14) * _blockSize;
-                var h = (HeightFactor * 8 + 6) * _blockSize + ExtraHeight;
+                var left = LeftPixels + LeftPixels / 32 * (_blockSize - 32) + 8;
+                var top = TopPixels + TopPixels / 32 * (_blockSize - 32);
+                var right = RightEdgeFactor * _blockSize * 8 + 256;
+                var bottom = BottomEdgeFactor * _blockSize * 8 + 192 + ExtraHeight;
+                var rect = new Rectangle(left, top, right - left, bottom - top);
+                // Draw the grey region
                 using var brush = new SolidBrush(Color.FromArgb(128, Color.Black));
-                // Top
-                g.FillRectangle(brush, 0, 0, result.Width, y);
-                // Bottom
-                g.FillRectangle(brush, 0, y + h, result.Width, result.Height - y - h);
-                // Left chunk
-                g.FillRectangle(brush, 0, y, x, h);
-                // Right chunk
-                g.FillRectangle(brush, x + w, y, result.Width - x - w, h);
-
-                g.DrawRectangle(Pens.Red, x, y, w, h);
+                g.SetClip(rect, CombineMode.Exclude);
+                g.FillRectangle(brush, 0, 0, result.Width, result.Height);
+                // Draw the red border, a bit bigger so it's on the outside
+                rect.Width += 1;
+                rect.Height += 1;
+                g.DrawRectangle(Pens.Red, rect);
             }
 
             return result;
@@ -372,7 +444,59 @@ namespace sth1edwv
 
         public IList<byte> GetData()
         {
-            throw new NotImplementedException();
+            using var stream = new MemoryStream();
+            using var writer = new BinaryWriter(stream);
+            writer.Write((byte)_solidityIndex);
+            writer.Write((ushort)_floorWidth);
+            writer.Write((ushort)_floorHeight);
+            writer.Write((ushort)LeftPixels);
+            // Unknown byte
+            writer.Write((byte)0);
+            writer.Write((byte)RightEdgeFactor);
+            writer.Write((ushort)TopPixels);
+            writer.Write((byte)ExtraHeight);
+            writer.Write((byte)BottomEdgeFactor);
+            writer.Write((byte)StartX);
+            writer.Write((byte)StartY);
+            writer.Write((ushort)_floorAddress); // relative to 0x14000
+            writer.Write((ushort)_floorSize); // compressed size in bytes
+            writer.Write((ushort)_blockMappingAddress); // relative to 0x10000
+            writer.Write((ushort)_offsetArt); // Relative to 0x30000
+            writer.Write((ushort)_spriteArtAddress); // CPU address when paged in
+            writer.Write((byte)_spriteArtPage); // Page for the above, using slot 2
+            writer.Write((byte)_initPalette); // Index of palette
+            writer.Write((byte)PaletteCycleRate); // Number of frames between palette cycles
+            writer.Write((byte)_paletteCycleCount); // Number of palette cycles in a loop
+            writer.Write((byte)_paletteCycleIndex); // Which cycling palette to use
+            writer.Write((ushort)_offsetObjectLayout); // relative to 0x15580
+            var flags = 0;
+            if (DemoMode) flags |= 1 << 1;
+            if (ShowRings) flags |= 1 << 2;
+            if (AutoScrollRight) flags |= 1 << 3;
+            if (AutoScrollUp) flags |= 1 << 4;
+            if (SlowScroll) flags |= 1 << 5;
+            if (WaveScrollY) flags |= 1 << 6;
+            if (NoScrollDown) flags |= 1 << 7;
+            writer.Write((byte)flags);
+            flags = 0;
+            if (HasWater) flags |= 1 << 7;
+            writer.Write((byte)flags);
+            flags = 0;
+            if (SpecialStageTimer) flags |= 1 << 0;
+            if (HasLightning) flags |= 1 << 1;
+            if (UseUnderwaterBossPalette) flags |= 1 << 4;
+            if (ShowTime) flags |= 1 << 5;
+            if (DisableScrolling) flags |= 1 << 6;
+            writer.Write((byte)flags);
+            writer.Write((byte)MusicIndex);
+            return stream.ToArray();
         }
+
+        public List<RomBuilder.DataChunk.Reference> GetReferences()
+        {
+            // Level headers have lots of references!
+            return new List<RomBuilder.DataChunk.Reference>();
+        }
+
     }
 }

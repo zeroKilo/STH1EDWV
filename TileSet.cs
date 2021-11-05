@@ -84,6 +84,11 @@ namespace sth1edwv
             return Compression.CompressArt(ms);
         }
 
+        public List<RomBuilder.DataChunk.Reference> GetReferences()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             foreach (var tile in Tiles)

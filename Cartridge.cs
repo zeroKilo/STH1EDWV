@@ -23,6 +23,8 @@ namespace sth1edwv
         /// Get raw data from the item
         /// </summary>
         IList<byte> GetData();
+
+        List<RomBuilder.DataChunk.Reference> GetReferences();
     }
 
     public class Cartridge: IDisposable
@@ -385,7 +387,7 @@ namespace sth1edwv
             return GetItem(_floors, offset, () => new Floor(this, offset, size, width));
         }
 
-        public BlockMapping GetBlockMapping(int offset, byte solidityIndex, TileSet tileSet)
+        public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet)
         {
             return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet));
         }
@@ -566,5 +568,156 @@ namespace sth1edwv
             // - Iteratively solve outstanding calculations
             // - Emit ROM!
         }
+
+        public byte[] GetData()
+        {
+            var builder = new RomBuilder(_originalMemory);
+
+            // We "de-allocate" all the parts we want to rewrite.
+            // We don't use what data was consumed when reading - we use the data space from the original game.
+            foreach (var item in Sonic1MasterSystem.Levels
+                .Cast<MemoryItem>()
+                .Concat(Sonic1MasterSystem.Palettes)
+                .Concat(Sonic1MasterSystem.Floors)
+                .Concat(Sonic1MasterSystem.TileSets)
+                // TODO: add more stuff here
+                )
+            {
+                builder.AddFreeSpace(item.Offset, item.Length);
+            }
+
+            // Then we put back in the things we have in memory.
+            foreach (var item in Levels
+                .Cast<IDataItem>()
+                .Concat(_floors.Values)
+                .Concat(_tileSets.Values)
+                .Concat(_blockMappings.Values))
+            {
+                builder.AddDataChunk(new RomBuilder.DataChunk
+                {
+                    Data = item.GetData(),
+                    References = item.GetReferences()
+                });
+            }
+
+            builder.PlaceChunks();
+
+            return builder.Data;
+        }
     }
+
+    public class RomBuilder
+    {
+        public byte[] Data { get; }
+
+        public class Space
+        {
+            // Inclusive offsets, i.e. start, end and all offsets in between are free.
+            public int Start { get; set; }
+            public int End { get; set; }
+
+            public bool Overlaps(Space item)
+            {
+                // it overlaps if its start or end is within our range
+                return (item.Start >= Start && item.Start <= End) ||
+                       (item.End >= Start && item.End <= End);
+            }
+        }
+
+        private List<Space> _freeSpace = new();
+        private List<DataChunk> _chunks = new();
+
+        public RomBuilder(byte[] data)
+        {
+            Data = (byte[])data.Clone();
+        }
+
+        public void AddFreeSpace(int offset, int length)
+        {
+            var item = new Space{Start = offset, End = offset + length - 1};
+
+            if (_freeSpace.Any(x => x.Overlaps(item)))
+            {
+                throw new Exception("Space overlaps existing free space");
+            }
+
+            _freeSpace.Add(item);
+        }
+
+        private void TidyFreeSpace()
+        {
+            // We first order things...
+            _freeSpace = _freeSpace.OrderBy(x => x.Start).ToList();
+            // Then we look for consecutive items
+            for (var i = 0; i < _freeSpace.Count - 1; ++i)
+            {
+                if (_freeSpace[i].End + 1 == _freeSpace[i + 1].Start)
+                {
+                    // Merge them together
+                    _freeSpace[i].End = _freeSpace[i + 1].End;
+                    // Remove the extra one
+                    _freeSpace.RemoveAt(i + 1);
+                    // Adjust the index down so we check this one again
+                    --i;
+                }
+            }
+        }
+
+        public void AddDataChunk(DataChunk chunk)
+        {
+            _chunks.Add(chunk);
+        }
+
+        public void PlaceChunks()
+        {
+            TidyFreeSpace();
+
+            _chunks = _chunks.OrderBy(x => x.Data.Count).ToList();
+
+            // Find the first free space that can take it
+        }
+
+        public class DataChunk
+        {
+            public IList<byte> Data { get; set; }
+            public List<Reference> References { get; set; } = new();
+
+            public class Reference
+            {
+                public int RelativeOffset { get; set; }
+
+                public enum ReferenceTypes
+                {
+                    BankNumber,
+                    RelativeToChunkStart,
+                    PagedInSlot2
+                }
+                public ReferenceTypes TypeOfReference { get; set; }
+            }
+
+            public ILocationSelector LocationSelector { get; set; }
+        }
+
+        public interface ILocationSelector
+        {
+            public int ChooseLocation(List<Space> spaces);
+        }
+
+        // Always pick the given offset
+        public class FixedLocation : ILocationSelector
+        {
+            private readonly int _offset;
+
+            public FixedLocation(int offset)
+            {
+                _offset = offset;
+            }
+
+            public int ChooseLocation(List<Space> spaces)
+            {
+                return _offset;
+            }
+        }
+    }
+
 }
