@@ -418,8 +418,8 @@ namespace sth1edwv
             {
                 var left = LeftPixels + LeftPixels / 32 * (_blockSize - 32) + 8;
                 var top = TopPixels + TopPixels / 32 * (_blockSize - 32);
-                var right = RightEdgeFactor * _blockSize * 8 + 256;
-                var bottom = BottomEdgeFactor * _blockSize * 8 + 192 + ExtraHeight;
+                var right = RightEdgeFactor * _blockSize * 8 + (256 / 32 * _blockSize);
+                var bottom = BottomEdgeFactor * _blockSize * 8 + (192 / 32 * _blockSize) + ExtraHeight;
                 var rect = new Rectangle(left, top, right - left, bottom - top);
                 // Draw the grey region
                 using var brush = new SolidBrush(Color.FromArgb(128, Color.Black));
