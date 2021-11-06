@@ -65,6 +65,9 @@ namespace sth1edwv
 
             // Add or replace filename in title bar
             Text = $"{Regex.Replace(Text, " \\[.+\\]$", "")} [{Path.GetFileName(filename)}]";
+
+            // Trigger the selected level changed event
+            SelectedLevelChanged(null, null);
         }
 
         private void ListBoxMemoryLocationsSelectedIndexChanged(object sender, EventArgs e)
@@ -92,33 +95,30 @@ namespace sth1edwv
 
         private void SelectedLevelChanged(object sender, EventArgs e)
         {
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
-
             RenderLevel();
 
-            tilePicker1.Items = level.TileSet.Tiles.Cast<IDrawableBlock>().ToList();
+            var level = listBoxLevels.SelectedItem as Level;
+
+            tilePicker1.Items = level?.TileSet.Tiles.Cast<IDrawableBlock>().ToList();
 
             LoadLevelData();
 
             propertyGridLevel.SelectedObject = level;
 
-            level.BlockMapping.UpdateUsageForLevel(level);
-            level.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
+            level?.BlockMapping.UpdateUsageForLevel(level);
+            level?.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
 
-            dataGridViewBlocks.DataSource = new BindingListView<Block>(level.BlockMapping.Blocks);
+            dataGridViewBlocks.DataSource = level == null ? null : new BindingListView<Block>(level.BlockMapping.Blocks);
             dataGridViewBlocks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
         }
 
         private void LoadLevelData()
         {
+            treeViewLevelData.Nodes.Clear();
             if (listBoxLevels.SelectedItem is not Level level)
             {
                 return;
             }
-            treeViewLevelData.Nodes.Clear();
             var t = new TreeNode($"{level}");
             t.Nodes.Add(level.ToNode());
             t.Nodes.Add(level.TileSet.ToNode());
