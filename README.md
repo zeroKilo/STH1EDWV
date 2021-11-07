@@ -1,7 +1,21 @@
-# Sonic The Hedgehog 1 Editor by WV
+# Sonic The Hedgehog 1 for Sega Master System editor by WV, extended by Maxim
 
-this is a simple ROM editor that lets you f.e. edit levels
+This is a ROM editor that lets you edit various aspects of the game.
 
-example video: https://www.youtube.com/watch?v=qjK0FeIWsTM
+Currently editable:
 
-example video 2: https://www.youtube.com/watch?v=YQFW-_Oplw4
+- Level layout
+- Object positions and types
+- Level flags
+- Level blocks (32x32 blocks making up the levels)
+
+Still to come (in no particular order):
+
+- Removing size restrictions
+- Music/SFX editing/replacement
+- Palette editing (base palette and cycles)
+- Static screen editing
+- Tileset editing
+- Sonic 1 GG support
+
+Downloads in the Releases section.
