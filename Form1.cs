@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Be.Windows.Forms;
@@ -568,7 +569,7 @@ namespace sth1edwv
 
             // Try to insert it
             var newData = level.Floor.GetData();
-            if (newData.Count > level.Floor.LengthConsumed)
+            if (newData.Count > level.Floor.MaximumCompressedSize)
             {
                 MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
                 temp.CopyTo(level.Floor.BlockIndices, 0);
@@ -577,7 +578,7 @@ namespace sth1edwv
 
             // Apply to the ROM
             newData.CopyTo(_cartridge.Memory, level.Floor.Offset);
-            // We also have to change the level header to match
+            // We also have to change the level header length to specify the correct compressed size
             _cartridge.Memory[level.Offset + 17] = (byte)(newData.Count & 0xff);
             _cartridge.Memory[level.Offset + 18] = (byte)(newData.Count >> 8);
 

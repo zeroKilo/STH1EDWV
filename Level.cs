@@ -214,6 +214,32 @@ namespace sth1edwv
         private readonly int _solidityIndex;
         private readonly int _blockMappingAddress;
 
+        // TODO: make these come from the cartridge layout?
+        private readonly Dictionary<int, int> _originalSizes = new()
+        {
+            { 0x2dea, 0x83e }, // Green Hill Act 1/Ending Sequence
+            { 0x3628, 0x661 }, // Green Hill Act 2
+            { 0x3c89, 0x32d }, // Green Hill Act 3
+            { 0x3fb6, 0xaac }, // Jungle Act 1
+            { 0x4a62, 0x8db }, // Jungle Act 2/Special Stage 4/Special Stage 8
+            { 0x533d, 0x69a }, // Scrap Brain Act 1
+            { 0x59d7, 0x904 }, // Scrap Brain Act 2
+            { 0x62db, 0x8f8 }, // Scrap Brain Act 2 (Emerald Maze), from corridor
+            { 0x6bd3, 0x6af }, // Scrap Brain Act 2 (Ballhog Area)
+            { 0x7282, 0x8b2 }, // Scrap Brain Act 3
+            { 0x7b34, 0x39d }, // Sky Base Act 2
+            { 0x7ed1, 0x694 }, // Bridge Act 1
+            { 0x8565, 0x8c2 }, // Labyrinth Act 1
+            { 0x8e27, 0xd13 }, // Labyrinth Act 2
+            { 0x9b3a, 0x76e }, // Sky Base Act 1
+            { 0xa2a8, 0x499 }, // Bridge Act 2
+            { 0xa741, 0x4c0 }, // Sky Base Act 2 (Interior)/Sky Base Act 3
+            { 0xac01, 0x3f5 }, // Jungle Act 3
+            { 0xaff6, 0x30b }, // Labyrinth Act 3
+            { 0xb301, 0x140 }, // Bridge Act 3
+            { 0xb441, 0x760 }, // Special Stage 1/2/3/5/6/7
+        };
+
         public Level(Cartridge cartridge, int offset, int artBanksTableOffset, IList<Palette> palettes, string label)
         {
             _label = label;
@@ -287,7 +313,16 @@ namespace sth1edwv
                 TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, palettes[_initPalette], true);
             }
 
-            Floor = cartridge.GetFloor(_floorAddress + 0x14000, _floorSize, _floorWidth);
+            if (!_originalSizes.TryGetValue(_floorAddress, out var originalSize))
+            {
+                originalSize = 0;
+            }
+
+            Floor = cartridge.GetFloor(
+                _floorAddress + 0x14000, 
+                _floorSize, 
+                originalSize,
+                _floorWidth);
             BlockMapping = cartridge.GetBlockMapping(_blockMappingAddress + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
@@ -305,9 +340,9 @@ namespace sth1edwv
                 Nodes =
                 {
                     new TreeNode($"Floor Size           = {_floorWidth} x {_floorHeight} ({uncompressedSize}B)"),
-                    new TreeNode($"Floor Data           = @0x{_floorAddress:X} Size: 0x{_floorSize:X} ({(double)(uncompressedSize - _floorSize) / uncompressedSize:P})"),
-                    new TreeNode($"Level Size           = ({RightEdgeFactor} x {BottomEdgeFactor})"),
-                    new TreeNode($"Level Offset         = (dx:{LeftPixels} dy:{TopPixels})"),
+                    new TreeNode($"Floor Data           = @0x{_floorAddress:X} Size: {_floorSize}B ({(double)(uncompressedSize - _floorSize) / uncompressedSize:P}), max {Floor.MaximumCompressedSize}B"),
+                    new TreeNode($"Level Limits         = ({RightEdgeFactor}, {BottomEdgeFactor})"),
+                    new TreeNode($"Level Offset         = ({LeftPixels}, {TopPixels})"),
                     new TreeNode($"Extended Height      = {ExtraHeight}"),
                     new TreeNode($"Offset Art           = 0x{_offsetArt:X8}"),
                     new TreeNode($"Offset Object Layout = 0x{_offsetObjectLayout:X8}"),
@@ -495,6 +530,5 @@ namespace sth1edwv
             // Level headers have lots of references!
             return new List<RomBuilder.DataChunk.Reference>();
         }
-
     }
 }

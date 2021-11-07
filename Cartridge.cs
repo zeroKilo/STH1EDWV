@@ -378,9 +378,9 @@ namespace sth1edwv
             return GetItem(_tileSets, offset, () => new TileSet(this, offset, palette, addRings));
         }
 
-        public Floor GetFloor(int offset, int size, int width)
+        public Floor GetFloor(int offset, int compressedSize, int maximumCompressedSize, int width)
         {
-            return GetItem(_floors, offset, () => new Floor(this, offset, size, width));
+            return GetItem(_floors, offset, () => new Floor(this, offset, compressedSize, maximumCompressedSize, width));
         }
 
         public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet)
