@@ -551,7 +551,12 @@ namespace sth1edwv
             var maxX = Math.Max(x, _lastX);
             var minY = Math.Min(y, _lastY);
             var maxY = Math.Max(y, _lastY);
-            using var bc = new BlockChooser(level.BlockMapping.Blocks, level.Floor.BlockIndices[x + y * level.Floor.Width]);
+            var selectedBlock = -1;
+            if (minX == maxX && minY == maxY)
+            {
+                selectedBlock = level.Floor.BlockIndices[x + y * level.Floor.Width];
+            }
+            using var bc = new BlockChooser(level.BlockMapping.Blocks, selectedBlock);
             if (bc.ShowDialog(this) != DialogResult.OK)
             {
                 return;
@@ -578,9 +583,12 @@ namespace sth1edwv
 
             // Apply to the ROM
             newData.CopyTo(_cartridge.Memory, level.Floor.Offset);
-            // We also have to change the level header length to specify the correct compressed size
-            _cartridge.Memory[level.Offset + 17] = (byte)(newData.Count & 0xff);
-            _cartridge.Memory[level.Offset + 18] = (byte)(newData.Count >> 8);
+            // We also have to change the level header length to specify the correct compressed size, for all levels using this floor data
+            foreach (var l in _cartridge.Levels.Where(l => l.Floor == level.Floor))
+            {
+                _cartridge.Memory[l.Offset + 17] = (byte)(newData.Count & 0xff);
+                _cartridge.Memory[l.Offset + 18] = (byte)(newData.Count >> 8);
+            }
 
             // Redraw the level
             RenderLevel();
@@ -589,6 +597,8 @@ namespace sth1edwv
             level.BlockMapping.UpdateUsageForLevel(level);
             level.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
             dataGridViewBlocks.ResetBindings();
+
+            LoadLevelData();
         }
     }
 }

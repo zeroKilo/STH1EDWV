@@ -53,7 +53,7 @@ namespace sth1edwv
         {
             using var m = new MemoryStream(data);
             using var result = new MemoryStream();
-            while (m.Position < m.Length)            
+            while (m.Position < m.Length)
             {
                 // Look for a run of bytes
                 var b = m.ReadByte();
