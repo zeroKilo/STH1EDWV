@@ -57,5 +57,11 @@ namespace sth1edwv
             _imageWithoutRings = Image;
             _image = (Bitmap)image.Clone();
         }
+
+        public void SetData(int x, int y, int index)
+        {
+            _data[x + y * 8] = (byte)index;
+            _image = null;
+        }
     }
 }

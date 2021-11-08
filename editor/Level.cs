@@ -185,6 +185,7 @@ namespace sth1edwv
         [Category("General")] public Floor Floor { get; }
         [Category("General")] public LevelObjectSet Objects { get; }
         [Category("General")] public BlockMapping BlockMapping { get; }
+        [Category("General")] public Palette Palette { get; set; }
 
         [Category("General")] public int Offset { get; }
 
@@ -241,7 +242,7 @@ namespace sth1edwv
 
         private readonly byte _unknownByte;
 
-        public Level(Cartridge cartridge, int offset, int artBanksTableOffset, IList<Palette> palettes, string label)
+        public Level(Cartridge cartridge, int offset, IList<Palette> palettes, string label)
         {
             _label = label;
             Offset = offset;
@@ -305,16 +306,9 @@ namespace sth1edwv
                 _floorHeight /= 2;
             }
 
-            if (artBanksTableOffset > 0)
-            {
-                var levelIndex = (offset - 0x15580) / 2;
-                var artBank = cartridge.Memory[artBanksTableOffset + levelIndex];
-                TileSet = cartridge.GetTileSet(_offsetArt + artBank * 0x4000, palettes[_initPalette], true);
-            }
-            else
-            {
-                TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, palettes[_initPalette], true);
-            }
+            this.Palette = palettes[_initPalette];
+
+            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, Palette, true);
 
             if (!_originalSizes.TryGetValue(_floorAddress, out var originalSize))
             {
@@ -329,6 +323,7 @@ namespace sth1edwv
             BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
+
 
         public override string ToString()
         {

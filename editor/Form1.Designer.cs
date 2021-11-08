@@ -55,6 +55,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
             this.buttonCopyTileset = new System.Windows.Forms.ToolStripButton();
+            this.buttonPasteTileset = new System.Windows.Forms.ToolStripButton();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
@@ -380,7 +381,8 @@
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.buttonCopyTileset});
+            this.buttonCopyTileset,
+            this.buttonPasteTileset});
             this.toolStrip2.Location = new System.Drawing.Point(3, 3);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(712, 25);
@@ -395,6 +397,15 @@
             this.buttonCopyTileset.Size = new System.Drawing.Size(89, 22);
             this.buttonCopyTileset.Text = "Copy tileset";
             this.buttonCopyTileset.Click += new System.EventHandler(this.buttonCopyTileset_Click);
+            // 
+            // buttonPasteTileset
+            // 
+            this.buttonPasteTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonPasteTileset.Image")));
+            this.buttonPasteTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonPasteTileset.Name = "buttonPasteTileset";
+            this.buttonPasteTileset.Size = new System.Drawing.Size(89, 22);
+            this.buttonPasteTileset.Text = "Paste tileset";
+            this.buttonPasteTileset.Click += new System.EventHandler(this.buttonPasteTileset_Click);
             // 
             // tabPage3
             // 
@@ -882,6 +893,7 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel floorStatus;
         private System.Windows.Forms.ToolStripStatusLabel tileSetStatus;
+        private System.Windows.Forms.ToolStripButton buttonPasteTileset;
     }
 }
 

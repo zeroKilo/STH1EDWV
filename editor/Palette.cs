@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 
 namespace sth1edwv
 {
@@ -73,6 +72,27 @@ namespace sth1edwv
             }
 
             return bmp;
+        }
+
+        public int IndexOfNearest(Color color)
+        {
+            var bestIndex = -1;
+            var bestDistance = int.MaxValue;
+            for (var i = 0; i < Colors.Count; i++)
+            {
+                var c = Colors[i];
+                var distance = 
+                    Math.Abs(c.R - color.R) +
+                    Math.Abs(c.G - color.G) +
+                    Math.Abs(c.B - color.B);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestIndex = i;
+                }
+            }
+
+            return bestIndex;
         }
     }
 }

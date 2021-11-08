@@ -198,8 +198,6 @@ namespace sth1edwv
         public IList<GameText> GameText { get; } = new List<GameText>();
         public IList<Palette> Palettes { get; }
 
-        private readonly int _artBanksTableOffset;
-
         private readonly Dictionary<int, TileSet> _tileSets = new();
         private readonly Dictionary<int, Floor> _floors = new();
         private readonly Dictionary<int, BlockMapping> _blockMappings = new();
@@ -207,23 +205,6 @@ namespace sth1edwv
         public Cartridge(string path)
         {
             Memory = new Memory(File.ReadAllBytes(path));
-
-            _artBanksTableOffset = 0;
-            var symbolsFilePath = Path.ChangeExtension(path, "sym");
-            if (File.Exists(symbolsFilePath))
-            {
-                // As a hack, let's read it in and find the ArtTilesTable label
-                var regex = new Regex("(?<bank>[0-9]{2}):(?<offset>[0-9]{4}) ArtTilesTable");
-                var line = File.ReadAllLines(symbolsFilePath)
-                    .Select(x => regex.Match(x))
-                    .FirstOrDefault(x => x.Success);
-                if (line != null)
-                {
-                    // Compute the art banks table offset
-                    _artBanksTableOffset = Convert.ToInt32(line.Groups["bank"].Value, 16) * 0x4000 + Convert.ToInt32(line.Groups["offset"].Value, 16) % 0x4000;
-                }
-            }
-
             Palettes = Palette.ReadPalettes(Memory, 0x627C, 8+9).ToList();
             ReadLevels();
             ReadGameText();
@@ -236,7 +217,7 @@ namespace sth1edwv
             Levels.Clear();
             foreach (var level in Sonic1MasterSystem.Levels)
             {
-                Levels.Add(new Level(this, level.Offset, _artBanksTableOffset, Palettes, level.Name));
+                Levels.Add(new Level(this, level.Offset, Palettes, level.Name));
             }
         }
 
