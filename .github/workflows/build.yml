@@ -17,7 +17,7 @@ jobs:
     - name: Build
       shell: cmd
       run: |
-        cd source
+        cd editor
         nuget restore
         msbuild sth1edwv.sln /p:Configuration=Release
         7z a program.zip bin\Release\*
@@ -26,7 +26,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: program
-        path: source\bin\Release\*
+        path: editor\bin\Release\*
 
     - name: Build Number Generator
       uses: einaregilsson/build-number@v3
@@ -40,4 +40,4 @@ jobs:
         automatic_release_tag: "v0.${{env.BUILD_NUMBER}}"
         prerelease: false
         title: "Automatic build #${{env.BUILD_NUMBER}}"
-        files: source\program.zip
+        files: editor\program.zip
