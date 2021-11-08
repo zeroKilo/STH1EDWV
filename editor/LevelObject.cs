@@ -23,11 +23,6 @@ namespace sth1edwv
             return new List<byte> { Type, X, Y };
         }
 
-        public List<RomBuilder.DataChunk.Reference> GetReferences()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public TreeNode ToNode()
         {
             if (!Names.TryGetValue(Type, out var name))

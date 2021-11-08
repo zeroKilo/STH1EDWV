@@ -10,11 +10,9 @@ namespace sth1edwv
     {
         public static byte[] DecompressRle(Cartridge cartridge, int address, int size)
         {
-            // Read into a memory stream
-            // Decompress into another one
-            using var m = new MemoryStream(cartridge.Memory, address, size);
+            // Decompress into a new stream
+            using var m = cartridge.Memory.GetStream(address, size);
             using var result = new MemoryStream();
-            m.Seek(0, SeekOrigin.Begin);
             while (m.Position < m.Length)
             {
                 var b1 = (byte)m.ReadByte();
@@ -86,16 +84,16 @@ namespace sth1edwv
             return result.ToArray();
         }
 
-        public static byte[] DecompressArt(byte[] data, int offset, out int lengthConsumed)
+        public static byte[] DecompressArt(Memory data, int offset, out int lengthConsumed)
         {
-            var magic = Encoding.ASCII.GetString(data, offset, 2);
+            var magic = data.String(offset, 2);
             if (magic != "HY")
             {
                 throw new Exception("Invalid magic number");
             }
-            var duplicateRowsOffset = offset + BitConverter.ToUInt16(data, offset + 2);
-            var artDataOffset = offset + BitConverter.ToUInt16(data, offset + 4);
-            var rowCount = BitConverter.ToUInt16(data, offset + 6);
+            var duplicateRowsOffset = offset + data.Word(offset + 2);
+            var artDataOffset = offset + data.Word(offset + 4);
+            var rowCount = data.Word(offset + 6);
             if (rowCount % 8 != 0)
             {
                 throw new Exception($"Row count {rowCount} is not a multiple of 8");
@@ -103,8 +101,8 @@ namespace sth1edwv
 
             var nextArtDataOffset = artDataOffset;
             // We work through the data based on these...
-            using var bitMasks = new MemoryStream(data, offset+8, rowCount / 8);
-            using var duplicatesData = new MemoryStream(data, duplicateRowsOffset, rowCount);
+            using var bitMasks = data.GetStream(offset + 8, rowCount / 8);
+            using var duplicatesData = data.GetStream(duplicateRowsOffset, rowCount*2); // Real size is <= rowCount * 2 but hard to predict
             using var result = new MemoryStream();
             while (bitMasks.Position != bitMasks.Length)
             {
@@ -167,32 +165,33 @@ namespace sth1edwv
             var artData = new List<byte[]>();
             var duplicates = new List<int>();
             var bitMasks = new List<byte>();
+            var seenLines = new Dictionary<ulong, int>();
             
             // We work through it one row at a time...
             source.Position = 0;
             byte bitmask = 0;
             var linesConsumed = 0;
+            using var reader = new BinaryReader(source);
             while (source.Position < source.Length)
             {
-                // Read a line
-                var line = new byte[8];
-                source.Read(line, 0, 8);
+                // Read a line as a 64-bit number
+                var line = reader.ReadBytes(8);
+                var asInt = BitConverter.ToUInt64(line, 0);
                 ++linesConsumed;
-                bitmask <<= 1;
+                bitmask >>= 1;
                 // See if we already have it
-                var index = artData.IndexOf(line);
-
-                if (index == -1)
-                {
-                    // If not found, add to art data
-                    artData.Add(line);
-                }
-                else
+                if (seenLines.TryGetValue(asInt, out var index))
                 {
                     // If found, add the reference
                     duplicates.Add(index);
-                    // And set the bit
-                    bitmask |= 1;
+                    // And set the bit on the left
+                    bitmask |= 0x80;
+                }
+                else
+                {
+                    // If not found, add to art data
+                    artData.Add(line);
+                    seenLines.Add(asInt, artData.Count - 1);
                 }
 
                 // If we have finished a tile, emit the bitmask
@@ -205,14 +204,13 @@ namespace sth1edwv
 
             // Now we emit it back...
             using var result = new MemoryStream();
-            using var resultWriter = new BinaryWriter(result, Encoding.ASCII);
+            using var resultWriter = new BinaryWriter(result);
             // Header - magic chars
-            resultWriter.Write("HY");
-            // Art offset = 8 + bitmask count
-            // Duplicates offset = 8 + bitmask count + art size
-            var artOffset = 8 + bitMasks.Count;
-            var duplicatesOffset = artOffset + artData.Count * 4;
-            var rowCount = bitMasks.Count / 8;
+            resultWriter.Write(Encoding.ASCII.GetBytes("HY"));
+
+            var duplicatesOffset = bitMasks.Count + 8;
+            var artOffset = duplicatesOffset + duplicates.Sum(x => x < 0xf0 ? 1 : 2);
+            var rowCount = bitMasks.Count * 8;
 
             resultWriter.Write((ushort)duplicatesOffset);
             resultWriter.Write((ushort)artOffset);
@@ -220,9 +218,7 @@ namespace sth1edwv
 
             // Next the bitmasks
             resultWriter.Write(bitMasks.ToArray());
-            // And the art data, converting to chunky
-            resultWriter.Write(artData.SelectMany(ChunkyToPlanar).ToArray());
-            // Finally the duplicates data
+            // The duplicates data
             foreach (var index in duplicates)
             {
                 // 1-2 bytes encoding
@@ -236,6 +232,8 @@ namespace sth1edwv
                     resultWriter.Write((byte)(index & 0xff));
                 }
             }
+            // And the art data, converting to chunky
+            resultWriter.Write(artData.SelectMany(ChunkyToPlanar).ToArray());
             return result.ToArray();
         }
 

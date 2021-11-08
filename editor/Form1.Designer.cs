@@ -1,6 +1,6 @@
 ﻿namespace sth1edwv
 {
-    partial class Form1
+    sealed partial class Form1
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -82,15 +82,11 @@
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.listBoxPalettes = new System.Windows.Forms.ListBox();
             this.pictureBoxPalette = new System.Windows.Forms.PictureBox();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.listBoxMemoryLocations = new System.Windows.Forms.ListBox();
-            this.hexViewer = new Be.Windows.Forms.HexBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this._richTextBoxGeneralSummary = new System.Windows.Forms.RichTextBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -129,14 +125,9 @@
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPalette)).BeginInit();
-            this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tabPage4.SuspendLayout();
             this.tabPage9.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -190,9 +181,9 @@
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(954, 559);
+            this.tabPage5.Size = new System.Drawing.Size(954, 537);
             this.tabPage5.TabIndex = 5;
-            this.tabPage5.Text = "Level";
+            this.tabPage5.Text = "Levels";
             this.tabPage5.UseVisualStyleBackColor = true;
             // 
             // splitContainer6
@@ -208,7 +199,7 @@
             // splitContainer6.Panel2
             // 
             this.splitContainer6.Panel2.Controls.Add(this.tabControlLevel);
-            this.splitContainer6.Size = new System.Drawing.Size(948, 553);
+            this.splitContainer6.Size = new System.Drawing.Size(948, 531);
             this.splitContainer6.SplitterDistance = 218;
             this.splitContainer6.TabIndex = 0;
             // 
@@ -219,7 +210,7 @@
             this.listBoxLevels.IntegralHeight = false;
             this.listBoxLevels.Location = new System.Drawing.Point(0, 0);
             this.listBoxLevels.Name = "listBoxLevels";
-            this.listBoxLevels.Size = new System.Drawing.Size(218, 553);
+            this.listBoxLevels.Size = new System.Drawing.Size(218, 531);
             this.listBoxLevels.TabIndex = 1;
             this.listBoxLevels.SelectedIndexChanged += new System.EventHandler(this.SelectedLevelChanged);
             // 
@@ -234,7 +225,7 @@
             this.tabControlLevel.Location = new System.Drawing.Point(0, 0);
             this.tabControlLevel.Name = "tabControlLevel";
             this.tabControlLevel.SelectedIndex = 0;
-            this.tabControlLevel.Size = new System.Drawing.Size(726, 553);
+            this.tabControlLevel.Size = new System.Drawing.Size(726, 531);
             this.tabControlLevel.TabIndex = 1;
             this.tabControlLevel.SelectedIndexChanged += new System.EventHandler(this.tabControlLevel_SelectedIndexChanged);
             // 
@@ -245,7 +236,7 @@
             this.tabPage6.Location = new System.Drawing.Point(4, 22);
             this.tabPage6.Name = "tabPage6";
             this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(718, 527);
+            this.tabPage6.Size = new System.Drawing.Size(718, 505);
             this.tabPage6.TabIndex = 0;
             this.tabPage6.Text = "Level metadata";
             this.tabPage6.UseVisualStyleBackColor = true;
@@ -256,7 +247,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.propertyGridLevel.Location = new System.Drawing.Point(449, 6);
             this.propertyGridLevel.Name = "propertyGridLevel";
-            this.propertyGridLevel.Size = new System.Drawing.Size(263, 515);
+            this.propertyGridLevel.Size = new System.Drawing.Size(263, 493);
             this.propertyGridLevel.TabIndex = 2;
             this.propertyGridLevel.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridLevel_PropertyValueChanged);
             // 
@@ -268,7 +259,7 @@
             this.treeViewLevelData.Font = new System.Drawing.Font("Consolas", 8.25F);
             this.treeViewLevelData.Location = new System.Drawing.Point(3, 6);
             this.treeViewLevelData.Name = "treeViewLevelData";
-            this.treeViewLevelData.Size = new System.Drawing.Size(440, 515);
+            this.treeViewLevelData.Size = new System.Drawing.Size(440, 493);
             this.treeViewLevelData.TabIndex = 1;
             this.treeViewLevelData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewLevelDataItemSelected);
             // 
@@ -707,97 +698,6 @@
             this.pictureBoxPalette.TabIndex = 1;
             this.pictureBoxPalette.TabStop = false;
             // 
-            // tabPage1
-            // 
-            this.tabPage1.Controls.Add(this.splitContainer1);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(954, 559);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Memory";
-            this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(3, 3);
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.listBoxMemoryLocations);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.hexViewer);
-            this.splitContainer1.Size = new System.Drawing.Size(948, 553);
-            this.splitContainer1.SplitterDistance = 314;
-            this.splitContainer1.TabIndex = 0;
-            // 
-            // listBoxMemoryLocations
-            // 
-            this.listBoxMemoryLocations.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxMemoryLocations.Font = new System.Drawing.Font("Consolas", 8.25F);
-            this.listBoxMemoryLocations.FormattingEnabled = true;
-            this.listBoxMemoryLocations.IntegralHeight = false;
-            this.listBoxMemoryLocations.Location = new System.Drawing.Point(0, 0);
-            this.listBoxMemoryLocations.Name = "listBoxMemoryLocations";
-            this.listBoxMemoryLocations.Size = new System.Drawing.Size(314, 553);
-            this.listBoxMemoryLocations.TabIndex = 0;
-            this.listBoxMemoryLocations.SelectedIndexChanged += new System.EventHandler(this.ListBoxMemoryLocationsSelectedIndexChanged);
-            // 
-            // hexViewer
-            // 
-            this.hexViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.hexViewer.Font = new System.Drawing.Font("Consolas", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.hexViewer.LineInfoVisible = true;
-            this.hexViewer.Location = new System.Drawing.Point(0, 0);
-            this.hexViewer.Name = "hexViewer";
-            this.hexViewer.ShadowSelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(60)))), ((int)(((byte)(188)))), ((int)(((byte)(255)))));
-            this.hexViewer.Size = new System.Drawing.Size(630, 553);
-            this.hexViewer.StringViewVisible = true;
-            this.hexViewer.TabIndex = 0;
-            this.hexViewer.UseFixedBytesPerLine = true;
-            this.hexViewer.VScrollBarVisible = true;
-            // 
-            // tabControl1
-            // 
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage9);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage5);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 24);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(962, 585);
-            this.tabControl1.TabIndex = 1;
-            // 
-            // tabPage4
-            // 
-            this.tabPage4.Controls.Add(this._richTextBoxGeneralSummary);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(954, 559);
-            this.tabPage4.TabIndex = 6;
-            this.tabPage4.Text = "General Info";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // _richTextBoxGeneralSummary
-            // 
-            this._richTextBoxGeneralSummary.DetectUrls = false;
-            this._richTextBoxGeneralSummary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._richTextBoxGeneralSummary.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._richTextBoxGeneralSummary.Location = new System.Drawing.Point(3, 3);
-            this._richTextBoxGeneralSummary.Name = "_richTextBoxGeneralSummary";
-            this._richTextBoxGeneralSummary.Size = new System.Drawing.Size(948, 553);
-            this._richTextBoxGeneralSummary.TabIndex = 0;
-            this._richTextBoxGeneralSummary.Text = "";
-            this._richTextBoxGeneralSummary.WordWrap = false;
-            // 
             // tabPage9
             // 
             this.tabPage9.Controls.Add(this.listBoxGameText);
@@ -821,6 +721,34 @@
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.tabPage9);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 24);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(962, 563);
+            this.tabControl1.TabIndex = 1;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.floorStatus});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 587);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(962, 22);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // floorStatus
+            // 
+            this.floorStatus.Name = "floorStatus";
+            this.floorStatus.Size = new System.Drawing.Size(70, 17);
+            this.floorStatus.Text = "Floor space:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -828,6 +756,7 @@
             this.ClientSize = new System.Drawing.Size(962, 609);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.statusStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "STH1 Editor by WV :: extended by Maxim";
@@ -879,14 +808,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPalette)).EndInit();
-            this.tabPage1.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
             this.tabPage9.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -897,62 +822,58 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openROMToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveROMToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem quickTestToolStripMenuItem;
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.SplitContainer splitContainer6;
         private System.Windows.Forms.ListBox listBoxLevels;
         private System.Windows.Forms.TabControl tabControlLevel;
         private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.PropertyGrid propertyGridLevel;
         private System.Windows.Forms.TreeView treeViewLevelData;
+        private System.Windows.Forms.TabPage tabPagePalettes;
         private System.Windows.Forms.TabPage tabPage7;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.PictureBox pictureBoxTilePreview;
-        private System.Windows.Forms.TabPage tabPageLayout;
-        private System.Windows.Forms.PictureBox pictureBoxRenderedLevel;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.SplitContainer splitContainer3;
-        private System.Windows.Forms.ListBox listBoxPalettes;
-        private System.Windows.Forms.PictureBox pictureBoxPalette;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.ListBox listBoxMemoryLocations;
-        private Be.Windows.Forms.HexBox hexViewer;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.SplitContainer splitContainer4;
-        private System.Windows.Forms.PictureBox pictureBoxBlockEditor;
-        private System.Windows.Forms.ToolStripMenuItem saveROMToolStripMenuItem;
-        private System.Windows.Forms.TabPage tabPage4;
-        private System.Windows.Forms.RichTextBox _richTextBoxGeneralSummary;
-        private System.Windows.Forms.TabPage tabPage9;
-        private System.Windows.Forms.ListBox listBoxGameText;
         private ItemPicker tilePicker1;
-        private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton toolStripButtonSaveRenderedLevel;
-        private System.Windows.Forms.ToolStripButton buttonShowObjects;
-        private System.Windows.Forms.ToolStripButton buttonBlockNumbers;
-        private System.Windows.Forms.ToolStripButton buttonTileGaps;
-        private System.Windows.Forms.ToolStripButton buttonBlockGaps;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.DataGridView dataGridViewBlocks;
-        private System.Windows.Forms.ToolStripButton buttonLevelBounds;
-        private System.Windows.Forms.ToolStripMenuItem quickTestToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton buttonCopyFloor;
-        private System.Windows.Forms.ToolStripButton buttonPasteFloor;
-        private System.Windows.Forms.ToolStrip toolStrip2;
-        private System.Windows.Forms.ToolStripButton buttonCopyTileset;
         private System.Windows.Forms.SplitContainer splitContainer5;
+        private System.Windows.Forms.PictureBox pictureBoxTilePreview;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.PictureBox pictureBoxTileUsedIn;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ToolStripButton buttonCopyTileset;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.SplitContainer splitContainer4;
+        private System.Windows.Forms.DataGridView dataGridViewBlocks;
         private System.Windows.Forms.DataGridViewImageColumn Image;
         private System.Windows.Forms.DataGridViewTextBoxColumn Index;
         private System.Windows.Forms.DataGridViewComboBoxColumn Solidity;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Foreground;
         private System.Windows.Forms.DataGridViewTextBoxColumn Used;
         private System.Windows.Forms.DataGridViewTextBoxColumn UsedGlobal;
-        private System.Windows.Forms.TabPage tabPagePalettes;
-        private System.Windows.Forms.PropertyGrid propertyGridLevel;
+        private System.Windows.Forms.PictureBox pictureBoxBlockEditor;
+        private System.Windows.Forms.TabPage tabPageLayout;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.PictureBox pictureBoxRenderedLevel;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton buttonShowObjects;
+        private System.Windows.Forms.ToolStripButton buttonBlockNumbers;
+        private System.Windows.Forms.ToolStripButton buttonBlockGaps;
+        private System.Windows.Forms.ToolStripButton buttonTileGaps;
+        private System.Windows.Forms.ToolStripButton buttonLevelBounds;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton toolStripButtonSaveRenderedLevel;
+        private System.Windows.Forms.ToolStripButton buttonCopyFloor;
+        private System.Windows.Forms.ToolStripButton buttonPasteFloor;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.ListBox listBoxPalettes;
+        private System.Windows.Forms.PictureBox pictureBoxPalette;
+        private System.Windows.Forms.TabPage tabPage9;
+        private System.Windows.Forms.ListBox listBoxGameText;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel floorStatus;
     }
 }
 

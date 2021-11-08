@@ -2,51 +2,70 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace sth1edwv
 {
-    public class GameText
+    public class GameText: IDataItem
     {
-        private readonly Cartridge _cartridge;
-        private readonly int _offset;
         private readonly int _maxLength; // max length of the text in characters
         private readonly Dictionary<byte, char> _map;
-        private byte _x;
-        private byte _y;
         private string _text;
+        public byte X { get; set; }
+        public byte Y { get; set; }
+
+        public string Text
+        {
+            get => _text;
+            set
+            {
+                // We convert it...
+                // We pad the text to the full width with spaces, as the game does
+                var text = value.PadRight(_maxLength, ' ');
+                if (text.Length > _maxLength)
+                {
+                    throw new Exception("Text too long");
+                }
+
+                // Check it's allowed chars
+                foreach (var c in value.Where(c => !_allowedChars.Contains(c)))
+                {
+                    throw new Exception($"Invalid text: character \"{c}\" is not allowed");
+                }
+
+                _text = text;
+            }
+        }
 
         public GameText(Cartridge cartridge, int offset, bool isLowerMap)
         {
-            _cartridge = cartridge;
-            _offset = offset;
-            _x = cartridge.Memory[offset++];
-            _y = cartridge.Memory[offset++];
+            Offset = offset;
+            X = cartridge.Memory[offset++];
+            Y = cartridge.Memory[offset++];
             _map = isLowerMap ? LowerChars : UpperChars;
-            _text = "";
-            var length = 0;
+            _allowedChars = new HashSet<char>(_map.Values);
+            var s = new StringBuilder();
             for (;;)
             {
                 var b = cartridge.Memory[offset++];
                 if (b == 0xff)
                 {
                     // end of string
-                    _maxLength = length;
                     break;
                 }
-                ++length;
                 if (_map.TryGetValue(b, out var c))
                 {
-                    _text += c;
+                    s.Append(c);
                 }
             }
-        }
 
-        public string AsSerialized => $"{_x};{_y};{_text}";
+            _maxLength = s.Length;
+            Text = s.ToString();
+        }
 
         public override string ToString()
         {
-            return _text;
+            return Text;
         }
 
         private static readonly Dictionary<byte, char> LowerChars = new()
@@ -113,45 +132,21 @@ namespace sth1edwv
             {0xEB, ' '}
         };
 
-        public void Deserialize(string input)
+        private readonly HashSet<char> _allowedChars;
+
+        public int Offset { get; }
+        public IList<byte> GetData()
         {
-            var match = Regex.Match(input, "^(?<x>\\d+);(?<y>\\d+);(?<text>.+)$");
-            if (!match.Success)
-            {
-                throw new Exception("Invalid text entered");
-            }
-
-            var x = Convert.ToByte(match.Groups["x"].Value);
-            var y = Convert.ToByte(match.Groups["y"].Value);
-            // We pad the text to the full width with spaces, as the game does
-            var text = match.Groups["text"].Value.PadRight(_maxLength, ' ');
-            if (text.Length > _maxLength)
-            {
-                throw new Exception("Text too long");
-            }
-
-            // Now we convert to bytes
             var reverseMap = _map.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
             var buffer = new MemoryStream();
-            buffer.WriteByte(x);
-            buffer.WriteByte(y);
-            foreach (var c in text)
+            buffer.WriteByte(X);
+            buffer.WriteByte(Y);
+            foreach (var b in Text.Select(x => reverseMap[x]))
             {
-                if (reverseMap.TryGetValue(c, out var b))
-                {
                     buffer.WriteByte(b);
-                }
-                else
-                {
-                    throw new Exception($"Invalid text: character \"{c}\" is not allowed");
-                }
             }
             buffer.WriteByte(0xff);
-            // If we get here then we did not fail, finally we write to our members and the cartridge
-            _x = x;
-            _y = y;
-            _text = text;
-            Array.Copy(buffer.GetBuffer(), 0, _cartridge.Memory, _offset, buffer.Length);
+            return buffer.ToArray();
         }
     }
 }

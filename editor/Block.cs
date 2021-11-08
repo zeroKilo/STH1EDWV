@@ -35,7 +35,6 @@ namespace sth1edwv
         }
 
         public int Index { get; }
-        public int SolidityOffset { get; }
 
         public int SolidityIndex { get; set; }
         // ReSharper disable once MemberCanBePrivate.Global
@@ -44,16 +43,18 @@ namespace sth1edwv
 
         public byte Data => (byte)(SolidityIndex | (IsForeground ? 0x80 : 0));
 
-        public Block(byte[] cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index)
+        public Block(IReadOnlyList<byte> cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index)
         {
             TileSet = tileSet;
             Offset = tilesOffset;
             SolidityOffset = solidityOffset;
             Index = index;
-            Array.Copy(cartridgeMemory, tilesOffset, TileIndices, 0, 16);
+            for (int i = 0; i < 16; ++i)
+            {
+                TileIndices[i] = cartridgeMemory[tilesOffset + i];
+            }
             var solidityData = cartridgeMemory[solidityOffset];
-            SolidityIndex = solidityData & 0x3f;
-
+            SolidityIndex = solidityData & 0b00111111;
             IsForeground = (solidityData & 0b10000000) != 0;
         }
 
@@ -66,14 +67,11 @@ namespace sth1edwv
         public int UsageCount { get; set; }
         public int GlobalUsageCount { get; set; }
 
+        public int SolidityOffset { get; }
+
         public IList<byte> GetData()
         {
             return TileIndices;
-        }
-
-        public List<RomBuilder.DataChunk.Reference> GetReferences()
-        {
-            return new List<RomBuilder.DataChunk.Reference>();
         }
 
         public void ResetImage()

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace sth1edwv
 {
-    public class BlockMapping: IDisposable, IDataItem
+    public class BlockMapping: IDisposable
     {
         public List<Block> Blocks { get; } = new();
     
@@ -24,13 +24,11 @@ namespace sth1edwv
                 0x14980 => 128,
                 _ => 0
             };
-            var solidityOffset = BitConverter.ToUInt16(cartridge.Memory, 0x3A65 + solidityIndex * 2);
+            var solidityOffset = cartridge.Memory.Word(0x3A65 + solidityIndex * 2);
             for (var i = 0; i < blockCount; ++i)
             {
                 Blocks.Add(new Block(cartridge.Memory, address + i * 16, solidityOffset + i, tileSet, i));
             }
-
-            Offset = address;
         }
 
         public void Dispose()
@@ -40,18 +38,6 @@ namespace sth1edwv
                 block.Dispose();
             }
             Blocks.Clear();
-        }
-
-        public int Offset { get; }
-
-        public IList<byte> GetData()
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<RomBuilder.DataChunk.Reference> GetReferences()
-        {
-            throw new NotImplementedException();
         }
 
         public void UpdateUsageForLevel(Level level)

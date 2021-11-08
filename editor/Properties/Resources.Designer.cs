@@ -61,59 +61,6 @@ namespace sth1edwv.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to $15580 Green Hill Act 1
-        ///$15582 Green Hill Act 2
-        ///$15584 Green Hill Act 3
-        ///$15586 Bridge Act 1
-        ///$15588 Bridge Act 2
-        ///$1558A Bridge Act 3
-        ///$1558C Jungle Act 1
-        ///$1558E Jungle Act 2
-        ///$15590 Jungle Act 3
-        ///$15592 Labyrinth Act 1
-        ///$15594 Labyrinth Act 2
-        ///$15596 Labyrinth Act 3
-        ///$15598 Scrap Brain Act 1
-        ///$1559A Scrap Brain Act 2
-        ///$1559C Scrap Brain Act 3
-        ///$1559E Sky Base Act 1
-        ///$155A0 Sky Base Act 2
-        ///$155A2 Sky Base Act 3
-        ///$155A4 End Sequence
-        ///$155A8 Scrap Brain Act 2 (Emerald Maze), from corridor
-        ///$155AA Scrap Br [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string levels {
-            get {
-                return ResourceManager.GetString("levels", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to $00000 Main Game Code
-        ///$0024B Labyrinth Act 1-2 Underwater Palette
-        ///$0026B Labyrinth Act 3 Underwater Palette
-        ///$00F0E Map Screen 1 Palette
-        ///$00F2E Map Screen 2 Palette
-        ///$01209 Zone Title Pointers:
-        ///$01209 Green Hill Act 1 (=$122D)
-        ///$0120B Green Hill Act 2 (=$122D)
-        ///$0120D Green Hill Act 3 (=$122D)
-        ///$0120F Bridge Act 1 (=$123C)
-        ///$01211 Bridge Act 2 (=$123C)
-        ///$01213 Bridge Act 3 (=$123C)
-        ///$01215 Jungle Act 1 (=$124B)
-        ///$01217 Jungle Act 2 (=$124B)
-        ///$01219 Jungle Act 3 (=$124B)
-        ///$0121B Labyrinth Act 1 (=$125A)        /// [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string map {
-            get {
-                return ResourceManager.GetString("map", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap package {

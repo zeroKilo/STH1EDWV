@@ -18,10 +18,10 @@ namespace sth1edwv
         public TileSet(Cartridge cartridge, int offset, Palette palette, bool addRings)
         {
             Offset = offset;
-            _magic = BitConverter.ToUInt16(cartridge.Memory, offset);
-            _dupRows = BitConverter.ToUInt16(cartridge.Memory, offset + 2);
-            _artData = BitConverter.ToUInt16(cartridge.Memory, offset + 4);
-            _rowCount = BitConverter.ToUInt16(cartridge.Memory, offset + 6);
+            _magic = cartridge.Memory.Word(offset);
+            _dupRows = cartridge.Memory.Word(offset + 2);
+            _artData = cartridge.Memory.Word(offset + 4);
+            _rowCount = cartridge.Memory.Word(offset + 6);
             var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
             for (var i = 0; i < decompressed.Length; i += 64)
             {
@@ -80,11 +80,6 @@ namespace sth1edwv
             // Then we compress it...
             ms.Position = 0;
             return Compression.CompressArt(ms);
-        }
-
-        public List<RomBuilder.DataChunk.Reference> GetReferences()
-        {
-            throw new NotImplementedException();
         }
 
         public void Dispose()

@@ -35,9 +35,6 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Be.Windows.Forms.HexBox, Version=1.6.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Be.Windows.Forms.HexBox.1.6.1\lib\net40\Be.Windows.Forms.HexBox.dll</HintPath>
-    </Reference>
     <Reference Include="Equin.ApplicationFramework.BindingListView, Version=1.4.5222.35545, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Equin.ApplicationFramework.BindingListView.1.4.5222.35545\lib\net40-Client\Equin.ApplicationFramework.BindingListView.dll</HintPath>
     </Reference>
@@ -71,6 +68,7 @@
     <Compile Include="Level.cs" />
     <Compile Include="LevelObject.cs" />
     <Compile Include="LevelObjectSet.cs" />
+    <Compile Include="Memory.cs" />
     <Compile Include="ObjectChooser.cs">
       <SubType>Form</SubType>
     </Compile>

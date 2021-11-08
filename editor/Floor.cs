@@ -15,19 +15,13 @@ namespace sth1edwv
             Width = width;
         }
 
-        public int Offset { get; }
+        public int Offset { get; set; }
         public int MaximumCompressedSize { get; }
         public int Width { get; }
 
         public IList<byte> GetData()
         {
             return Compression.CompressRle(BlockIndices);
-        }
-
-        public List<RomBuilder.DataChunk.Reference> GetReferences()
-        {
-            // Floors contain no references
-            return new List<RomBuilder.DataChunk.Reference>();
         }
     }
 }

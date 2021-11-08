@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 
 namespace sth1edwv
 {
@@ -39,7 +40,7 @@ namespace sth1edwv
             };
         }
 
-        public static IEnumerable<Palette> ReadPalettes(byte[] mem, int offset, int count)
+        public static IEnumerable<Palette> ReadPalettes(Memory mem, int offset, int count)
         {
             var counts = new[]
             {
@@ -49,7 +50,7 @@ namespace sth1edwv
 
             for (var i = 0; i < count; i++)
             {
-                var address = BitConverter.ToUInt16(mem, offset);
+                var address = mem.Word(offset);
                 yield return new Palette(mem, address, $"{i} @ {offset:X}", counts[i]);
                 offset += 2;
             }

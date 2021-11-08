@@ -8,13 +8,12 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Be.Windows.Forms;
 using Equin.ApplicationFramework;
 using Microsoft.VisualBasic;
 
 namespace sth1edwv
 {
-    public partial class Form1 : Form
+    public sealed partial class Form1 : Form
     {
         private int _lastX, _lastY;
         private Cartridge _cartridge;
@@ -53,10 +52,6 @@ namespace sth1edwv
         private void LoadFile(string filename)
         {
             _cartridge = new Cartridge(filename);
-            _richTextBoxGeneralSummary.Text = _cartridge.MakeSummary();
-            hexViewer.ByteProvider = new DynamicByteProvider(_cartridge.Memory);
-            listBoxMemoryLocations.Items.Clear();
-            listBoxMemoryLocations.Items.AddRange(_cartridge.Labels.ToArray<object>());
             listBoxLevels.Items.Clear();
             listBoxLevels.Items.AddRange(_cartridge.Levels.ToArray<object>());
             listBoxPalettes.Items.Clear();
@@ -69,17 +64,8 @@ namespace sth1edwv
 
             // Trigger the selected level changed event
             SelectedLevelChanged(null, null);
-        }
 
-        private void ListBoxMemoryLocationsSelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (listBoxMemoryLocations.SelectedItem is not Cartridge.MemMapEntry label)
-            {
-                return;
-            }
-            hexViewer.SelectionStart = label.Offset;
-            hexViewer.SelectionLength = 1;
-            hexViewer.ScrollByteIntoView();
+            UpdateFloorSpace();
         }
 
         private void ListBoxPalettesSelectedIndexChanged(object sender, EventArgs e)
@@ -221,7 +207,7 @@ namespace sth1edwv
                 return;
             }
 
-            _cartridge.Memory[block.SolidityOffset] = block.Data;
+            // TODO remove this whole thing? _cartridge.Memory[block.SolidityOffset] = block.Data;
         }
 
         private void SelectedBlockChanged(object sender, EventArgs e)
@@ -287,7 +273,7 @@ namespace sth1edwv
                 // And the rendered level
                 RenderLevel();
                 // Finally apply the data to the cartridge
-                Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
+                // TODO remove Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
             }
         }
 
@@ -296,8 +282,7 @@ namespace sth1edwv
             using var dialog = new SaveFileDialog { Filter = "*.sms|*.sms" };
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                File.WriteAllBytes(dialog.FileName, _cartridge.Memory);
-                MessageBox.Show(this, "Done");
+                _cartridge.SaveTo(dialog.FileName);
             }
         }
 
@@ -317,7 +302,7 @@ namespace sth1edwv
                 levelObject.Type = Convert.ToByte(chooser.textBoxType.Text);
 
                 // Apply to the cartridge
-                levelObject.GetData().CopyTo(_cartridge.Memory, levelObject.Offset);
+                // TODO remove? levelObject.GetData().CopyTo(_cartridge.Memory, levelObject.Offset);
 
                 // Refresh the level data
                 LoadLevelData();
@@ -335,12 +320,20 @@ namespace sth1edwv
             }
             var input = Interaction.InputBox(
                 "Please enter new game text, format X;Y;TEXT\n(TEXT can be 'A'-'Z', ' ' and '©')", "Edit game text",
-                text.AsSerialized);
+                $"{text.X};{text.Y};{text.Text}");
             if (input != "")
             {
                 try
                 {
-                    text.Deserialize(input.ToUpperInvariant());
+                    var match = Regex.Match(input, "^(?<x>\\d+);(?<y>\\d+);(?<text>.+)$");
+                    if (!match.Success)
+                    {
+                        throw new Exception("Invalid text entered");
+                    }
+
+                    text.Text = match.Groups["text"].Value;
+                    text.X = Convert.ToByte(match.Groups["x"].Value);
+                    text.Y = Convert.ToByte(match.Groups["y"].Value);
                 }
                 catch (Exception exception)
                 {
@@ -463,7 +456,7 @@ namespace sth1edwv
         private void quickTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var filename = Path.Combine(Path.GetTempPath(), "test.sms");
-            File.WriteAllBytes(filename, _cartridge.Memory);
+            _cartridge.SaveTo(filename);
             Process.Start(filename);
         }
 
@@ -530,7 +523,7 @@ namespace sth1edwv
                 return;
             }
             
-            level.GetData().CopyTo(_cartridge.Memory, level.Offset);
+            // TODO remove? level.GetData().CopyTo(_cartridge.Memory, level.Offset);
             // Invalidate the level map
             RenderLevel();
         }
@@ -572,6 +565,7 @@ namespace sth1edwv
                 level.Floor.BlockIndices[col + row * level.Floor.Width] = (byte)bc.SelectedBlockIndex;
             }
 
+            /*
             // Try to insert it
             var newData = level.Floor.GetData();
             if (newData.Count > level.Floor.MaximumCompressedSize)
@@ -582,14 +576,14 @@ namespace sth1edwv
             }
 
             // Apply to the ROM
-            newData.CopyTo(_cartridge.Memory, level.Floor.Offset);
+            // TODO remove> newData.CopyTo(_cartridge.Memory, level.Floor.Offset);
             // We also have to change the level header length to specify the correct compressed size, for all levels using this floor data
             foreach (var l in _cartridge.Levels.Where(l => l.Floor == level.Floor))
             {
-                _cartridge.Memory[l.Offset + 17] = (byte)(newData.Count & 0xff);
-                _cartridge.Memory[l.Offset + 18] = (byte)(newData.Count >> 8);
+                // TODO remove> _cartridge.Memory[l.Offset + 17] = (byte)(newData.Count & 0xff);
+                // TODO remove> _cartridge.Memory[l.Offset + 18] = (byte)(newData.Count >> 8);
             }
-
+            */
             // Redraw the level
             RenderLevel();
 
@@ -599,6 +593,14 @@ namespace sth1edwv
             dataGridViewBlocks.ResetBindings();
 
             LoadLevelData();
+
+            UpdateFloorSpace();
+        }
+
+        private void UpdateFloorSpace()
+        {
+            var used = _cartridge.GetFloorSpace();
+            floorStatus.Text = $"Floor space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
         }
     }
 }
