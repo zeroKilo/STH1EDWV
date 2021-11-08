@@ -40,4 +40,4 @@ jobs:
         automatic_release_tag: "v0.${{env.BUILD_NUMBER}}"
         prerelease: false
         title: "Automatic build #${{env.BUILD_NUMBER}}"
-        files: editor\program.zip
+        files: editor/program.zip
