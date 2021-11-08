@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 namespace sth1edwv
 {
@@ -396,7 +395,7 @@ namespace sth1edwv
                 offset += data.Count;
             }
 
-            if (offset > 0x1ffff)
+            if (offset >= 0x20000)
             {
                 throw new Exception("Floor layouts out of space");
             }
@@ -405,10 +404,21 @@ namespace sth1edwv
             // TODO: make them fit, along with everything else
             // - all art from 26000
             // - level art from 32FE6
+            // - end at $3da28 where some more assets are placed in the way... repack them too? "Contains sprite art and/or sprite mappings"
+            offset = 0x32FE6;
             foreach (var tileSet in Levels.Select(l => l.TileSet).Distinct())
             {
-                tileSet.GetData().CopyTo(memory, tileSet.Offset);
+                var data = tileSet.GetData();
+                data.CopyTo(memory, offset);
+                tileSet.Offset = offset;
+                offset += data.Count;
             }
+
+            if (offset >= 0x3da28)
+            {
+                throw new Exception("Tilesets out of space");
+            }
+
             // - Block mappings (at original offsets)
             // TODO make these flexible if I make it possible to change sizes
             foreach (var blockMapping in Levels.Select(l => l.BlockMapping).Distinct())
@@ -440,13 +450,17 @@ namespace sth1edwv
             public int Used { get; set; }
         }
 
-        public Space GetFloorSpace()
-        {
-            return new Space
+        public Space GetFloorSpace() =>
+            new()
             {
                 Total = 0x20000 - 0x16dea,
                 Used = _floors.Values.Sum(x => x.GetData().Count)
             };
-        }
+        public Space GetTileSetSpace() =>
+            new()
+            {
+                Total = 0x3da28 - 0x32FE6,
+                Used = _tileSets.Values.Sum(x => x.GetData().Count)
+            };
     }
 }

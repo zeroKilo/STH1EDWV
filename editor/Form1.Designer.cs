@@ -87,6 +87,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -268,7 +269,7 @@
             this.tabPagePalettes.Location = new System.Drawing.Point(4, 22);
             this.tabPagePalettes.Name = "tabPagePalettes";
             this.tabPagePalettes.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPagePalettes.Size = new System.Drawing.Size(718, 527);
+            this.tabPagePalettes.Size = new System.Drawing.Size(718, 505);
             this.tabPagePalettes.TabIndex = 4;
             this.tabPagePalettes.Text = "Palettes";
             this.tabPagePalettes.UseVisualStyleBackColor = true;
@@ -280,7 +281,7 @@
             this.tabPage7.Location = new System.Drawing.Point(4, 22);
             this.tabPage7.Name = "tabPage7";
             this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(718, 527);
+            this.tabPage7.Size = new System.Drawing.Size(718, 505);
             this.tabPage7.TabIndex = 1;
             this.tabPage7.Text = "Tiles";
             this.tabPage7.UseVisualStyleBackColor = true;
@@ -299,7 +300,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer5);
-            this.splitContainer2.Size = new System.Drawing.Size(712, 496);
+            this.splitContainer2.Size = new System.Drawing.Size(712, 474);
             this.splitContainer2.SplitterDistance = 288;
             this.splitContainer2.TabIndex = 1;
             // 
@@ -313,7 +314,7 @@
             this.tilePicker1.Name = "tilePicker1";
             this.tilePicker1.Scaling = 1;
             this.tilePicker1.SelectedIndex = -1;
-            this.tilePicker1.Size = new System.Drawing.Size(286, 494);
+            this.tilePicker1.Size = new System.Drawing.Size(286, 472);
             this.tilePicker1.TabIndex = 0;
             this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.IDrawableBlock>(this.tilePicker1_SelectionChanged);
             // 
@@ -333,8 +334,8 @@
             // 
             this.splitContainer5.Panel2.Controls.Add(this.panel2);
             this.splitContainer5.Panel2.Controls.Add(this.label1);
-            this.splitContainer5.Size = new System.Drawing.Size(418, 494);
-            this.splitContainer5.SplitterDistance = 375;
+            this.splitContainer5.Size = new System.Drawing.Size(418, 472);
+            this.splitContainer5.SplitterDistance = 353;
             this.splitContainer5.TabIndex = 1;
             // 
             // pictureBoxTilePreview
@@ -342,7 +343,7 @@
             this.pictureBoxTilePreview.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxTilePreview.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxTilePreview.Name = "pictureBoxTilePreview";
-            this.pictureBoxTilePreview.Size = new System.Drawing.Size(418, 375);
+            this.pictureBoxTilePreview.Size = new System.Drawing.Size(418, 353);
             this.pictureBoxTilePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxTilePreview.TabIndex = 0;
             this.pictureBoxTilePreview.TabStop = false;
@@ -401,7 +402,7 @@
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(718, 527);
+            this.tabPage3.Size = new System.Drawing.Size(718, 505);
             this.tabPage3.TabIndex = 3;
             this.tabPage3.Text = "Blocks";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -420,7 +421,7 @@
             // 
             this.splitContainer4.Panel2.AutoScroll = true;
             this.splitContainer4.Panel2.Controls.Add(this.pictureBoxBlockEditor);
-            this.splitContainer4.Size = new System.Drawing.Size(712, 521);
+            this.splitContainer4.Size = new System.Drawing.Size(712, 499);
             this.splitContainer4.SplitterDistance = 439;
             this.splitContainer4.TabIndex = 2;
             // 
@@ -445,7 +446,7 @@
             this.dataGridViewBlocks.RowHeadersVisible = false;
             this.dataGridViewBlocks.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dataGridViewBlocks.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewBlocks.Size = new System.Drawing.Size(439, 521);
+            this.dataGridViewBlocks.Size = new System.Drawing.Size(439, 499);
             this.dataGridViewBlocks.TabIndex = 2;
             this.dataGridViewBlocks.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridViewBlocks_CellPainting);
             this.dataGridViewBlocks.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridViewBlocks_DataError);
@@ -505,7 +506,7 @@
             this.pictureBoxBlockEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxBlockEditor.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxBlockEditor.Name = "pictureBoxBlockEditor";
-            this.pictureBoxBlockEditor.Size = new System.Drawing.Size(269, 521);
+            this.pictureBoxBlockEditor.Size = new System.Drawing.Size(269, 499);
             this.pictureBoxBlockEditor.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxBlockEditor.TabIndex = 3;
             this.pictureBoxBlockEditor.TabStop = false;
@@ -518,7 +519,7 @@
             this.tabPageLayout.Location = new System.Drawing.Point(4, 22);
             this.tabPageLayout.Name = "tabPageLayout";
             this.tabPageLayout.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageLayout.Size = new System.Drawing.Size(718, 527);
+            this.tabPageLayout.Size = new System.Drawing.Size(718, 505);
             this.tabPageLayout.TabIndex = 2;
             this.tabPageLayout.Text = "Layout";
             this.tabPageLayout.UseVisualStyleBackColor = true;
@@ -530,7 +531,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 28);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(712, 496);
+            this.panel1.Size = new System.Drawing.Size(712, 474);
             this.panel1.TabIndex = 4;
             // 
             // pictureBoxRenderedLevel
@@ -654,7 +655,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(954, 559);
+            this.tabPage2.Size = new System.Drawing.Size(954, 537);
             this.tabPage2.TabIndex = 3;
             this.tabPage2.Text = "Palettes";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -672,7 +673,7 @@
             // splitContainer3.Panel2
             // 
             this.splitContainer3.Panel2.Controls.Add(this.pictureBoxPalette);
-            this.splitContainer3.Size = new System.Drawing.Size(948, 553);
+            this.splitContainer3.Size = new System.Drawing.Size(948, 531);
             this.splitContainer3.SplitterDistance = 314;
             this.splitContainer3.TabIndex = 1;
             // 
@@ -684,7 +685,7 @@
             this.listBoxPalettes.IntegralHeight = false;
             this.listBoxPalettes.Location = new System.Drawing.Point(0, 0);
             this.listBoxPalettes.Name = "listBoxPalettes";
-            this.listBoxPalettes.Size = new System.Drawing.Size(314, 553);
+            this.listBoxPalettes.Size = new System.Drawing.Size(314, 531);
             this.listBoxPalettes.TabIndex = 0;
             this.listBoxPalettes.SelectedIndexChanged += new System.EventHandler(this.ListBoxPalettesSelectedIndexChanged);
             // 
@@ -693,7 +694,7 @@
             this.pictureBoxPalette.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxPalette.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxPalette.Name = "pictureBoxPalette";
-            this.pictureBoxPalette.Size = new System.Drawing.Size(630, 553);
+            this.pictureBoxPalette.Size = new System.Drawing.Size(630, 531);
             this.pictureBoxPalette.TabIndex = 1;
             this.pictureBoxPalette.TabStop = false;
             // 
@@ -703,7 +704,7 @@
             this.tabPage9.Location = new System.Drawing.Point(4, 22);
             this.tabPage9.Name = "tabPage9";
             this.tabPage9.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage9.Size = new System.Drawing.Size(954, 559);
+            this.tabPage9.Size = new System.Drawing.Size(954, 537);
             this.tabPage9.TabIndex = 7;
             this.tabPage9.Text = "Game Text";
             this.tabPage9.UseVisualStyleBackColor = true;
@@ -716,7 +717,7 @@
             this.listBoxGameText.IntegralHeight = false;
             this.listBoxGameText.Location = new System.Drawing.Point(3, 3);
             this.listBoxGameText.Name = "listBoxGameText";
-            this.listBoxGameText.Size = new System.Drawing.Size(948, 553);
+            this.listBoxGameText.Size = new System.Drawing.Size(948, 531);
             this.listBoxGameText.TabIndex = 1;
             this.listBoxGameText.DoubleClick += new System.EventHandler(this.GameTextDoubleClicked);
             // 
@@ -735,7 +736,8 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.floorStatus});
+            this.floorStatus,
+            this.tileSetStatus});
             this.statusStrip1.Location = new System.Drawing.Point(0, 587);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(962, 22);
@@ -747,6 +749,12 @@
             this.floorStatus.Name = "floorStatus";
             this.floorStatus.Size = new System.Drawing.Size(70, 17);
             this.floorStatus.Text = "Floor space:";
+            // 
+            // tileSetStatus
+            // 
+            this.tileSetStatus.Name = "tileSetStatus";
+            this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
+            this.tileSetStatus.Text = "Tileset space:";
             // 
             // Form1
             // 
@@ -873,6 +881,7 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel floorStatus;
+        private System.Windows.Forms.ToolStripStatusLabel tileSetStatus;
     }
 }
 

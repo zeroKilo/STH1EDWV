@@ -66,7 +66,7 @@ namespace sth1edwv
             };
         }
 
-        public int Offset { get; }
+        public int Offset { get; set; }
 
         public IList<byte> GetData()
         {

@@ -65,6 +65,7 @@ namespace sth1edwv
             SelectedLevelChanged(null, null);
 
             UpdateFloorSpace();
+            UpdateTileSetSpace();
         }
 
         private void ListBoxPalettesSelectedIndexChanged(object sender, EventArgs e)
@@ -556,5 +557,12 @@ namespace sth1edwv
             var used = _cartridge.GetFloorSpace();
             floorStatus.Text = $"Floor space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
         }
+
+        private void UpdateTileSetSpace()
+        {
+            var used = _cartridge.GetTileSetSpace();
+            tileSetStatus.Text = $"Tile set space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
+        }
+
     }
 }
