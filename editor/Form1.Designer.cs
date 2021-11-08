@@ -448,7 +448,6 @@
             this.dataGridViewBlocks.Size = new System.Drawing.Size(439, 521);
             this.dataGridViewBlocks.TabIndex = 2;
             this.dataGridViewBlocks.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridViewBlocks_CellPainting);
-            this.dataGridViewBlocks.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.BlockGridCellEdited);
             this.dataGridViewBlocks.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dataGridViewBlocks_DataError);
             this.dataGridViewBlocks.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dataGridViewBlocks_EditingControlShowing);
             this.dataGridViewBlocks.SelectionChanged += new System.EventHandler(this.SelectedBlockChanged);

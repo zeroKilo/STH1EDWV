@@ -386,7 +386,7 @@ namespace sth1edwv
                 gameText.GetData().CopyTo(memory, gameText.Offset);
             }
             // - Floors (filling space)
-            // TODO: 16000-18de9 is tilemaps, I should pack them and then append
+            // TODO: 16000-18de9 is tilemaps, I should repack them and then append (when I add an editor?)
             var offset = 0x16dea;
             foreach (var floor in Levels.Select(l => l.Floor).Distinct())
             {
@@ -400,8 +400,6 @@ namespace sth1edwv
             {
                 throw new Exception("Floor layouts out of space");
             }
-
-            MessageBox.Show($"Floors go up to {offset:X}, {0x20000 - offset} bytes free, {(double)(offset- 0x16dea) / (0x20000 - 0x16dea):P} used");
 
             // - Tile sets (at original offsets)
             // TODO: make them fit, along with everything else
@@ -422,6 +420,11 @@ namespace sth1edwv
 
                     memory[block.SolidityOffset] = block.Data;
                 }
+            }
+            // - Level objects (at original offsets)
+            foreach (var obj in Levels.Select(l => l.Objects).Distinct().SelectMany(x => x))
+            {
+                obj.GetData().CopyTo(memory, obj.Offset);
             }
             // - Level headers (at original offsets). We do these last so they pick up info from the contained objects.
             foreach (var level in Levels)

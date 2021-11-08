@@ -5,7 +5,6 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Equin.ApplicationFramework;
@@ -199,17 +198,6 @@ namespace sth1edwv
                 : (dataGridViewBlocks.SelectedRows[0].DataBoundItem as ObjectView<Block>)?.Object;
         }
 
-        private void BlockGridCellEdited(object sender, DataGridViewCellEventArgs e)
-        {
-            var block = GetSelectedBlock();
-            if (block == null)
-            {
-                return;
-            }
-
-            // TODO remove this whole thing? _cartridge.Memory[block.SolidityOffset] = block.Data;
-        }
-
         private void SelectedBlockChanged(object sender, EventArgs e)
         {
             DrawBlockEditor();
@@ -272,8 +260,6 @@ namespace sth1edwv
                 dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
                 // And the rendered level
                 RenderLevel();
-                // Finally apply the data to the cartridge
-                // TODO remove Array.Copy(block.TileIndices, 0, _cartridge.Memory, block.Offset, block.TileIndices.Length);
             }
         }
 
@@ -300,9 +286,6 @@ namespace sth1edwv
                 levelObject.X = Convert.ToByte(chooser.textBoxX.Text);
                 levelObject.Y = Convert.ToByte(chooser.textBoxY.Text);
                 levelObject.Type = Convert.ToByte(chooser.textBoxType.Text);
-
-                // Apply to the cartridge
-                // TODO remove? levelObject.GetData().CopyTo(_cartridge.Memory, levelObject.Offset);
 
                 // Refresh the level data
                 LoadLevelData();
@@ -517,13 +500,6 @@ namespace sth1edwv
 
         private void propertyGridLevel_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
-            // Apply the level to the ROM
-            if (propertyGridLevel.SelectedObject is not Level level)
-            {
-                return;
-            }
-            
-            // TODO remove? level.GetData().CopyTo(_cartridge.Memory, level.Offset);
             // Invalidate the level map
             RenderLevel();
         }
@@ -555,9 +531,6 @@ namespace sth1edwv
                 return;
             }
 
-            // Make a backup
-            var temp = (byte[])level.Floor.BlockIndices.Clone();
-
             // Apply the change
             for (var row = minY; row <= maxY; row++)
             for (var col = minX; col <= maxX; col++)
@@ -565,25 +538,6 @@ namespace sth1edwv
                 level.Floor.BlockIndices[col + row * level.Floor.Width] = (byte)bc.SelectedBlockIndex;
             }
 
-            /*
-            // Try to insert it
-            var newData = level.Floor.GetData();
-            if (newData.Count > level.Floor.MaximumCompressedSize)
-            {
-                MessageBox.Show(this, "Cannot compress level enough to fit into ROM.");
-                temp.CopyTo(level.Floor.BlockIndices, 0);
-                return;
-            }
-
-            // Apply to the ROM
-            // TODO remove> newData.CopyTo(_cartridge.Memory, level.Floor.Offset);
-            // We also have to change the level header length to specify the correct compressed size, for all levels using this floor data
-            foreach (var l in _cartridge.Levels.Where(l => l.Floor == level.Floor))
-            {
-                // TODO remove> _cartridge.Memory[l.Offset + 17] = (byte)(newData.Count & 0xff);
-                // TODO remove> _cartridge.Memory[l.Offset + 18] = (byte)(newData.Count >> 8);
-            }
-            */
             // Redraw the level
             RenderLevel();
 

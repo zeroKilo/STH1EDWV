@@ -183,7 +183,7 @@ namespace sth1edwv
         // Objects representing referenced data
         [Category("General")] public TileSet TileSet { get; }
         [Category("General")] public Floor Floor { get; }
-        [Category("General")] private LevelObjectSet Objects { get; }
+        [Category("General")] public LevelObjectSet Objects { get; }
         [Category("General")] public BlockMapping BlockMapping { get; }
 
         [Category("General")] public int Offset { get; }
