@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -479,27 +480,6 @@ namespace sth1edwv
             }
         }
 
-        private void buttonCopyTileset_Click(object sender, EventArgs e)
-        {
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
-
-            // We write the tileset to an image and put that on the clipboard
-            var rows = level.TileSet.Tiles.Count / 16;
-            using var image = new Bitmap(128, rows * 8);
-            using var g = Graphics.FromImage(image);
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            foreach (var tile in level.TileSet.Tiles)
-            {
-                var x = tile.Index % 16 * 8;
-                var y = tile.Index / 16 * 8;
-                g.DrawImageUnscaled(tile.ImageWithoutRings, x, y);
-            }
-            Clipboard.SetImage(image);
-        }
-
         private void propertyGridLevel_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             // Invalidate the level map
@@ -559,52 +539,76 @@ namespace sth1edwv
             floorStatus.Text = $"Floor space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
         }
 
-        private void buttonPasteTileset_Click(object sender, EventArgs e)
+        private void buttonSaveTileset_Click(object sender, EventArgs e)
         {
             if (listBoxLevels.SelectedItem is not Level level)
             {
                 return;
             }
 
-            var image = Clipboard.GetImage();
+            using var d = new SaveFileDialog { Filter = "PNG images|*.png" };
+            if (d.ShowDialog(this) == DialogResult.OK)
+            {
+                using var image = level.TileSet.ToImage();
+                image.Save(d.FileName, ImageFormat.Png);
+            }
+        }
+
+        private void buttonLoadTileset_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+
+            using var d = new OpenFileDialog { Filter = "Images|*.png" };
+            if (d.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+
+            using var image = (Bitmap) new ImageConverter().ConvertFrom(File.ReadAllBytes(d.FileName));
             if (image == null)
             {
-                // Silently do nothing
+                MessageBox.Show(this, "Failed to load image");
                 return;
             }
 
-            var expectedHeight = level.TileSet.Tiles.Count / 16 * 8;
-            if (image.Width != 128 || image.Height != expectedHeight)
+            try
             {
-                MessageBox.Show(this, $"Clipboard image is {image.Width}x{image.Height}, we need 128x{expectedHeight}");
+                level.TileSet.FromImage(image);
+
+                // Invalidate the tileset picker
+                tilePicker1.Invalidate();
+
+                // Mark the level as needing a redraw
+                RenderLevel();
+
+                UpdateTileSetSpace();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message);
+            }
+        }
+
+        private void buttonBlankUnusedTiles_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
                 return;
             }
 
-            // We walk over the image and extract each tile...
-            using var newTile = new Bitmap(8, 8, PixelFormat.Format24bppRgb);
-            using var newTileG = Graphics.FromImage(newTile);
-            foreach (var tile in level.TileSet.Tiles)
+            var tilesUsed = new HashSet<int>(level.BlockMapping.Blocks.SelectMany(b => b.TileIndices).Select(b => (int)b));
+
+            foreach (var tile in level.TileSet.Tiles.Where(t => !tilesUsed.Contains(t.Index)))
             {
-                var x = tile.Index % 16 * 8;
-                var y = tile.Index / 16 * 8;
-                newTileG.DrawImageUnscaled(image, -x, -y);
-                // Now b is the new image in 8x8
-                // We want to apply it to the tile
-                for (y = 0; y < 8; ++y)
-                for (x = 0; x < 8; ++x)
-                {
-                    var color = newTile.GetPixel(x, y);
-                    // We find the nearest in the tile palette
-                    var index = level.Palette.IndexOfNearest(color);
-                    // And put it in the tile data
-                    tile.SetData(x, y, index);
-                }
+                // Tile is unused
+                tile.CopyFrom(level.TileSet.Tiles[0]);
             }
+
             // Invalidate the tileset picker
             tilePicker1.Invalidate();
-
-            // Mark the level as needing a redraw
-            RenderLevel();
 
             UpdateTileSetSpace();
         }

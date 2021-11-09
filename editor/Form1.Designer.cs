@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,8 +54,9 @@
             this.pictureBoxTileUsedIn = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.buttonCopyTileset = new System.Windows.Forms.ToolStripButton();
-            this.buttonPasteTileset = new System.Windows.Forms.ToolStripButton();
+            this.buttonSaveTileset = new System.Windows.Forms.ToolStripButton();
+            this.buttonLoadTileset = new System.Windows.Forms.ToolStripButton();
+            this.buttonBlankUnusedTiles = new System.Windows.Forms.ToolStripButton();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
@@ -381,31 +382,41 @@
             // toolStrip2
             // 
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.buttonCopyTileset,
-            this.buttonPasteTileset});
+            this.buttonSaveTileset,
+            this.buttonLoadTileset,
+            this.buttonBlankUnusedTiles});
             this.toolStrip2.Location = new System.Drawing.Point(3, 3);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(712, 25);
             this.toolStrip2.TabIndex = 2;
             this.toolStrip2.Text = "toolStrip2";
             // 
-            // buttonCopyTileset
+            // buttonSaveTileset
             // 
-            this.buttonCopyTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonCopyTileset.Image")));
-            this.buttonCopyTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonCopyTileset.Name = "buttonCopyTileset";
-            this.buttonCopyTileset.Size = new System.Drawing.Size(89, 22);
-            this.buttonCopyTileset.Text = "Copy tileset";
-            this.buttonCopyTileset.Click += new System.EventHandler(this.buttonCopyTileset_Click);
+            this.buttonSaveTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonSaveTileset.Image")));
+            this.buttonSaveTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonSaveTileset.Name = "buttonSaveTileset";
+            this.buttonSaveTileset.Size = new System.Drawing.Size(60, 22);
+            this.buttonSaveTileset.Text = "Save...";
+            this.buttonSaveTileset.Click += new System.EventHandler(this.buttonSaveTileset_Click);
             // 
-            // buttonPasteTileset
+            // buttonLoadTileset
             // 
-            this.buttonPasteTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonPasteTileset.Image")));
-            this.buttonPasteTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonPasteTileset.Name = "buttonPasteTileset";
-            this.buttonPasteTileset.Size = new System.Drawing.Size(89, 22);
-            this.buttonPasteTileset.Text = "Paste tileset";
-            this.buttonPasteTileset.Click += new System.EventHandler(this.buttonPasteTileset_Click);
+            this.buttonLoadTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonLoadTileset.Image")));
+            this.buttonLoadTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonLoadTileset.Name = "buttonLoadTileset";
+            this.buttonLoadTileset.Size = new System.Drawing.Size(62, 22);
+            this.buttonLoadTileset.Text = "Load...";
+            this.buttonLoadTileset.Click += new System.EventHandler(this.buttonLoadTileset_Click);
+            // 
+            // buttonBlankUnusedTiles
+            // 
+            this.buttonBlankUnusedTiles.Image = ((System.Drawing.Image)(resources.GetObject("buttonBlankUnusedTiles.Image")));
+            this.buttonBlankUnusedTiles.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonBlankUnusedTiles.Name = "buttonBlankUnusedTiles";
+            this.buttonBlankUnusedTiles.Size = new System.Drawing.Size(98, 22);
+            this.buttonBlankUnusedTiles.Text = "Blank unused";
+            this.buttonBlankUnusedTiles.Click += new System.EventHandler(this.buttonBlankUnusedTiles_Click);
             // 
             // tabPage3
             // 
@@ -474,8 +485,8 @@
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -497,8 +508,8 @@
             // Used
             // 
             this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle5;
             this.Used.HeaderText = "Used";
             this.Used.Name = "Used";
             this.Used.ReadOnly = true;
@@ -506,8 +517,8 @@
             // UsedGlobal
             // 
             this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle6;
             this.UsedGlobal.HeaderText = "Total used";
             this.UsedGlobal.Name = "UsedGlobal";
             this.UsedGlobal.ReadOnly = true;
@@ -859,7 +870,7 @@
         private System.Windows.Forms.PictureBox pictureBoxTileUsedIn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStrip toolStrip2;
-        private System.Windows.Forms.ToolStripButton buttonCopyTileset;
+        private System.Windows.Forms.ToolStripButton buttonSaveTileset;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.SplitContainer splitContainer4;
         private System.Windows.Forms.DataGridView dataGridViewBlocks;
@@ -893,7 +904,8 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel floorStatus;
         private System.Windows.Forms.ToolStripStatusLabel tileSetStatus;
-        private System.Windows.Forms.ToolStripButton buttonPasteTileset;
+        private System.Windows.Forms.ToolStripButton buttonLoadTileset;
+        private System.Windows.Forms.ToolStripButton buttonBlankUnusedTiles;
     }
 }
 

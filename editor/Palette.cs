@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 
 namespace sth1edwv
@@ -27,17 +26,13 @@ namespace sth1edwv
             return _label;
         }
 
-        private static int ScaleColor(int c)
+        private static int ScaleColor(int c) => c switch
         {
-            return c switch
-            {
-                0 => 0,
-                1 => 80,
-                2 => 175,
-                3 => 255,
-                _ => 0
-            };
-        }
+            0 => 0x00,
+            1 => 0x55,
+            2 => 0xaa,
+            _ => 0xff
+        };
 
         public static IEnumerable<Palette> ReadPalettes(Memory mem, int offset, int count)
         {
@@ -72,27 +67,6 @@ namespace sth1edwv
             }
 
             return bmp;
-        }
-
-        public int IndexOfNearest(Color color)
-        {
-            var bestIndex = -1;
-            var bestDistance = int.MaxValue;
-            for (var i = 0; i < Colors.Count; i++)
-            {
-                var c = Colors[i];
-                var distance = 
-                    Math.Abs(c.R - color.R) +
-                    Math.Abs(c.G - color.G) +
-                    Math.Abs(c.B - color.B);
-                if (distance < bestDistance)
-                {
-                    bestDistance = distance;
-                    bestIndex = i;
-                }
-            }
-
-            return bestIndex;
         }
     }
 }

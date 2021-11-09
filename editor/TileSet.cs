@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace sth1edwv
@@ -89,6 +92,91 @@ namespace sth1edwv
                 tile.Dispose();
             }
             Tiles.Clear();
+        }
+
+        public Bitmap ToImage()
+        {
+            // We write the tileset to an image
+            // Keeping it all in 8bpp is a pain!
+            var rows = Tiles.Count / 16;
+            using var image = new Bitmap(128, rows * 8, PixelFormat.Format8bppIndexed);
+            image.Palette = Tiles[0].Image.Palette;
+            var data = image.LockBits(
+                new Rectangle(0, 0, image.Width, image.Height),
+                ImageLockMode.WriteOnly,
+                PixelFormat.Format8bppIndexed);
+            foreach (var tile in Tiles)
+            {
+                var x = tile.Index % 16 * 8;
+                var y = tile.Index / 16 * 8;
+                // We copy the data from the source image one row at a time
+                var sourceData = tile.ImageWithoutRings.LockBits(
+                    new Rectangle(0, 0, 8, 8),
+                    ImageLockMode.ReadOnly,
+                    PixelFormat.Format8bppIndexed);
+                var rowData = new byte[8];
+                for (int row = 0; row < 8; ++row)
+                {
+                    Marshal.Copy(
+                        sourceData.Scan0 + row * sourceData.Stride,
+                        rowData, 
+                        0, 
+                        8);
+                    Marshal.Copy(
+                        rowData, 
+                        0, 
+                        data.Scan0 + (row + y) * data.Stride + x,
+                        8);
+                }
+                tile.ImageWithoutRings.UnlockBits(data);
+            }
+            image.UnlockBits(data);
+            return image; // Caller disposes
+        }
+
+        public void FromImage(Bitmap image)
+        {
+            if (image.PixelFormat != PixelFormat.Format8bppIndexed)
+            {
+                throw new Exception("Image is not paletted!");
+            }
+
+            var expectedHeight = Tiles.Count / 16 * 8;
+            if (image.Width != 128 || image.Height != expectedHeight)
+            {
+                throw new Exception("Clipboard image is {image.Width}x{image.Height}, we need 128x{expectedHeight}");
+            }
+
+            // We walk over the image and extract each tile...
+            var data = image.LockBits(
+                new Rectangle(0, 0, image.Width, image.Height), 
+                ImageLockMode.ReadOnly,
+                PixelFormat.Format8bppIndexed);
+            // Make a buffer
+            var rowData = new byte[8];
+            foreach (var tile in Tiles)
+            {
+                // First get the tile's source coordinates
+                var tileX = tile.Index % 16 * 8;
+                var tileY = tile.Index / 16 * 8;
+
+                for (int row = 0; row < 8; ++row)
+                {
+                    // Copy source data into the buffer
+                    Marshal.Copy(
+                        data.Scan0 + (tileY + row) * data.Stride + tileX,
+                        rowData,
+                        0,
+                        8);
+
+                    // Then into the tile
+                    for (var x = 0; x < 8; ++x)
+                    {
+                        tile.SetData(x, row, rowData[x] & 0xf);
+                    }
+                }
+            }
+            image.UnlockBits(data);
         }
     }
 }
