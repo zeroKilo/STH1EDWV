@@ -178,5 +178,10 @@ namespace sth1edwv
             }
             image.UnlockBits(data);
         }
+
+        public override string ToString()
+        {
+            return $"{Tiles.Count} tiles @ {Offset:X}";
+        }
     }
 }

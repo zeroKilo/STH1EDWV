@@ -71,5 +71,10 @@ namespace sth1edwv
                 ++Blocks[index].GlobalUsageCount;
             }
         }
+
+        public override string ToString()
+        {
+            return $"{Blocks.Count} blocks @ {Blocks[0].Offset:X}";
+        }
     }
 }

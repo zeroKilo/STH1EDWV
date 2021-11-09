@@ -28,5 +28,10 @@ namespace sth1edwv
             result.Nodes.AddRange(_objects.Select(x => x.ToNode()).ToArray());
             return result;
         }
+
+        public override string ToString()
+        {
+            return $"{_objects.Count} objects @ {_objects[0].Offset:X}";
+        }
     }
 }

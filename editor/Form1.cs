@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Equin.ApplicationFramework;
 using Microsoft.VisualBasic;
+using sth1edwv.Properties;
 
 namespace sth1edwv
 {
@@ -31,7 +32,7 @@ namespace sth1edwv
                 ColorDepth = ColorDepth.Depth16Bit,
                 ImageSize = new Size(32, 32)
             };
-            _solidityImages.Images.AddStrip(Properties.Resources.SolidityImages);
+            _solidityImages.Images.AddStrip(Resources.SolidityImages);
 
             typeof(DataGridView).InvokeMember("DoubleBuffered", 
                 BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, 

@@ -225,9 +225,9 @@ namespace sth1edwv
             return GetItem(_tileSets, offset, () => new TileSet(this, offset, palette, addRings));
         }
 
-        public Floor GetFloor(int offset, int compressedSize, int maximumCompressedSize, int width)
+        public Floor GetFloor(int offset, int compressedSize, int width)
         {
-            return GetItem(_floors, offset, () => new Floor(this, offset, compressedSize, maximumCompressedSize, width));
+            return GetItem(_floors, offset, () => new Floor(this, offset, compressedSize, width));
         }
 
         public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet)
@@ -375,7 +375,7 @@ namespace sth1edwv
                 offset += data.Count;
             }
 
-            if (offset >= 0x20000)
+            if (offset > 0x20000)
             {
                 throw new Exception("Floor layouts out of space");
             }
@@ -394,7 +394,7 @@ namespace sth1edwv
                 offset += data.Count;
             }
 
-            if (offset >= 0x3da28)
+            if (offset > 0x3da28)
             {
                 throw new Exception("Tilesets out of space");
             }

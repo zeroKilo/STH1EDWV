@@ -1,11 +1,14 @@
-﻿namespace sth1edwv
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace sth1edwv
 {
     partial class ObjectChooser
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -145,14 +148,14 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        public System.Windows.Forms.TextBox textBoxX;
-        public System.Windows.Forms.TextBox textBoxY;
-        private System.Windows.Forms.Label label2;
-        public System.Windows.Forms.TextBox textBoxType;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button1;
-        public System.Windows.Forms.ComboBox comboBoxNames;
-        private System.Windows.Forms.Label label4;
+        private Label label1;
+        public TextBox textBoxX;
+        public TextBox textBoxY;
+        private Label label2;
+        public TextBox textBoxType;
+        private Label label3;
+        private Button button1;
+        public ComboBox comboBoxNames;
+        private Label label4;
     }
 }

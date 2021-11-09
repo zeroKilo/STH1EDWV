@@ -39,7 +39,7 @@ namespace sth1edwv
             var counts = new[]
             {
                 2, 2, 2, 2, 2, 2, 2, 2, // Regular tile+sprite palettes
-                3, 3, 3, 3, 4, 12, 4, 1, 4 // Palette 
+                3, 3, 3, 3, 4, 12, 4, 1, 4 // Cycling palette 
             };
 
             for (var i = 0; i < count; i++)
