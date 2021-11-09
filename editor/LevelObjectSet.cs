@@ -7,6 +7,8 @@ namespace sth1edwv
 {
     public class LevelObjectSet: IEnumerable<LevelObject>
     {
+        private readonly int _offset;
+
         // We thinly wrap a list
         public IEnumerator<LevelObject> GetEnumerator() => _objects.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _objects.GetEnumerator();
@@ -16,7 +18,8 @@ namespace sth1edwv
 
         public LevelObjectSet(Cartridge cartridge, int offset)
         {
-            var count = cartridge.Memory[offset];
+            _offset = offset;
+            var count = cartridge.Memory[offset] - 1;
             _objects = Enumerable.Range(0, count)
                 .Select(i => new LevelObject(cartridge.Memory, offset + i * 3 + 1))
                 .ToList();
@@ -31,7 +34,7 @@ namespace sth1edwv
 
         public override string ToString()
         {
-            return $"{_objects.Count} objects @ {_objects[0].Offset:X}";
+            return $"{_objects.Count} objects @ {_offset:X}";
         }
     }
 }
