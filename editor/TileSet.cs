@@ -28,7 +28,7 @@ namespace sth1edwv
             var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
             for (var i = 0; i < decompressed.Length; i += 64)
             {
-                Tiles.Add(new Tile(decompressed, palette, i, i / 64));
+                Tiles.Add(new Tile(decompressed, i, i / 64));
             }
             _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
 
@@ -41,7 +41,7 @@ namespace sth1edwv
                     // We want to convert the data from raw VDP to one byte per pixel
                     const int ringOffset = 0x2FD70 + 32 * 4 * 3; // Frame 3 of the animation looks good
                     var buffer = Compression.PlanarToChunky(cartridge.Memory, ringOffset + i * 32, 8).ToArray();
-                    var ringTile = new Tile(buffer, palette, 0, index);
+                    var ringTile = new Tile(buffer, 0, index);
                     Tiles[index].SetRingVersion(ringTile);
                 }
             }
@@ -100,7 +100,7 @@ namespace sth1edwv
             // Keeping it all in 8bpp is a pain!
             var rows = Tiles.Count / 16;
             using var image = new Bitmap(128, rows * 8, PixelFormat.Format8bppIndexed);
-            image.Palette = Tiles[0].Image.Palette;
+            image.Palette = palette.ImagePalette;
             var data = image.LockBits(
                 new Rectangle(0, 0, image.Width, image.Height),
                 ImageLockMode.WriteOnly,

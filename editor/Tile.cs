@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 
 namespace sth1edwv
 {
@@ -14,16 +13,19 @@ namespace sth1edwv
 
         public int Index { get; }
 
-        // Default image is the default palette and rings included (if set)
-        public Bitmap Image => GetImage(_defaultPalette);
+        public int Size => 8;
 
         // Images are per-palette
         private readonly Dictionary<Palette, Bitmap> _images = new();
-        private readonly Palette _defaultPalette;
 
         private Tile _ringTile;
 
-        public Bitmap GetImage(Palette palette, bool withRings = true)
+        public Bitmap GetImage(Palette palette)
+        {
+            return GetImage(palette, true);
+        }
+
+        public Bitmap GetImage(Palette palette, bool withRings)
         {
             if (withRings && _ringTile != null)
             {
@@ -37,18 +39,7 @@ namespace sth1edwv
 
             // We render only when needed. We do stick to paletted images though..
             image = new Bitmap(8, 8, PixelFormat.Format8bppIndexed);
-            // We have to duplicate the palette to make it pick it up. This gets us a copy...
-            var imagePalette = image.Palette;
-            // We have to clear the whole palette to non-transparent colours to avoid (1) the default palette and (2) an image that GDI+ transforms to 32bpp on load
-            for (int i = 0; i < 256; ++i)
-            {
-                imagePalette.Entries[i] = Color.Magenta;
-            }
-
-            // Then we apply the real palette to the start
-            palette.Colors.CopyTo(imagePalette.Entries, 0);
-            // And apply it back to the image
-            image.Palette = imagePalette;
+            image.Palette = palette.ImagePalette;
             var data = image.LockBits(
                 new Rectangle(0, 0, 8, 8),
                 ImageLockMode.WriteOnly,
@@ -64,11 +55,10 @@ namespace sth1edwv
             return image;
         }
 
-        public Tile(byte[] data, Palette palette, int offset, int index)
+        public Tile(byte[] data, int offset, int index)
         {
             Index = index;
             Array.Copy(data, offset, _data, 0, 64);
-            _defaultPalette = palette;
         }
 
         public void WriteTo(MemoryStream ms)
@@ -78,10 +68,10 @@ namespace sth1edwv
 
         public void Dispose()
         {
-            disposeImages();
+            DisposeImages();
         }
 
-        private void disposeImages()
+        private void DisposeImages()
         {
             foreach (var image in _images.Values)
             {
@@ -98,13 +88,13 @@ namespace sth1edwv
         public void SetData(int x, int y, int index)
         {
             _data[x + y * 8] = (byte)index;
-            disposeImages();
+            DisposeImages();
         }
 
         public void CopyFrom(Tile other)
         {
             Array.Copy(other._data, _data, _data.Length);
-            disposeImages();
+            DisposeImages();
         }
     }
 }

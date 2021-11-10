@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace sth1edwv
 {
@@ -7,6 +8,7 @@ namespace sth1edwv
     {
         private readonly int _offset;
         public IList<Color> Colors { get; } = new List<Color>();
+        public ColorPalette ImagePalette { get; }
 
         public Palette(IReadOnlyList<byte> mem, int offset, int paletteCount)
         {
@@ -19,6 +21,18 @@ namespace sth1edwv
                 var b = ScaleColor((color >> 4) & 0b11);
                 Colors.Add(Color.FromArgb(r, g, b));
             }
+
+            // We have to extract a ColorPalette from an image as it blocks us from constructing it...
+            using var bmp = new Bitmap(1, 1, PixelFormat.Format8bppIndexed);
+            ImagePalette = bmp.Palette;
+            // We have to clear the whole palette to non-transparent colours to avoid (1) the default palette and (2) an image that GDI+ transforms to 32bpp on load
+            for (int i = 0; i < 256; ++i)
+            {
+                ImagePalette.Entries[i] = Color.Magenta;
+            }
+
+            // Then we apply the real palette to the start
+            Colors.CopyTo(ImagePalette.Entries, 0);
         }
 
         public override string ToString()

@@ -8,7 +8,8 @@ namespace sth1edwv
 {
     public interface IDrawableBlock
     {
-        public Bitmap Image { get; }
+        public Bitmap GetImage(Palette palette);
+        public int Size { get; }
     }
 
     public sealed partial class ItemPicker : UserControl
@@ -21,6 +22,8 @@ namespace sth1edwv
             InitializeComponent();
         }
 
+        public Palette Palette { get; set; }
+
         public List<IDrawableBlock> Items
         {
             get => _items;
@@ -31,7 +34,7 @@ namespace sth1edwv
                 {
                     // We want to auto-size
                     var rowCount = Items.Count / ItemsPerRow + (Items.Count % ItemsPerRow == 0 ? 0 : 1);
-                    var pixelsPerItem = Items[0].Image.Width * Math.Max(1, Scaling) + 1;
+                    var pixelsPerItem = Items[0].Size * Math.Max(1, Scaling) + 1;
                     Size = new Size(ItemsPerRow * pixelsPerItem + 1, rowCount * pixelsPerItem + 1);
                 }
                 CheckDrawingSettings();
@@ -68,7 +71,7 @@ namespace sth1edwv
             else if (Items is { Count: > 0 })
             {
                 // We compute the items per row
-                var newItemsPerRow = (Width - 1) / Items[0].Image.Width;
+                var newItemsPerRow = (Width - 1) / Items[0].Size;
                 if (newItemsPerRow != ItemsPerRow)
                 {
                     ItemsPerRow = newItemsPerRow;
@@ -86,6 +89,12 @@ namespace sth1edwv
                 e.Graphics.DrawString("No items", Font, SystemBrushes.WindowText, 0, 0);
                 return;
             }
+
+            if (Palette == null)
+            {
+                e.Graphics.DrawString("No palette`", Font, SystemBrushes.WindowText, 0, 0);
+                return;
+            }
             // Draw all tiles overlapping the rect
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
@@ -98,7 +107,7 @@ namespace sth1edwv
                     continue;
                 }
                 var tile = Items[index];
-                e.Graphics.DrawImage(tile.Image, tileRect);
+                e.Graphics.DrawImage(tile.GetImage(Palette), tileRect);
             }
 
             if (SelectedIndex > -1)

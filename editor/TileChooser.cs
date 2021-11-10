@@ -5,10 +5,11 @@ namespace sth1edwv
 {
     public partial class TileChooser : Form
     {
-        public TileChooser(TileSet tileSet, int selectedIndex)
+        public TileChooser(TileSet tileSet, int selectedIndex, Palette palette)
         {
             InitializeComponent();
             tilePicker1.Items = tileSet.Tiles.Cast<IDrawableBlock>().ToList();
+            tilePicker1.Palette = palette;
             tilePicker1.SelectedIndex = selectedIndex;
         }
 

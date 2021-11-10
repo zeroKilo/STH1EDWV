@@ -1,40 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace sth1edwv
 {
+    // Wrapper class for use in the grid
+    public class BlockRow
+    {
+        private readonly Palette _palette;
+
+        public BlockRow(Block block, Palette palette)
+        {
+            Block = block;
+            _palette = palette;
+        }
+
+        // ReSharper disable UnusedMember.Global
+        public Image Image => Block.GetImage(_palette);
+
+        public int Index => Block.Index;
+
+        public bool IsForeground
+        {
+            get => Block.IsForeground;
+            set => Block.IsForeground = value;
+        }
+
+        public int SolidityIndex
+        {
+            get => Block.SolidityIndex;
+            set => Block.SolidityIndex = value;
+        }
+
+        public int UsageCount => Block.UsageCount;
+        public int GlobalUsageCount => Block.GlobalUsageCount;
+        // ReSharper restore UnusedMember.Global
+
+        public Block Block { get; }
+    }
+
     public class Block: IDisposable, IDataItem, IDrawableBlock
     {
         public TileSet TileSet { get; }
-        private Bitmap _image;
-        private Palette _palette;
+        private readonly Dictionary<Palette, Bitmap> _images = new();
 
         public byte[] TileIndices { get; } = new byte[16];
-        public Bitmap Image {
-            get
+
+        public Bitmap GetImage(Palette palette)
+        {
+            if (_images.TryGetValue(palette, out var image))
             {
-                if (_image != null)
-                {
-                    return _image;
-                }
-                // Lazy rendering
-                _image = new Bitmap(32, 32);
-                using (var g = Graphics.FromImage(_image))
-                {
-                    for (var i = 0; i < 16; ++i)
-                    {
-                        var x = i % 4 * 8;
-                        var y = i / 4 * 8;
-                        var tileIndex = TileIndices[i];
-                        var tile = TileSet.Tiles[tileIndex];
-                        g.DrawImageUnscaled(tile.GetImage(_palette), x, y);
-                    }
-                }
-                return _image;
+                return image;
             }
+
+            // Lazy rendering
+            image = new Bitmap(32, 32);
+            using (var g = Graphics.FromImage(image))
+            {
+                for (var i = 0; i < 16; ++i)
+                {
+                    var x = i % 4 * 8;
+                    var y = i / 4 * 8;
+                    var tileIndex = TileIndices[i];
+                    var tile = TileSet.Tiles[tileIndex];
+                    g.DrawImageUnscaled(tile.GetImage(palette), x, y);
+                }
+            }
+
+            _images.Add(palette, image);
+            return image;
         }
 
+        public int Size => 32;
+        
         public int Index { get; }
 
         public int SolidityIndex { get; set; }
@@ -44,13 +83,12 @@ namespace sth1edwv
 
         public byte Data => (byte)(SolidityIndex | (IsForeground ? 0x80 : 0));
 
-        public Block(IReadOnlyList<byte> cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index, Palette palette)
+        public Block(IReadOnlyList<byte> cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index)
         {
             TileSet = tileSet;
             Offset = tilesOffset;
             SolidityOffset = solidityOffset;
             Index = index;
-            _palette = palette;
             for (int i = 0; i < 16; ++i)
             {
                 TileIndices[i] = cartridgeMemory[tilesOffset + i];
@@ -62,7 +100,7 @@ namespace sth1edwv
 
         public void Dispose()
         {
-            _image?.Dispose();
+            ResetImages();
         }
 
         public int Offset { get; }
@@ -76,10 +114,13 @@ namespace sth1edwv
             return TileIndices;
         }
 
-        public void ResetImage()
+        public void ResetImages()
         {
-            _image?.Dispose();
-            _image = null;
+            foreach (var bitmap in _images.Values)
+            {
+                bitmap.Dispose();
+            }
+            _images.Clear();
         }
     }
 }

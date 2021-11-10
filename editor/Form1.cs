@@ -92,6 +92,7 @@ namespace sth1edwv
             var level = listBoxLevels.SelectedItem as Level;
 
             tilePicker1.Items = level?.TileSet.Tiles.Cast<IDrawableBlock>().ToList();
+            tilePicker1.Palette = level?.CyclingPalette;
 
             LoadLevelData();
 
@@ -100,7 +101,9 @@ namespace sth1edwv
             level?.BlockMapping.UpdateUsageForLevel(level);
             level?.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
 
-            dataGridViewBlocks.DataSource = level == null ? null : new BindingListView<Block>(level.BlockMapping.Blocks);
+            dataGridViewBlocks.DataSource = level == null 
+                ? null 
+                : new BindingListView<BlockRow>(level.BlockMapping.Blocks.Select(x => new BlockRow(x, level.CyclingPalette)).ToList());
             dataGridViewBlocks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
         }
 
@@ -158,7 +161,7 @@ namespace sth1edwv
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.ScaleTransform(zoom, zoom);
-                g.DrawImageUnscaled(tile.GetImage(level.Palette), 0, 0);
+                g.DrawImageUnscaled(tile.GetImage(level.CyclingPalette), 0, 0);
             }
 
             pictureBoxTilePreview.Image = bmp;
@@ -183,7 +186,7 @@ namespace sth1edwv
                 g.Clear(SystemColors.Window);
                 foreach (var block in blocks)
                 {
-                    g.DrawImageUnscaled(block.Image, x, 0);
+                    g.DrawImageUnscaled(block.GetImage(level.CyclingPalette), x, 0);
                     g.DrawString(block.Index.ToString("X2"), Font, SystemBrushes.WindowText, 
                         new RectangleF(x, 32, 32, 16),
                         new StringFormat
@@ -201,7 +204,7 @@ namespace sth1edwv
         {
             return dataGridViewBlocks.SelectedRows.Count == 0 
                 ? null 
-                : (dataGridViewBlocks.SelectedRows[0].DataBoundItem as ObjectView<Block>)?.Object;
+                : (dataGridViewBlocks.SelectedRows[0].DataBoundItem as ObjectView<BlockRow>)?.Object.Block;
         }
 
         private void SelectedBlockChanged(object sender, EventArgs e)
@@ -236,7 +239,7 @@ namespace sth1edwv
                     var tile = block.TileSet.Tiles[block.TileIndices[i]];
                     var x = i % 4 * _blockEditorTileSize - 1;
                     var y = i / 4 * _blockEditorTileSize - 1;
-                    g.DrawImage(tile.GetImage(level.Palette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
+                    g.DrawImage(tile.GetImage(level.CyclingPalette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
                 }
             }
 
@@ -250,6 +253,11 @@ namespace sth1edwv
             {
                 return;
             }
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+
             var x = e.X / _blockEditorTileSize;
             var y = e.Y / _blockEditorTileSize;
             if (x > 3 || y > 3)
@@ -258,13 +266,13 @@ namespace sth1edwv
             }
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
-            using var tc = new TileChooser(block.TileSet, tileIndex);
+            using var tc = new TileChooser(block.TileSet, tileIndex, level.CyclingPalette);
             if (tc.ShowDialog(this) == DialogResult.OK)
             {
                 // Apply to the block object
                 block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
                 // Invalidate its cached image
-                block.ResetImage();
+                block.ResetImages();
                 // Trigger a redraw of the editor
                 DrawBlockEditor();
                 // And the grid
@@ -515,7 +523,7 @@ namespace sth1edwv
             {
                 selectedBlock = level.Floor.BlockIndices[x + y * level.Floor.Width];
             }
-            using var bc = new BlockChooser(level.BlockMapping.Blocks, selectedBlock);
+            using var bc = new BlockChooser(level.BlockMapping.Blocks, selectedBlock, level.CyclingPalette);
             if (bc.ShowDialog(this) != DialogResult.OK)
             {
                 return;
@@ -557,7 +565,7 @@ namespace sth1edwv
             using var d = new SaveFileDialog { Filter = "PNG images|*.png" };
             if (d.ShowDialog(this) == DialogResult.OK)
             {
-                using var image = level.TileSet.ToImage(level.Palette);
+                using var image = level.TileSet.ToImage(level.CyclingPalette);
                 image.Save(d.FileName, ImageFormat.Png);
             }
         }
@@ -586,8 +594,19 @@ namespace sth1edwv
             {
                 level.TileSet.FromImage(image);
 
+                // Invalidate any blocks using it
+                foreach (var block in _cartridge.Levels
+                    .Where(x => x.TileSet == level.TileSet)
+                    .Select(x => x.BlockMapping)
+                    .SelectMany(x => x.Blocks))
+                {
+                    block.ResetImages();
+                }
+
                 // Invalidate the tileset picker
                 tilePicker1.Invalidate();
+                // Trigger the tile view to redraw
+                tilePicker1_SelectionChanged(tilePicker1, tilePicker1.SelectedItem);
 
                 // Mark the level as needing a redraw
                 RenderLevel();

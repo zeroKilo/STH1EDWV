@@ -8,10 +8,11 @@ namespace sth1edwv
     {
         public int SelectedBlockIndex => itemPicker1.SelectedIndex;
 
-        public BlockChooser(List<Block> blocks, int selectedBlockIndex)
+        public BlockChooser(List<Block> blocks, int selectedBlockIndex, Palette palette)
         {
             InitializeComponent();
             itemPicker1.Items = blocks.Cast<IDrawableBlock>().ToList();
+            itemPicker1.Palette = palette;
             itemPicker1.SelectedIndex = selectedBlockIndex;
         }
 

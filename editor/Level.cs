@@ -363,7 +363,7 @@ namespace sth1edwv
                             var tile = TileSet.Tiles[tileIndex];
                             var x = blockX * _blockSize + tileX * tileSize;
                             var y = blockY * _blockSize + tileY * tileSize;
-                            g.DrawImageUnscaled(tile.Image, x, y);
+                            g.DrawImageUnscaled(tile.GetImage(CyclingPalette), x, y);
                         }
                     }
                 }
