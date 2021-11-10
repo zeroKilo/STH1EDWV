@@ -1,5 +1,7 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace sth1edwv
 {
@@ -13,11 +15,11 @@ namespace sth1edwv
 
         public Palette Palette { get; }
 
-        public byte[] Tilemap { get; }
+        public List<ushort> Tilemap { get; }
 
         public Screen(Cartridge cartridge, string name, int tileSetReferenceOffset,
             int tileSetBankOffset, int paletteReferenceOffset, int tileMapReferenceOffset, int tileMapSizeOffset,
-            int tileMapBankOffset)
+            int tileMapBankOffset, int secondaryTileMapReferenceOffset, int secondaryTileMapSizeOffset)
         {
             Name = name;
             var paletteOffset = cartridge.Memory.Word(paletteReferenceOffset);
@@ -28,7 +30,30 @@ namespace sth1edwv
             // Tile map offset is as pages in slot 1 (TODO always?)
             var tileMapOffset = cartridge.Memory.Word(tileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
             var tileMapSize = cartridge.Memory.Word(tileMapSizeOffset);
-            Tilemap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize);
+            Tilemap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize)
+                .Select(b => (ushort)b)
+                .ToList();
+            if (secondaryTileMapReferenceOffset != 0)
+            {
+                tileMapOffset = cartridge.Memory.Word(tileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
+                tileMapSize = cartridge.Memory.Word(tileMapSizeOffset);
+                var secondaryTileMap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize);
+
+                // Apply to the tilemap
+                for (var i = 0; i < secondaryTileMap.Length; i++)
+                {
+                    var index = secondaryTileMap[i];
+                    if (index == 0xff)
+                    {
+                        //  Assume the primary one is therefore foreground
+                        Tilemap[i] |= 0x1000;
+                    }
+                    else
+                    {
+                        Tilemap[i] = secondaryTileMap[i];
+                    }
+                }
+            }
         }
 
         public override string ToString()
@@ -45,7 +70,7 @@ namespace sth1edwv
                     _image = new Bitmap(256, 192);
                     using var g = Graphics.FromImage(_image);
                     g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    for (var i = 0; i < Tilemap.Length; ++i)
+                    for (var i = 0; i < Tilemap.Count; ++i)
                     {
                         var x = i % 32 * 8;
                         var y = i / 32 * 8;

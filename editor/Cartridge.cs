@@ -34,12 +34,14 @@ namespace sth1edwv
             public class ScreenInfo
             {
                 public string Name { get; set; }
-                public int TileSetReferenceOffset { get; set; }
                 public int TileSetBankOffset { get; set; }
-                public int TileMapReferenceOffset { get; set; }
+                public int TileSetReferenceOffset { get; set; }
                 public int TileMapBankOffset { get; set; }
-                public int PaletteReferenceOffset { get; set; }
+                public int TileMapReferenceOffset { get; set; }
+                public int SecondaryTileMapReferenceOffset { get; set; }
                 public int TileMapSizeOffset { get; set; }
+                public int SecondaryTileMapSizeOffset { get; set; }
+                public int PaletteReferenceOffset { get; set; }
             }
             public List<ScreenInfo> Screens { get; set; }
         }
@@ -50,53 +52,98 @@ namespace sth1edwv
             {
                 new()
                 {
-                    Name = "Map screen 1 foreground", 
+                    Name = "Map screen 1", 
                     TileSetReferenceOffset = 0x0c8a, 
                     TileSetBankOffset = 0x0c90, 
-                    PaletteReferenceOffset = 0x0cd5, 
+                    TileMapBankOffset = 0x0cab,
                     TileMapReferenceOffset = 0x0cb3, 
                     TileMapSizeOffset = 0x0cb6,
-                    TileMapBankOffset = 0x0cab
-                },
-                new()
-                {
-                    Name = "Map screen 1 background", 
-                    TileSetReferenceOffset = 0x0c8a, 
-                    TileSetBankOffset = 0x0c90, 
+                    SecondaryTileMapReferenceOffset = 0x0cc4, 
+                    SecondaryTileMapSizeOffset = 0x0cc7,
                     PaletteReferenceOffset = 0x0cd5, 
-                    TileMapReferenceOffset = 0x0cc4, 
-                    TileMapSizeOffset = 0x0cc7,
-                    TileMapBankOffset = 0x0cab
                 },
                 new()
                 {
-                    Name = "Map screen 2 foreground", 
+                    Name = "Map screen 2", 
                     TileSetReferenceOffset = 0x0cec, 
                     TileSetBankOffset = 0x0cf2, 
                     PaletteReferenceOffset = 0x0d37, 
                     TileMapReferenceOffset = 0x0d15, 
                     TileMapSizeOffset = 0x0d18,
-                    TileMapBankOffset = 0x0d0d
-                },
-                new()
-                {
-                    Name = "Map screen 2 background", 
-                    TileSetReferenceOffset = 0x0cec, 
-                    TileSetBankOffset = 0x0cf2, 
-                    PaletteReferenceOffset = 0x0d37, 
-                    TileMapReferenceOffset = 0x0d26, 
-                    TileMapSizeOffset = 0x0d29,
-                    TileMapBankOffset = 0x0d0d
+                    TileMapBankOffset = 0x0d0d,
+                    SecondaryTileMapReferenceOffset = 0x0d26, 
+                    SecondaryTileMapSizeOffset = 0x0d29,
                 },
                 new()
                 {
                     Name = "Title screen", 
                     TileSetReferenceOffset = 0x1297, 
                     TileSetBankOffset = 0x129d, 
-                    PaletteReferenceOffset = 0x12cd, 
+                    TileMapBankOffset = 0x12ad,
                     TileMapReferenceOffset = 0x12b5, 
                     TileMapSizeOffset = 0x12bb,
-                    TileMapBankOffset = 0x12ad
+                    PaletteReferenceOffset = 0x12cd, 
+                },
+                new()
+                {
+                    Name = "Game Over",
+                    TileSetReferenceOffset = 0x1412,
+                    TileSetBankOffset = 0x1418,
+                    TileMapBankOffset = 0x141d,
+                    TileMapReferenceOffset = 0x1425,
+                    TileMapSizeOffset = 0x1428,
+                    PaletteReferenceOffset = 0x143d
+                },
+                new()
+                {
+                    Name = "Act Complete",
+                    TileSetReferenceOffset = 0x1581,
+                    TileSetBankOffset = 0x1587,
+                    TileMapBankOffset = 0x158c,
+                    TileMapReferenceOffset = 0x1594,
+                    TileMapSizeOffset = 0x1597,
+                    PaletteReferenceOffset = 0x1605
+                },
+                new()
+                {
+                    Name = "Special Stage Complete",
+                    TileSetReferenceOffset = 0x1581,
+                    TileSetBankOffset = 0x1587,
+                    TileMapBankOffset = 0x158c,
+                    TileMapReferenceOffset = 0x15a4,
+                    TileMapSizeOffset = 0x15a7,
+                    PaletteReferenceOffset = 0x1605
+                },
+                new()
+                {
+                    Name = "Ending Map",
+                    PaletteReferenceOffset = 0x25a2,
+                    TileSetReferenceOffset = 0x25aa,
+                    TileSetBankOffset = 0x25b0,
+                    TileMapBankOffset = 0x25b5,
+                    TileMapReferenceOffset = 0x25bd,
+                    TileMapSizeOffset = 0x25c0,
+                },
+                new()
+                {
+                    Name = "Ending Map 2",
+                    // Uses the tileset from Ending Map...
+                    PaletteReferenceOffset = 0x25a2,
+                    TileSetReferenceOffset = 0x25aa,
+                    TileSetBankOffset = 0x25b0,
+                    TileMapBankOffset = 0x26c2,
+                    TileMapReferenceOffset = 0x267e,
+                    TileMapSizeOffset = 0x2681,
+                },
+                new()
+                {
+                    Name = "Credits",
+                    TileSetReferenceOffset = 0x26ac,
+                    TileSetBankOffset = 0x26b2,
+                    TileMapBankOffset = 0x26c2,
+                    TileMapReferenceOffset = 0x26ca,
+                    TileMapSizeOffset = 0x26cd,
+                    PaletteReferenceOffset = 0x2703, // TODO: same tileset, different palette... how to resolve this?
                 }
             },
             Levels = new List<Game.LevelInfo>
@@ -169,7 +216,9 @@ namespace sth1edwv
                     screenInfo.PaletteReferenceOffset, 
                     screenInfo.TileMapReferenceOffset, 
                     screenInfo.TileMapSizeOffset,
-                    screenInfo.TileMapBankOffset));
+                    screenInfo.TileMapBankOffset,
+                    screenInfo.SecondaryTileMapReferenceOffset,
+                    screenInfo.SecondaryTileMapSizeOffset));
             }
         }
 
@@ -349,10 +398,9 @@ namespace sth1edwv
                 throw new Exception("Floor layouts out of space");
             }
 
-            // - Tile sets (at original offsets)
-            // TODO: make them fit, along with everything else
-            // - all art from 26000
-            // - level art from 32FE6
+            // - Tile sets (filling space)
+            // TODO: various art from 26000
+            // TODO: map art from 30000 - can be more flexible for the bank, levels can't
             // - end at $3da28 where some more assets are placed in the way... repack them too? "Contains sprite art and/or sprite mappings"
             offset = 0x32FE6;
             foreach (var tileSet in Levels.Select(l => l.TileSet).Distinct())

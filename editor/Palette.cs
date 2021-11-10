@@ -23,7 +23,7 @@ namespace sth1edwv
 
         public override string ToString()
         {
-            return $"{Colors.Count} colours @ {_offset}";
+            return $"{Colors.Count} colours @ {_offset:X}";
         }
 
         private static int ScaleColor(int c) => c switch
