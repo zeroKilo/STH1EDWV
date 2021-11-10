@@ -37,7 +37,6 @@ namespace sth1edwv
             // 
             this.itemPicker1.AutoSize = true;
             this.itemPicker1.FixedItemsPerRow = true;
-            this.itemPicker1.Items = null;
             this.itemPicker1.ItemsPerRow = 8;
             this.itemPicker1.Location = new System.Drawing.Point(3, 3);
             this.itemPicker1.Name = "itemPicker1";

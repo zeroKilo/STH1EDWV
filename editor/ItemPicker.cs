@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace sth1edwv
@@ -16,30 +17,27 @@ namespace sth1edwv
     {
         private int _tileSize;
         private List<IDrawableBlock> _items;
+        private Palette _palette;
+        private int _selectedIndex = -1;
 
         public ItemPicker()
         {
             InitializeComponent();
         }
 
-        public Palette Palette { get; set; }
-
-        public List<IDrawableBlock> Items
+        public void SetData(IEnumerable<IDrawableBlock> items, Palette palette)
         {
-            get => _items;
-            set
+            _palette = palette;
+            _items = items?.ToList();
+            if (AutoSize && FixedItemsPerRow && ItemsPerRow > 0 && _items is { Count: > 0 })
             {
-                _items = value;
-                if (AutoSize && FixedItemsPerRow && ItemsPerRow > 0 && Items is { Count: > 0 })
-                {
-                    // We want to auto-size
-                    var rowCount = Items.Count / ItemsPerRow + (Items.Count % ItemsPerRow == 0 ? 0 : 1);
-                    var pixelsPerItem = Items[0].Size * Math.Max(1, Scaling) + 1;
-                    Size = new Size(ItemsPerRow * pixelsPerItem + 1, rowCount * pixelsPerItem + 1);
-                }
-                CheckDrawingSettings();
-                Invalidate();
+                // We want to auto-size
+                var rowCount = _items.Count / ItemsPerRow + (_items.Count % ItemsPerRow == 0 ? 0 : 1);
+                var pixelsPerItem = _items[0].Size * Math.Max(1, Scaling) + 1;
+                Size = new Size(ItemsPerRow * pixelsPerItem + 1, rowCount * pixelsPerItem + 1);
             }
+            CheckDrawingSettings();
+            Invalidate();
         }
 
         public bool FixedItemsPerRow { get; set; }
@@ -68,10 +66,10 @@ namespace sth1edwv
                     }
                 }
             }
-            else if (Items is { Count: > 0 })
+            else if (_items is { Count: > 0 })
             {
                 // We compute the items per row
-                var newItemsPerRow = (Width - 1) / Items[0].Size;
+                var newItemsPerRow = (Width - 1) / _items[0].Size;
                 if (newItemsPerRow != ItemsPerRow)
                 {
                     ItemsPerRow = newItemsPerRow;
@@ -84,13 +82,13 @@ namespace sth1edwv
         {
             // Clear the area first
             e.Graphics.FillRectangle(SystemBrushes.Window, e.ClipRectangle);
-            if (Items == null)
+            if (_items == null)
             {
                 e.Graphics.DrawString("No items", Font, SystemBrushes.WindowText, 0, 0);
                 return;
             }
 
-            if (Palette == null)
+            if (_palette == null)
             {
                 e.Graphics.DrawString("No palette`", Font, SystemBrushes.WindowText, 0, 0);
                 return;
@@ -98,7 +96,7 @@ namespace sth1edwv
             // Draw all tiles overlapping the rect
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            for (var index = 0; index < Items.Count; ++index)
+            for (var index = 0; index < _items.Count; ++index)
             {
                 // Is this tile in the clip rectangle?
                 var tileRect = ScreenRectFromIndex(index);
@@ -106,8 +104,8 @@ namespace sth1edwv
                 {
                     continue;
                 }
-                var tile = Items[index];
-                e.Graphics.DrawImage(tile.GetImage(Palette), tileRect);
+                var tile = _items[index];
+                e.Graphics.DrawImage(tile.GetImage(_palette), tileRect);
             }
 
             if (SelectedIndex > -1)
@@ -126,7 +124,7 @@ namespace sth1edwv
         // Returns the bounding rect for the given metatile, in screen coordinates.
         private Rectangle ScreenRectFromIndex(int index)
         {
-            if (Items == null || index < 0 || index >= Items.Count)
+            if (_items == null || index < 0 || index >= _items.Count)
             {
                 return new Rectangle();
             }
@@ -140,7 +138,7 @@ namespace sth1edwv
             var newSelection = -1;
             try
             {
-                if (Items == null)
+                if (_items == null)
                 {
                     return;
                 }
@@ -154,7 +152,7 @@ namespace sth1edwv
 
                 var y = e.Y / (_tileSize + 1);
                 var tileIndex = x + y * ItemsPerRow;
-                if (tileIndex >= Items.Count)
+                if (tileIndex >= _items.Count)
                 {
                     return;
                 }
@@ -163,19 +161,7 @@ namespace sth1edwv
             }
             finally
             {
-                ChangeSelection(newSelection);
-            }
-        }
-
-        private void ChangeSelection(int newSelection)
-        {
-            if (SelectedIndex != newSelection)
-            {
-                var previousSelection = SelectedIndex;
                 SelectedIndex = newSelection;
-                InvalidateItem(previousSelection);
-                InvalidateItem(SelectedIndex);
-                SelectionChanged?.Invoke(this, SelectedItem);
             }
         }
 
@@ -190,9 +176,23 @@ namespace sth1edwv
             }
         }
 
-        public IDrawableBlock SelectedItem => SelectedIndex == -1 ? null : Items[SelectedIndex];
+        public IDrawableBlock SelectedItem => SelectedIndex == -1 ? null : _items[SelectedIndex];
 
-        public int SelectedIndex { get; set; } = -1;
+        public int SelectedIndex
+        {
+            get => _selectedIndex;
+            set
+            {
+                if (_selectedIndex != value)
+                {
+                    var previousSelection = _selectedIndex;
+                    _selectedIndex = value;
+                    InvalidateItem(previousSelection);
+                    InvalidateItem(_selectedIndex);
+                    SelectionChanged?.Invoke(this, SelectedItem);
+                }
+            }
+        }
 
         public event EventHandler<IDrawableBlock> SelectionChanged;
 
@@ -215,8 +215,7 @@ namespace sth1edwv
                     break;
             }
 
-            newSelection = Math.Max(0, Math.Min(Items.Count - 1, newSelection));
-            ChangeSelection(newSelection);
+            SelectedIndex = Math.Max(0, Math.Min(_items.Count - 1, newSelection));
         }
     }
 }

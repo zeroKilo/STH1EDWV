@@ -36,7 +36,6 @@ namespace sth1edwv
             // tilePicker1
             // 
             this.tilePicker1.FixedItemsPerRow = true;
-            this.tilePicker1.Items = null;
             this.tilePicker1.ItemsPerRow = 16;
             this.tilePicker1.Location = new System.Drawing.Point(3, 3);
             this.tilePicker1.Name = "tilePicker1";

@@ -8,8 +8,7 @@ namespace sth1edwv
         public TileChooser(TileSet tileSet, int selectedIndex, Palette palette)
         {
             InitializeComponent();
-            tilePicker1.Items = tileSet.Tiles.Cast<IDrawableBlock>().ToList();
-            tilePicker1.Palette = palette;
+            tilePicker1.SetData(tileSet.Tiles, palette);
             tilePicker1.SelectedIndex = selectedIndex;
         }
 

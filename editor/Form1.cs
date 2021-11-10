@@ -91,8 +91,7 @@ namespace sth1edwv
 
             var level = listBoxLevels.SelectedItem as Level;
 
-            tilePicker1.Items = level?.TileSet.Tiles.Cast<IDrawableBlock>().ToList();
-            tilePicker1.Palette = level?.CyclingPalette;
+            tilePicker1.SetData(level?.TileSet.Tiles, level?.CyclingPalette);
 
             LoadLevelData();
 
@@ -105,6 +104,11 @@ namespace sth1edwv
                 ? null 
                 : new BindingListView<BlockRow>(level.BlockMapping.Blocks.Select(x => new BlockRow(x, level.CyclingPalette)).ToList());
             dataGridViewBlocks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+
+            layoutBlockChooser.SetData(level?.BlockMapping.Blocks, level?.CyclingPalette);
+
+            // Invalidate the selected tile view
+            tilePicker1.SelectedIndex = -1;
         }
 
         private void LoadLevelData()
@@ -143,10 +147,12 @@ namespace sth1edwv
         private void tilePicker1_SelectionChanged(object sender, IDrawableBlock b)
         {
             var tile = b as Tile;
+            pictureBoxTilePreview.Image = null;
             pictureBoxTilePreview.Image?.Dispose();
+            pictureBoxTileUsedIn.Image = null;
+            pictureBoxTileUsedIn.Image?.Dispose();
             if (tile == null)
             {
-                pictureBoxTilePreview.Image = null;
                 return;
             }
             if (listBoxLevels.SelectedItem is not Level level)
@@ -165,9 +171,6 @@ namespace sth1edwv
             }
 
             pictureBoxTilePreview.Image = bmp;
-
-            pictureBoxTileUsedIn.Image?.Dispose();
-            pictureBoxTileUsedIn.Image = null;
 
             var blocks = level.BlockMapping.Blocks
                 .Where(block => block.TileIndices.Contains((byte)tile.Index))
