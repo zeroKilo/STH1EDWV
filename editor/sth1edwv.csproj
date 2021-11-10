@@ -79,6 +79,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Compression.cs" />
+    <Compile Include="Screen.cs" />
     <Compile Include="Tile.cs" />
     <Compile Include="TileChooser.cs">
       <SubType>Form</SubType>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace sth1edwv
 {
@@ -21,185 +22,131 @@ namespace sth1edwv
 
     public class Cartridge: IDisposable
     {
-        private class MemoryItem
-        {
-            public int Offset { get; set; }
-            public int Length { get; set; }
-        }
-
         private class Game
         {
-            public class Level : MemoryItem
+            public class LevelInfo
             {
                 public string Name { get; set; }
+                public int Offset { get; set; }
             }
+            public List<LevelInfo> Levels { get; set; }
 
-            public List<Level> Levels { get; set; }
-
-            public class Palette: MemoryItem
+            public class ScreenInfo
             {
                 public string Name { get; set; }
+                public int TileSetReferenceOffset { get; set; }
+                public int TileSetBankOffset { get; set; }
+                public int TileMapReferenceOffset { get; set; }
+                public int TileMapBankOffset { get; set; }
+                public int PaletteReferenceOffset { get; set; }
+                public int TileMapSizeOffset { get; set; }
             }
-
-            public List<Palette> Palettes { get; set; }
-
-            public class TileSet : MemoryItem
-            {}
-
-            public List<TileSet> TileSets { get; set; }
-
-            public class Floor : MemoryItem
-            {}
-
-            public List<Floor> Floors { get; set; }
+            public List<ScreenInfo> Screens { get; set; }
         }
 
         private static readonly Game Sonic1MasterSystem = new()
         {
-            Levels = new List<Game.Level>
+            Screens = new List<Game.ScreenInfo>
             {
-                new() {
-                    Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a, Length = 37,
-                }, new() {
-                    Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f, Length = 37,
-                }, new() {
-                    Name = "Green Hill Act 3", Offset = 0x15580 + 0x94, Length = 37,
-                }, new() {
-                    Name = "Bridge Act 1", Offset = 0x15580 + 0xde, Length = 37,
-                }, new() {
-                    Name = "Bridge Act 2", Offset = 0x15580 + 0x103, Length = 37,
-                }, new() {
-                    Name = "Bridge Act 3", Offset = 0x15580 + 0x128, Length = 37,
-                }, new() {
-                    Name = "Jungle Act 1", Offset = 0x15580 + 0x14d, Length = 37,
-                }, new() {
-                    Name = "Jungle Act 2", Offset = 0x15580 + 0x172, Length = 37,
-                }, new() {
-                    Name = "Jungle Act 3", Offset = 0x15580 + 0x197, Length = 37,
-                }, new() {
-                    Name = "Labyrinth Act 1", Offset = 0x15580 + 0x1bc, Length = 37,
-                }, new() {
-                    Name = "Labyrinth Act 2", Offset = 0x15580 + 0x1e1, Length = 37,
-                }, new() {
-                    Name = "Labyrinth Act 3", Offset = 0x15580 + 0x206, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 1", Offset = 0x15580 + 0x22b, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 2", Offset = 0x15580 + 0x250, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 3", Offset = 0x15580 + 0x2bf, Length = 37,
-                }, new() {
-                    Name = "Sky Base Act 1", Offset = 0x15580 + 0x378, Length = 37,
-                }, new() {
-                    Name = "Sky Base Act 2", Offset = 0x15580 + 0x39d, Length = 37,
-                }, new() {
-                    Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2, Length = 37,
-                }, new() {
-                    Name = "Ending Sequence", Offset = 0x15580 + 0xb9, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4, Length = 37,
-                }, new() {
-                    Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309, Length = 37,
-                }, new() {
-                    Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7, Length = 37,
-                }, new() {
-                    Name = "Special Stage 1", Offset = 0x15580 + 0x40c, Length = 37,
-                }, new() {
-                    Name = "Special Stage 2", Offset = 0x15580 + 0x431, Length = 37,
-                }, new() {
-                    Name = "Special Stage 3", Offset = 0x15580 + 0x456, Length = 37,
-                }, new() {
-                    Name = "Special Stage 4", Offset = 0x15580 + 0x47b, Length = 37,
-                }, new() {
-                    Name = "Special Stage 5", Offset = 0x15580 + 0x4a0, Length = 37,
-                }, new() {
-                    Name = "Special Stage 6", Offset = 0x15580 + 0x4c5, Length = 37,
-                }, new() {
-                    Name = "Special Stage 7", Offset = 0x15580 + 0x4ea, Length = 37,
-                }, new() {
-                    Name = "Special Stage 8", Offset = 0x15580 + 0x50f, Length = 37,
+                new()
+                {
+                    Name = "Map screen 1 foreground", 
+                    TileSetReferenceOffset = 0x0c8a, 
+                    TileSetBankOffset = 0x0c90, 
+                    PaletteReferenceOffset = 0x0cd5, 
+                    TileMapReferenceOffset = 0x0cb3, 
+                    TileMapSizeOffset = 0x0cb6,
+                    TileMapBankOffset = 0x0cab
+                },
+                new()
+                {
+                    Name = "Map screen 1 background", 
+                    TileSetReferenceOffset = 0x0c8a, 
+                    TileSetBankOffset = 0x0c90, 
+                    PaletteReferenceOffset = 0x0cd5, 
+                    TileMapReferenceOffset = 0x0cc4, 
+                    TileMapSizeOffset = 0x0cc7,
+                    TileMapBankOffset = 0x0cab
+                },
+                new()
+                {
+                    Name = "Map screen 2 foreground", 
+                    TileSetReferenceOffset = 0x0cec, 
+                    TileSetBankOffset = 0x0cf2, 
+                    PaletteReferenceOffset = 0x0d37, 
+                    TileMapReferenceOffset = 0x0d15, 
+                    TileMapSizeOffset = 0x0d18,
+                    TileMapBankOffset = 0x0d0d
+                },
+                new()
+                {
+                    Name = "Map screen 2 background", 
+                    TileSetReferenceOffset = 0x0cec, 
+                    TileSetBankOffset = 0x0cf2, 
+                    PaletteReferenceOffset = 0x0d37, 
+                    TileMapReferenceOffset = 0x0d26, 
+                    TileMapSizeOffset = 0x0d29,
+                    TileMapBankOffset = 0x0d0d
+                },
+                new()
+                {
+                    Name = "Title screen", 
+                    TileSetReferenceOffset = 0x1297, 
+                    TileSetBankOffset = 0x129d, 
+                    PaletteReferenceOffset = 0x12cd, 
+                    TileMapReferenceOffset = 0x12b5, 
+                    TileMapSizeOffset = 0x12bb,
+                    TileMapBankOffset = 0x12ad
                 }
             },
-            Palettes = new List<Game.Palette>
+            Levels = new List<Game.LevelInfo>
             {
-                new() {
-                    Name = "Green Hill", Length = 16*5, Offset = 0x629e, 
-                }, new() {
-                    Name = "Bridge", Length = 16*5, Offset = 0x62ee, 
-                }, new() {
-                    Name = "Jungle", Length = 16*5, Offset = 0x633e, 
-                }, new() {
-                    Name = "Labyrinth", Length = 16*5, Offset = 0x638e, 
-                }, new() {
-                    Name = "Scrap Brain", Length = 16*6, Offset = 0x63de, 
-                }, new() {
-                    Name = "Sky Base 1/2", Length = 16*6, Offset = 0x643e, 
-                }, new() {
-                    Name = "Sky Base 3/2 interior", Length = 16*2, Offset = 0x658e, 
-                }, new() {
-                    Name = "Special stage", Length = 16*2, Offset = 0x655e, 
-                }, new() {
-                    Name = "Green Hill cycle", Length = 16*3, Offset = 0x62be, 
-                }, new() {
-                    Name = "Bridge cycle", Length = 16*3, Offset = 0x630e, 
-                }, new() {
-                    Name = "Jungle cycle", Length = 16*3, Offset = 0x635e, 
-                }, new() {
-                    Name = "Labyrinth cycle", Length = 16*3, Offset = 0x63ae, 
-                }, new() {
-                    Name = "Scrap Brain cycle", Length = 16*4, Offset = 0x63fe, 
-                }, new() {
-                    Name = "Sky Base 1 cycle", Length = 16*4, Offset = 0x645e, 
-                }, new() {
-                    Name = "Sky Base lightning 1", Length = 16*4, Offset = 0x649e, 
-                }, new() {
-                    Name = "Sky Base lightning 2", Length = 16*4, Offset = 0x64de, 
-                }, new() {
-                    Name = "Sky Base interior cycle", Length = 16*4, Offset = 0x65ae, 
-                }, new() {
-                    Name = "Special stage cycle", Length = 16*1, Offset = 0x657e, 
-                },  new() {
-                    Name = "Sky Base 2 cycle", Length = 16*4, Offset = 0x651e, 
-                },  new() {
-                    Name = "Underwater", Length = 16*2, Offset = 0x024b, 
-                },  new() {
-                    Name = "Underwater (boss)", Length = 16*2, Offset = 0x024b, 
-                },  new() {
-                    Name = "Map screen 1", Length = 16*2, Offset = 0x0f0e, 
-                },  new() {
-                    Name = "Map screen 2", Length = 16*2, Offset = 0x0f2e, 
-                },  new() {
-                    Name = "Title screen", Length = 16*2, Offset = 0x13e1, 
-                },  new() {
-                    Name = "Act complete screen", Length = 16*2, Offset = 0x1b8d, 
-                },  new() {
-                    Name = "Credits screen", Length = 16*2, Offset = 0x2ad6, 
-                },  new() {
-                    Name = "End sign sprites", Length = 16, Offset = 0x626c, 
-                },  new() {
-                    Name = "Boss sprites #1", Length = 16, Offset = 0x731c, 
-                },  new() {
-                    Name = "Act complete", Length = 16*2, Offset = 0x14fc, 
-                }
-                // TODO: there is a "regular palette" table and a "palette cycle" table implied by the above, it'd be better to make those tables flexible?
-                // TODO: palette editing at all :)
-            }
+                new() { Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a, },
+                new() { Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f, },
+                new() { Name = "Green Hill Act 3", Offset = 0x15580 + 0x94, },
+                new() { Name = "Bridge Act 1", Offset = 0x15580 + 0xde, },
+                new() { Name = "Bridge Act 2", Offset = 0x15580 + 0x103, },
+                new() { Name = "Bridge Act 3", Offset = 0x15580 + 0x128, },
+                new() { Name = "Jungle Act 1", Offset = 0x15580 + 0x14d, },
+                new() { Name = "Jungle Act 2", Offset = 0x15580 + 0x172, },
+                new() { Name = "Jungle Act 3", Offset = 0x15580 + 0x197, },
+                new() { Name = "Labyrinth Act 1", Offset = 0x15580 + 0x1bc, },
+                new() { Name = "Labyrinth Act 2", Offset = 0x15580 + 0x1e1, },
+                new() { Name = "Labyrinth Act 3", Offset = 0x15580 + 0x206, },
+                new() { Name = "Scrap Brain Act 1", Offset = 0x15580 + 0x22b, },
+                new() { Name = "Scrap Brain Act 2", Offset = 0x15580 + 0x250, },
+                new() { Name = "Scrap Brain Act 3", Offset = 0x15580 + 0x2bf, },
+                new() { Name = "Sky Base Act 1", Offset = 0x15580 + 0x378, },
+                new() { Name = "Sky Base Act 2", Offset = 0x15580 + 0x39d, },
+                new() { Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2, },
+                new() { Name = "Ending Sequence", Offset = 0x15580 + 0xb9, },
+                new() { Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275, },
+                new() { Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a, },
+                new() { Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e, },
+                new() { Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4, },
+                new() { Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309, },
+                new() { Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7, },
+                new() { Name = "Special Stage 1", Offset = 0x15580 + 0x40c, },
+                new() { Name = "Special Stage 2", Offset = 0x15580 + 0x431, },
+                new() { Name = "Special Stage 3", Offset = 0x15580 + 0x456, },
+                new() { Name = "Special Stage 4", Offset = 0x15580 + 0x47b, },
+                new() { Name = "Special Stage 5", Offset = 0x15580 + 0x4a0, },
+                new() { Name = "Special Stage 6", Offset = 0x15580 + 0x4c5, },
+                new() { Name = "Special Stage 7", Offset = 0x15580 + 0x4ea, },
+                new() { Name = "Special Stage 8", Offset = 0x15580 + 0x50f, }
+            },
         };
 
         public Memory Memory { get; }
         public IList<Level> Levels { get; } = new List<Level>();
         public IList<GameText> GameText { get; } = new List<GameText>();
         public IList<Palette> Palettes { get; }
+        public IList<Screen> Screens { get; } = new List<Screen>();
 
         private readonly Dictionary<int, TileSet> _tileSets = new();
         private readonly Dictionary<int, Floor> _floors = new();
         private readonly Dictionary<int, BlockMapping> _blockMappings = new();
+        private readonly Dictionary<int, Palette> _palettes = new();
 
         public Cartridge(string path)
         {
@@ -207,6 +154,23 @@ namespace sth1edwv
             Palettes = Palette.ReadPalettes(Memory, 0x627C, 8+9).ToList();
             ReadLevels();
             ReadGameText();
+            ReadScreens();
+        }
+
+        private void ReadScreens()
+        {
+            foreach (var screenInfo in Sonic1MasterSystem.Screens)
+            {
+                Screens.Add(new Screen(
+                    this, 
+                    screenInfo.Name, 
+                    screenInfo.TileSetReferenceOffset, 
+                    screenInfo.TileSetBankOffset, 
+                    screenInfo.PaletteReferenceOffset, 
+                    screenInfo.TileMapReferenceOffset, 
+                    screenInfo.TileMapSizeOffset,
+                    screenInfo.TileMapBankOffset));
+            }
         }
 
         private void ReadLevels()
@@ -233,6 +197,11 @@ namespace sth1edwv
         public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet)
         {
             return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet));
+        }
+
+        public Palette GetPalette(int offset, int count)
+        {
+            return GetItem(_palettes, offset, () => new Palette(this.Memory, offset, count));
         }
 
         private static T GetItem<T>(IDictionary<int, T> dictionary, int offset, Func<T> generatorFunc) 

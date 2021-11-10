@@ -60,6 +60,8 @@ namespace sth1edwv
             listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
             listBoxGameText.Items.Clear();
             listBoxGameText.Items.AddRange(_cartridge.GameText.ToArray<object>());
+            listBoxScreens.Items.Clear();
+            listBoxScreens.Items.AddRange(_cartridge.Screens.ToArray<object>());
 
             // Add or replace filename in title bar
             Text = $"{Regex.Replace(Text, " \\[.+\\]$", "")} [{Path.GetFileName(filename)}]";
@@ -612,6 +614,12 @@ namespace sth1edwv
             tilePicker1.Invalidate();
 
             UpdateTileSetSpace();
+        }
+
+        private void listBoxScreens_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            propertyGrid1.SelectedObject = listBoxScreens.SelectedItem;
+            pictureBox1.Image = (listBoxScreens.SelectedItem as Screen)?.Image;
         }
 
         private void UpdateTileSetSpace()

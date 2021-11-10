@@ -5,12 +5,12 @@ namespace sth1edwv
 {
     public class Palette
     {
-        private readonly string _label;
+        private readonly int _offset;
         public IList<Color> Colors { get; } = new List<Color>();
 
-        private Palette(IReadOnlyList<byte> mem, int offset, string label, int paletteCount)
+        public Palette(IReadOnlyList<byte> mem, int offset, int paletteCount)
         {
-            _label = label;
+            _offset = offset;
             for (var i = 0; i < 16*paletteCount; i++)
             {
                 var color = mem[offset + i];
@@ -23,7 +23,7 @@ namespace sth1edwv
 
         public override string ToString()
         {
-            return _label;
+            return $"{Colors.Count} colours @ {_offset}";
         }
 
         private static int ScaleColor(int c) => c switch
@@ -45,7 +45,8 @@ namespace sth1edwv
             for (var i = 0; i < count; i++)
             {
                 var address = mem.Word(offset);
-                yield return new Palette(mem, address, $"{i} @ {offset:X}", counts[i]);
+                var palette = new Palette(mem, address, counts[i]);
+                yield return palette;
                 offset += 2;
             }
         }
