@@ -8,7 +8,7 @@ namespace sth1edwv
     {
         public List<Block> Blocks { get; } = new();
     
-        public BlockMapping(Cartridge cartridge, int address, int solidityIndex, TileSet tileSet)
+        public BlockMapping(Cartridge cartridge, int address, int solidityIndex, TileSet tileSet, Palette palette)
         {
             // Hard-coded block counts...
             // TODO: make these safer?
@@ -27,7 +27,7 @@ namespace sth1edwv
             var solidityOffset = cartridge.Memory.Word(0x3A65 + solidityIndex * 2);
             for (var i = 0; i < blockCount; ++i)
             {
-                Blocks.Add(new Block(cartridge.Memory, address + i * 16, solidityOffset + i, tileSet, i));
+                Blocks.Add(new Block(cartridge.Memory, address + i * 16, solidityOffset + i, tileSet, i, palette));
             }
         }
 

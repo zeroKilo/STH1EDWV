@@ -77,7 +77,7 @@ namespace sth1edwv
                         var index = Tilemap[i];
                         if (index != 0xff)
                         {
-                            g.DrawImageUnscaled(TileSet.Tiles[index].Image, x, y);
+                            g.DrawImageUnscaled(TileSet.Tiles[index].GetImage(Palette), x, y);
                         }
                     }
                 }

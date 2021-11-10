@@ -146,6 +146,10 @@ namespace sth1edwv
                 pictureBoxTilePreview.Image = null;
                 return;
             }
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
             var shortestSize = Math.Min(pictureBoxTilePreview.Width, pictureBoxTilePreview.Height);
             var zoom = shortestSize / 8.0f;
             var bmp = new Bitmap(shortestSize, shortestSize);
@@ -154,17 +158,13 @@ namespace sth1edwv
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.ScaleTransform(zoom, zoom);
-                g.DrawImageUnscaled(tile.Image, 0, 0);
+                g.DrawImageUnscaled(tile.GetImage(level.Palette), 0, 0);
             }
 
             pictureBoxTilePreview.Image = bmp;
 
             pictureBoxTileUsedIn.Image?.Dispose();
             pictureBoxTileUsedIn.Image = null;
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
 
             var blocks = level.BlockMapping.Blocks
                 .Where(block => block.TileIndices.Contains((byte)tile.Index))
@@ -219,6 +219,11 @@ namespace sth1edwv
                 return;
             }
 
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+
             var scale = (pictureBoxBlockEditor.Width - 3) / 32;
             var bmp = new Bitmap(32 * scale + 3, 32 * scale + 3);
             _blockEditorTileSize = scale * 8 + 1;
@@ -231,7 +236,7 @@ namespace sth1edwv
                     var tile = block.TileSet.Tiles[block.TileIndices[i]];
                     var x = i % 4 * _blockEditorTileSize - 1;
                     var y = i / 4 * _blockEditorTileSize - 1;
-                    g.DrawImage(tile.Image, x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
+                    g.DrawImage(tile.GetImage(level.Palette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
                 }
             }
 
@@ -552,7 +557,7 @@ namespace sth1edwv
             using var d = new SaveFileDialog { Filter = "PNG images|*.png" };
             if (d.ShowDialog(this) == DialogResult.OK)
             {
-                using var image = level.TileSet.ToImage();
+                using var image = level.TileSet.ToImage(level.Palette);
                 image.Save(d.FileName, ImageFormat.Png);
             }
         }

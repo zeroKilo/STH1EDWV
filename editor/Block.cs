@@ -8,6 +8,7 @@ namespace sth1edwv
     {
         public TileSet TileSet { get; }
         private Bitmap _image;
+        private Palette _palette;
 
         public byte[] TileIndices { get; } = new byte[16];
         public Bitmap Image {
@@ -27,7 +28,7 @@ namespace sth1edwv
                         var y = i / 4 * 8;
                         var tileIndex = TileIndices[i];
                         var tile = TileSet.Tiles[tileIndex];
-                        g.DrawImageUnscaled(tile.Image, x, y);
+                        g.DrawImageUnscaled(tile.GetImage(_palette), x, y);
                     }
                 }
                 return _image;
@@ -43,12 +44,13 @@ namespace sth1edwv
 
         public byte Data => (byte)(SolidityIndex | (IsForeground ? 0x80 : 0));
 
-        public Block(IReadOnlyList<byte> cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index)
+        public Block(IReadOnlyList<byte> cartridgeMemory, int tilesOffset, int solidityOffset, TileSet tileSet, int index, Palette palette)
         {
             TileSet = tileSet;
             Offset = tilesOffset;
             SolidityOffset = solidityOffset;
             Index = index;
+            _palette = palette;
             for (int i = 0; i < 16; ++i)
             {
                 TileIndices[i] = cartridgeMemory[tilesOffset + i];

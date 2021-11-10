@@ -291,7 +291,7 @@ namespace sth1edwv
                 _floorAddress + 0x14000, 
                 _floorSize, 
                 _floorWidth);
-            BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
+            BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet, Palette);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
 

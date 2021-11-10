@@ -243,9 +243,9 @@ namespace sth1edwv
             return GetItem(_floors, offset, () => new Floor(this, offset, compressedSize, width));
         }
 
-        public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet)
+        public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet, Palette palette)
         {
-            return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet));
+            return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet, palette));
         }
 
         public Palette GetPalette(int offset, int count)

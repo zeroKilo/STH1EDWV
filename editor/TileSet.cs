@@ -28,7 +28,7 @@ namespace sth1edwv
             var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
             for (var i = 0; i < decompressed.Length; i += 64)
             {
-                Tiles.Add(new Tile(decompressed, i, palette, i / 64));
+                Tiles.Add(new Tile(decompressed, palette, i, i / 64));
             }
             _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
 
@@ -41,8 +41,8 @@ namespace sth1edwv
                     // We want to convert the data from raw VDP to one byte per pixel
                     const int ringOffset = 0x2FD70 + 32 * 4 * 3; // Frame 3 of the animation looks good
                     var buffer = Compression.PlanarToChunky(cartridge.Memory, ringOffset + i * 32, 8).ToArray();
-                    using var ringTile = new Tile(buffer, 0, palette, index);
-                    Tiles[index].SetRingImage(ringTile.Image);
+                    var ringTile = new Tile(buffer, palette, 0, index);
+                    Tiles[index].SetRingVersion(ringTile);
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace sth1edwv
             Tiles.Clear();
         }
 
-        public Bitmap ToImage()
+        public Bitmap ToImage(Palette palette)
         {
             // We write the tileset to an image
             // Keeping it all in 8bpp is a pain!
@@ -110,7 +110,8 @@ namespace sth1edwv
                 var x = tile.Index % 16 * 8;
                 var y = tile.Index / 16 * 8;
                 // We copy the data from the source image one row at a time
-                var sourceData = tile.ImageWithoutRings.LockBits(
+                var sourceImage = tile.GetImage(palette, false);
+                var sourceData = sourceImage.LockBits(
                     new Rectangle(0, 0, 8, 8),
                     ImageLockMode.ReadOnly,
                     PixelFormat.Format8bppIndexed);
@@ -128,7 +129,7 @@ namespace sth1edwv
                         data.Scan0 + (row + y) * data.Stride + x,
                         8);
                 }
-                tile.ImageWithoutRings.UnlockBits(data);
+                sourceImage.UnlockBits(sourceData);
             }
             image.UnlockBits(data);
             return image; // Caller disposes
