@@ -17,7 +17,6 @@ namespace sth1edwv
 {
     public sealed partial class Form1 : Form
     {
-        private int _lastX, _lastY;
         private Cartridge _cartridge;
         private readonly ImageList _solidityImages;
         private int _blockEditorTileSize;
@@ -87,11 +86,12 @@ namespace sth1edwv
 
         private void SelectedLevelChanged(object sender, EventArgs e)
         {
-            RenderLevel();
-
             var level = listBoxLevels.SelectedItem as Level;
 
-            tilePicker1.SetData(level?.TileSet.Tiles, level?.CyclingPalette);
+            floorEditor1.SetData(level);
+            LevelRenderModeChanged(null, EventArgs.Empty);
+
+            levelTilePicker.SetData(level?.TileSet.Tiles, level?.CyclingPalette);
 
             LoadLevelData();
 
@@ -108,7 +108,7 @@ namespace sth1edwv
             layoutBlockChooser.SetData(level?.BlockMapping.Blocks, level?.CyclingPalette);
 
             // Invalidate the selected tile view
-            tilePicker1.SelectedIndex = -1;
+            levelTilePicker.SelectedIndex = -1;
         }
 
         private void LoadLevelData()
@@ -127,21 +127,11 @@ namespace sth1edwv
 
         private void LevelRenderModeChanged(object sender, EventArgs e)
         {
-            RenderLevel();
-        }
-
-        private void RenderLevel()
-        {
-            if (tabControlLevel.SelectedTab == tabPageLayout && listBoxLevels.SelectedItem is Level level)
-            {
-                pictureBoxRenderedLevel.Image?.Dispose();
-                pictureBoxRenderedLevel.Image = level.Render(buttonShowObjects.Checked, buttonBlockGaps.Checked,
-                    buttonTileGaps.Checked, buttonBlockNumbers.Checked, buttonLevelBounds.Checked);
-            }
-            else
-            {
-                pictureBoxRenderedLevel.Image = null;
-            }
+            floorEditor1.TileGaps = buttonTileGaps.Checked;
+            floorEditor1.BlockGaps = buttonBlockGaps.Checked;
+            floorEditor1.LevelBounds = buttonLevelBounds.Checked;
+            floorEditor1.BlockNumbers = buttonBlockNumbers.Checked;
+            floorEditor1.WithObjects = buttonShowObjects.Checked;
         }
 
         private void tilePicker1_SelectionChanged(object sender, IDrawableBlock b)
@@ -281,7 +271,7 @@ namespace sth1edwv
                 // And the grid
                 dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
                 // And the rendered level
-                RenderLevel();
+                floorEditor1.Invalidate();
             }
         }
 
@@ -313,7 +303,10 @@ namespace sth1edwv
                 LoadLevelData();
 
                 // And the level map may be different
-                RenderLevel();
+                if (floorEditor1.WithObjects)
+                {
+                    floorEditor1.Invalidate();
+                }
             }
         }
 
@@ -352,22 +345,14 @@ namespace sth1edwv
 
         private void toolStripButtonSaveRenderedLevel_Click(object sender, EventArgs e)
         {
-            if (pictureBoxRenderedLevel.Image == null)
-            {
-                return;
-            }
-
+            using var bmp = new Bitmap(floorEditor1.AutoScrollMinSize.Width, floorEditor1.AutoScrollMinSize.Height);
+            using var g = Graphics.FromImage(bmp);
+            floorEditor1.Draw(g, new Rectangle(0, 0, bmp.Width, bmp.Height));
             using var d = new SaveFileDialog { Filter = "*.png|*.png" };
             if (d.ShowDialog(this) == DialogResult.OK)
             {
-                pictureBoxRenderedLevel.Image.Save(d.FileName);
+                bmp.Save(d.FileName);
             }
-        }
-
-        private void LevelMapMouseDown(object sender, MouseEventArgs e)
-        {
-            _lastX = e.X;
-            _lastY = e.Y;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -449,15 +434,6 @@ namespace sth1edwv
             e.ThrowException = false;
         }
 
-        private void tabControlLevel_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (tabControlLevel.SelectedTab == tabPageLayout &&
-                pictureBoxRenderedLevel.Image == null)
-            {
-                RenderLevel();
-            }
-        }
-
         private void quickTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var filename = Path.Combine(Path.GetTempPath(), "test.sms");
@@ -491,7 +467,7 @@ namespace sth1edwv
                 }
                 data.CopyTo(level.Floor.BlockIndices, 0);
                 // Need to redraw
-                RenderLevel();
+                floorEditor1.Invalidate();
             }
             catch (Exception)
             {
@@ -502,54 +478,7 @@ namespace sth1edwv
         private void propertyGridLevel_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             // Invalidate the level map
-            RenderLevel();
-        }
-
-        private void pb3_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
-
-            var x = e.X;
-            var y = e.Y;
-            level.AdjustPixelsToTile(ref x, ref y);
-            level.AdjustPixelsToTile(ref _lastX, ref _lastY);
-
-            var minX = Math.Min(x, _lastX);
-            var maxX = Math.Max(x, _lastX);
-            var minY = Math.Min(y, _lastY);
-            var maxY = Math.Max(y, _lastY);
-            var selectedBlock = -1;
-            if (minX == maxX && minY == maxY)
-            {
-                selectedBlock = level.Floor.BlockIndices[x + y * level.Floor.Width];
-            }
-            using var bc = new BlockChooser(level.BlockMapping.Blocks, selectedBlock, level.CyclingPalette);
-            if (bc.ShowDialog(this) != DialogResult.OK)
-            {
-                return;
-            }
-
-            // Apply the change
-            for (var row = minY; row <= maxY; row++)
-            for (var col = minX; col <= maxX; col++)
-            {
-                level.Floor.BlockIndices[col + row * level.Floor.Width] = (byte)bc.SelectedBlockIndex;
-            }
-
-            // Redraw the level
-            RenderLevel();
-
-            // Update counts
-            level.BlockMapping.UpdateUsageForLevel(level);
-            level.BlockMapping.UpdateGlobalUsage(_cartridge.Levels);
-            dataGridViewBlocks.ResetBindings();
-
-            LoadLevelData();
-
-            UpdateFloorSpace();
+            floorEditor1.Invalidate();
         }
 
         private void UpdateFloorSpace()
@@ -607,12 +536,12 @@ namespace sth1edwv
                 }
 
                 // Invalidate the tileset picker
-                tilePicker1.Invalidate();
+                levelTilePicker.Invalidate();
                 // Trigger the tile view to redraw
-                tilePicker1_SelectionChanged(tilePicker1, tilePicker1.SelectedItem);
+                tilePicker1_SelectionChanged(levelTilePicker, levelTilePicker.SelectedItem);
 
                 // Mark the level as needing a redraw
-                RenderLevel();
+                floorEditor1.Invalidate();
 
                 UpdateTileSetSpace();
             }
@@ -638,7 +567,7 @@ namespace sth1edwv
             }
 
             // Invalidate the tileset picker
-            tilePicker1.Invalidate();
+            levelTilePicker.Invalidate();
 
             UpdateTileSetSpace();
         }
@@ -647,6 +576,21 @@ namespace sth1edwv
         {
             propertyGrid1.SelectedObject = listBoxScreens.SelectedItem;
             pictureBox1.Image = (listBoxScreens.SelectedItem as Screen)?.Image;
+        }
+
+        private void DrawingButtonCheckedChanged(object sender, EventArgs e)
+        {
+            foreach (var button in new[]{buttonDraw, buttonSelect}.Where(x => x.Checked && x != sender))
+            {
+                button.Checked = false;
+            }
+
+            floorEditor1.DrawingMode = buttonDraw.Checked ? FloorEditor.Modes.Draw : FloorEditor.Modes.Select;
+        }
+
+        private void floorEditor1_FloorChanged()
+        {
+            UpdateFloorSpace();
         }
 
         private void UpdateTileSetSpace()

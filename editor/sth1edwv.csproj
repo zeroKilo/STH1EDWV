@@ -58,6 +58,12 @@
     <Compile Include="BlockMapping.cs" />
     <Compile Include="Cartridge.cs" />
     <Compile Include="Floor.cs" />
+    <Compile Include="FloorEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FloorEditor.Designer.cs">
+      <DependentUpon>FloorEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

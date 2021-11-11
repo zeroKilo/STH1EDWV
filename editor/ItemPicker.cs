@@ -13,7 +13,7 @@ namespace sth1edwv
         public int Size { get; }
     }
 
-    public sealed partial class ItemPicker : UserControl
+    public sealed partial class ItemPicker : ScrollableControl
     {
         private int _tileSize;
         private List<IDrawableBlock> _items;
@@ -69,10 +69,16 @@ namespace sth1edwv
             else if (_items is { Count: > 0 })
             {
                 // We compute the items per row
-                var newItemsPerRow = (Width - 1) / _items[0].Size;
+                _tileSize = _items[0].Size;
+                var newItemsPerRow = (Width - 1 - SystemInformation.VerticalScrollBarWidth) / _tileSize;
                 if (newItemsPerRow != ItemsPerRow)
                 {
                     ItemsPerRow = newItemsPerRow;
+                    
+                    // Set scroll bounds
+                    var numRows = _items.Count / ItemsPerRow + (_items.Count % ItemsPerRow == 0 ? 0 : 1);
+                    AutoScrollMinSize = new Size(ItemsPerRow * _tileSize, numRows * _tileSize);
+
                     Invalidate();
                 }
             }
@@ -128,8 +134,8 @@ namespace sth1edwv
             {
                 return new Rectangle();
             }
-            var x = index % ItemsPerRow  * (_tileSize + 1) + 1;
-            var y = index / ItemsPerRow * (_tileSize + 1) + 1;
+            var x = index % ItemsPerRow  * (_tileSize + 1) + 1 + AutoScrollPosition.X;
+            var y = index / ItemsPerRow * (_tileSize + 1) + 1 + AutoScrollPosition.Y;
             return new Rectangle(x, y, _tileSize, _tileSize);
         }
 
@@ -144,13 +150,13 @@ namespace sth1edwv
                 }
 
                 // Determine the clicked tile
-                var x = e.X / (_tileSize + 1);
+                var x = (e.X - AutoScrollPosition.X) / (_tileSize + 1);
                 if (x > 15)
                 {
                     return;
                 }
 
-                var y = e.Y / (_tileSize + 1);
+                var y = (e.Y - AutoScrollPosition.Y) / (_tileSize + 1);
                 var tileIndex = x + y * ItemsPerRow;
                 if (tileIndex >= _items.Count)
                 {

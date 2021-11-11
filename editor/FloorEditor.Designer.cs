@@ -1,14 +1,12 @@
 ﻿
-using System.ComponentModel;
-
 namespace sth1edwv
 {
-    sealed partial class ItemPicker
+    sealed partial class FloorEditor
     {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private IContainer components = null;
+        private System.ComponentModel.IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -31,19 +29,7 @@ namespace sth1edwv
         /// </summary>
         private void InitializeComponent()
         {
-            this.SuspendLayout();
-            // 
-            // ItemPicker
-            // 
-            this.DoubleBuffered = true;
-            this.Name = "ItemPicker";
-            this.Size = new System.Drawing.Size(227, 217);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.TilePicker_Paint);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUp);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnMouseClick);
-            this.Resize += new System.EventHandler(this.OnResize);
-            this.ResumeLayout(false);
-
+            components = new System.ComponentModel.Container();
         }
 
         #endregion
