@@ -34,10 +34,10 @@ namespace sth1edwv
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,23 +47,15 @@ namespace sth1edwv
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
             this.listBoxLevels = new System.Windows.Forms.ListBox();
             this.tabControlLevel = new System.Windows.Forms.TabControl();
-            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.tabPageMetadata = new System.Windows.Forms.TabPage();
             this.propertyGridLevel = new System.Windows.Forms.PropertyGrid();
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPagePalettes = new System.Windows.Forms.TabPage();
-            this.tabPage7 = new System.Windows.Forms.TabPage();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.levelTilePicker = new sth1edwv.ItemPicker();
-            this.splitContainer5 = new System.Windows.Forms.SplitContainer();
-            this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.pictureBoxTileUsedIn = new System.Windows.Forms.PictureBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-            this.buttonSaveTileset = new System.Windows.Forms.ToolStripButton();
-            this.buttonLoadTileset = new System.Windows.Forms.ToolStripButton();
-            this.buttonBlankUnusedTiles = new System.Windows.Forms.ToolStripButton();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabPageTiles = new System.Windows.Forms.TabPage();
+            this.tileSetViewer = new sth1edwv.TileSetViewer();
+            this.tabPageSprites = new System.Windows.Forms.TabPage();
+            this.spriteTileSetViewer = new sth1edwv.TileSetViewer();
+            this.tabPageBlocks = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
             this.Image = new System.Windows.Forms.DataGridViewImageColumn();
@@ -115,21 +107,10 @@ namespace sth1edwv
             this.splitContainer6.Panel2.SuspendLayout();
             this.splitContainer6.SuspendLayout();
             this.tabControlLevel.SuspendLayout();
-            this.tabPage6.SuspendLayout();
-            this.tabPage7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit();
-            this.splitContainer5.Panel1.SuspendLayout();
-            this.splitContainer5.Panel2.SuspendLayout();
-            this.splitContainer5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilePreview)).BeginInit();
-            this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTileUsedIn)).BeginInit();
-            this.toolStrip2.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.tabPageMetadata.SuspendLayout();
+            this.tabPageTiles.SuspendLayout();
+            this.tabPageSprites.SuspendLayout();
+            this.tabPageBlocks.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
             this.splitContainer4.Panel1.SuspendLayout();
             this.splitContainer4.Panel2.SuspendLayout();
@@ -246,10 +227,11 @@ namespace sth1edwv
             // 
             // tabControlLevel
             // 
-            this.tabControlLevel.Controls.Add(this.tabPage6);
+            this.tabControlLevel.Controls.Add(this.tabPageMetadata);
             this.tabControlLevel.Controls.Add(this.tabPagePalettes);
-            this.tabControlLevel.Controls.Add(this.tabPage7);
-            this.tabControlLevel.Controls.Add(this.tabPage3);
+            this.tabControlLevel.Controls.Add(this.tabPageTiles);
+            this.tabControlLevel.Controls.Add(this.tabPageSprites);
+            this.tabControlLevel.Controls.Add(this.tabPageBlocks);
             this.tabControlLevel.Controls.Add(this.tabPageLayout);
             this.tabControlLevel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlLevel.Location = new System.Drawing.Point(0, 0);
@@ -258,17 +240,17 @@ namespace sth1edwv
             this.tabControlLevel.Size = new System.Drawing.Size(1011, 531);
             this.tabControlLevel.TabIndex = 1;
             // 
-            // tabPage6
+            // tabPageMetadata
             // 
-            this.tabPage6.Controls.Add(this.propertyGridLevel);
-            this.tabPage6.Controls.Add(this.treeViewLevelData);
-            this.tabPage6.Location = new System.Drawing.Point(4, 22);
-            this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(1003, 505);
-            this.tabPage6.TabIndex = 0;
-            this.tabPage6.Text = "Level metadata";
-            this.tabPage6.UseVisualStyleBackColor = true;
+            this.tabPageMetadata.Controls.Add(this.propertyGridLevel);
+            this.tabPageMetadata.Controls.Add(this.treeViewLevelData);
+            this.tabPageMetadata.Location = new System.Drawing.Point(4, 22);
+            this.tabPageMetadata.Name = "tabPageMetadata";
+            this.tabPageMetadata.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageMetadata.Size = new System.Drawing.Size(1003, 505);
+            this.tabPageMetadata.TabIndex = 0;
+            this.tabPageMetadata.Text = "Level metadata";
+            this.tabPageMetadata.UseVisualStyleBackColor = true;
             // 
             // propertyGridLevel
             // 
@@ -302,157 +284,56 @@ namespace sth1edwv
             this.tabPagePalettes.Text = "Palettes";
             this.tabPagePalettes.UseVisualStyleBackColor = true;
             // 
-            // tabPage7
+            // tabPageTiles
             // 
-            this.tabPage7.Controls.Add(this.splitContainer2);
-            this.tabPage7.Controls.Add(this.toolStrip2);
-            this.tabPage7.Location = new System.Drawing.Point(4, 22);
-            this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage7.Size = new System.Drawing.Size(1003, 505);
-            this.tabPage7.TabIndex = 1;
-            this.tabPage7.Text = "Tiles";
-            this.tabPage7.UseVisualStyleBackColor = true;
+            this.tabPageTiles.Controls.Add(this.tileSetViewer);
+            this.tabPageTiles.Location = new System.Drawing.Point(4, 22);
+            this.tabPageTiles.Name = "tabPageTiles";
+            this.tabPageTiles.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageTiles.Size = new System.Drawing.Size(1003, 505);
+            this.tabPageTiles.TabIndex = 1;
+            this.tabPageTiles.Text = "Tiles";
+            this.tabPageTiles.UseVisualStyleBackColor = true;
             // 
-            // splitContainer2
+            // tileSetViewer
             // 
-            this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(3, 28);
-            this.splitContainer2.Name = "splitContainer2";
+            this.tileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tileSetViewer.Location = new System.Drawing.Point(3, 3);
+            this.tileSetViewer.Name = "tileSetViewer";
+            this.tileSetViewer.Size = new System.Drawing.Size(997, 499);
+            this.tileSetViewer.TabIndex = 1;
+            this.tileSetViewer.Changed += new System.Action<sth1edwv.TileSet>(this.tileSetViewer_Changed);
             // 
-            // splitContainer2.Panel1
+            // tabPageSprites
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.levelTilePicker);
+            this.tabPageSprites.Controls.Add(this.spriteTileSetViewer);
+            this.tabPageSprites.Location = new System.Drawing.Point(4, 22);
+            this.tabPageSprites.Name = "tabPageSprites";
+            this.tabPageSprites.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageSprites.Size = new System.Drawing.Size(1003, 505);
+            this.tabPageSprites.TabIndex = 5;
+            this.tabPageSprites.Text = "Sprite tiles";
+            this.tabPageSprites.UseVisualStyleBackColor = true;
             // 
-            // splitContainer2.Panel2
+            // spriteTileSetViewer
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.splitContainer5);
-            this.splitContainer2.Size = new System.Drawing.Size(997, 474);
-            this.splitContainer2.SplitterDistance = 403;
-            this.splitContainer2.TabIndex = 1;
+            this.spriteTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.spriteTileSetViewer.Location = new System.Drawing.Point(3, 3);
+            this.spriteTileSetViewer.Name = "spriteTileSetViewer";
+            this.spriteTileSetViewer.Size = new System.Drawing.Size(997, 499);
+            this.spriteTileSetViewer.TabIndex = 0;
+            this.spriteTileSetViewer.Changed += new System.Action<sth1edwv.TileSet>(this.spriteTileSetViewer_Changed);
             // 
-            // levelTilePicker
+            // tabPageBlocks
             // 
-            this.levelTilePicker.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.levelTilePicker.FixedItemsPerRow = true;
-            this.levelTilePicker.ItemsPerRow = 16;
-            this.levelTilePicker.Location = new System.Drawing.Point(0, 0);
-            this.levelTilePicker.Name = "levelTilePicker";
-            this.levelTilePicker.Scaling = 1;
-            this.levelTilePicker.SelectedIndex = -1;
-            this.levelTilePicker.Size = new System.Drawing.Size(401, 472);
-            this.levelTilePicker.TabIndex = 0;
-            this.levelTilePicker.SelectionChanged += new System.EventHandler<sth1edwv.IDrawableBlock>(this.tilePicker1_SelectionChanged);
-            // 
-            // splitContainer5
-            // 
-            this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer5.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.splitContainer5.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer5.Name = "splitContainer5";
-            this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer5.Panel1
-            // 
-            this.splitContainer5.Panel1.Controls.Add(this.pictureBoxTilePreview);
-            // 
-            // splitContainer5.Panel2
-            // 
-            this.splitContainer5.Panel2.Controls.Add(this.panel2);
-            this.splitContainer5.Panel2.Controls.Add(this.label1);
-            this.splitContainer5.Size = new System.Drawing.Size(588, 472);
-            this.splitContainer5.SplitterDistance = 353;
-            this.splitContainer5.TabIndex = 1;
-            // 
-            // pictureBoxTilePreview
-            // 
-            this.pictureBoxTilePreview.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxTilePreview.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxTilePreview.Name = "pictureBoxTilePreview";
-            this.pictureBoxTilePreview.Size = new System.Drawing.Size(588, 353);
-            this.pictureBoxTilePreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBoxTilePreview.TabIndex = 0;
-            this.pictureBoxTilePreview.TabStop = false;
-            // 
-            // panel2
-            // 
-            this.panel2.AutoScroll = true;
-            this.panel2.Controls.Add(this.pictureBoxTileUsedIn);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(0, 13);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(588, 102);
-            this.panel2.TabIndex = 1;
-            // 
-            // pictureBoxTileUsedIn
-            // 
-            this.pictureBoxTileUsedIn.Location = new System.Drawing.Point(3, 3);
-            this.pictureBoxTileUsedIn.Name = "pictureBoxTileUsedIn";
-            this.pictureBoxTileUsedIn.Size = new System.Drawing.Size(142, 82);
-            this.pictureBoxTileUsedIn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBoxTileUsedIn.TabIndex = 0;
-            this.pictureBoxTileUsedIn.TabStop = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(80, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Used in blocks:";
-            // 
-            // toolStrip2
-            // 
-            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.buttonSaveTileset,
-            this.buttonLoadTileset,
-            this.buttonBlankUnusedTiles});
-            this.toolStrip2.Location = new System.Drawing.Point(3, 3);
-            this.toolStrip2.Name = "toolStrip2";
-            this.toolStrip2.Size = new System.Drawing.Size(997, 25);
-            this.toolStrip2.TabIndex = 2;
-            this.toolStrip2.Text = "toolStrip2";
-            // 
-            // buttonSaveTileset
-            // 
-            this.buttonSaveTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonSaveTileset.Image")));
-            this.buttonSaveTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonSaveTileset.Name = "buttonSaveTileset";
-            this.buttonSaveTileset.Size = new System.Drawing.Size(60, 22);
-            this.buttonSaveTileset.Text = "Save...";
-            this.buttonSaveTileset.Click += new System.EventHandler(this.buttonSaveTileset_Click);
-            // 
-            // buttonLoadTileset
-            // 
-            this.buttonLoadTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonLoadTileset.Image")));
-            this.buttonLoadTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonLoadTileset.Name = "buttonLoadTileset";
-            this.buttonLoadTileset.Size = new System.Drawing.Size(62, 22);
-            this.buttonLoadTileset.Text = "Load...";
-            this.buttonLoadTileset.Click += new System.EventHandler(this.buttonLoadTileset_Click);
-            // 
-            // buttonBlankUnusedTiles
-            // 
-            this.buttonBlankUnusedTiles.Image = ((System.Drawing.Image)(resources.GetObject("buttonBlankUnusedTiles.Image")));
-            this.buttonBlankUnusedTiles.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.buttonBlankUnusedTiles.Name = "buttonBlankUnusedTiles";
-            this.buttonBlankUnusedTiles.Size = new System.Drawing.Size(98, 22);
-            this.buttonBlankUnusedTiles.Text = "Blank unused";
-            this.buttonBlankUnusedTiles.Click += new System.EventHandler(this.buttonBlankUnusedTiles_Click);
-            // 
-            // tabPage3
-            // 
-            this.tabPage3.Controls.Add(this.splitContainer4);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1003, 505);
-            this.tabPage3.TabIndex = 3;
-            this.tabPage3.Text = "Blocks";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabPageBlocks.Controls.Add(this.splitContainer4);
+            this.tabPageBlocks.Location = new System.Drawing.Point(4, 22);
+            this.tabPageBlocks.Name = "tabPageBlocks";
+            this.tabPageBlocks.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageBlocks.Size = new System.Drawing.Size(1003, 505);
+            this.tabPageBlocks.TabIndex = 3;
+            this.tabPageBlocks.Text = "Blocks";
+            this.tabPageBlocks.UseVisualStyleBackColor = true;
             // 
             // splitContainer4
             // 
@@ -963,25 +844,10 @@ namespace sth1edwv
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).EndInit();
             this.splitContainer6.ResumeLayout(false);
             this.tabControlLevel.ResumeLayout(false);
-            this.tabPage6.ResumeLayout(false);
-            this.tabPage7.ResumeLayout(false);
-            this.tabPage7.PerformLayout();
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
-            this.splitContainer5.Panel1.ResumeLayout(false);
-            this.splitContainer5.Panel2.ResumeLayout(false);
-            this.splitContainer5.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
-            this.splitContainer5.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTilePreview)).EndInit();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTileUsedIn)).EndInit();
-            this.toolStrip2.ResumeLayout(false);
-            this.toolStrip2.PerformLayout();
-            this.tabPage3.ResumeLayout(false);
+            this.tabPageMetadata.ResumeLayout(false);
+            this.tabPageTiles.ResumeLayout(false);
+            this.tabPageSprites.ResumeLayout(false);
+            this.tabPageBlocks.ResumeLayout(false);
             this.splitContainer4.Panel1.ResumeLayout(false);
             this.splitContainer4.Panel2.ResumeLayout(false);
             this.splitContainer4.Panel2.PerformLayout();
@@ -1030,21 +896,12 @@ namespace sth1edwv
         private SplitContainer splitContainer6;
         private ListBox listBoxLevels;
         private TabControl tabControlLevel;
-        private TabPage tabPage6;
+        private TabPage tabPageMetadata;
         private PropertyGrid propertyGridLevel;
         private TreeView treeViewLevelData;
         private TabPage tabPagePalettes;
-        private TabPage tabPage7;
-        private SplitContainer splitContainer2;
-        private ItemPicker levelTilePicker;
-        private SplitContainer splitContainer5;
-        private PictureBox pictureBoxTilePreview;
-        private Panel panel2;
-        private PictureBox pictureBoxTileUsedIn;
-        private Label label1;
-        private ToolStrip toolStrip2;
-        private ToolStripButton buttonSaveTileset;
-        private TabPage tabPage3;
+        private TabPage tabPageTiles;
+        private TabPage tabPageBlocks;
         private SplitContainer splitContainer4;
         private DataGridView dataGridViewBlocks;
         private DataGridViewImageColumn Image;
@@ -1076,8 +933,6 @@ namespace sth1edwv
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel floorStatus;
         private ToolStripStatusLabel tileSetStatus;
-        private ToolStripButton buttonLoadTileset;
-        private ToolStripButton buttonBlankUnusedTiles;
         private TabPage tabPageScreens;
         private SplitContainer splitContainer1;
         private ListBox listBoxScreens;
@@ -1091,6 +946,9 @@ namespace sth1edwv
         private ToolStripButton buttonDraw;
         private ToolStripButton buttonSelect;
         private FloorEditor floorEditor1;
+        private TabPage tabPageSprites;
+        private TileSetViewer spriteTileSetViewer;
+        private TileSetViewer tileSetViewer;
     }
 }
 

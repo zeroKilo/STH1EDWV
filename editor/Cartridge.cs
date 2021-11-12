@@ -231,9 +231,9 @@ namespace sth1edwv
             }
         }
 
-        public TileSet GetTileSet(int offset, bool addRings)
+        public TileSet GetTileSet(int offset, bool addRings, bool isSprites)
         {
-            return GetItem(_tileSets, offset, () => new TileSet(this, offset, addRings));
+            return GetItem(_tileSets, offset, () => new TileSet(this, offset, addRings, isSprites));
         }
 
         public Floor GetFloor(int offset, int compressedSize, int width)
@@ -320,8 +320,24 @@ namespace sth1edwv
             // - Tile sets (filling space)
             // TODO: various art from 26000
             // TODO: map art from 30000 - can be more flexible for the bank, levels can't
-            // - end at $3da28 where some more assets are placed in the way... repack them too? "Contains sprite art and/or sprite mappings"
-            offset = 0x32FE6;
+            // Level sprite art is from 0x2a12a to 0x2f92e (ending sequence includes boss sprites)
+            offset = 0x2a12a;
+            foreach (var tileSet in Levels.Select(l => l.SpriteTileSet).Distinct())
+            {
+                var data = tileSet.GetData();
+                data.CopyTo(memory, offset);
+                tileSet.Offset = offset;
+                offset += data.Count;
+            }
+
+            if (offset > 0x2f92e)
+            {
+                throw new Exception("Sprite tile sets out of space");
+            }
+
+            // Level background art is from 0x32fe6 to $3da28, where some more assets are placed in the way... repack them too?
+            // "Contains sprite art and/or sprite mappings"
+            offset = 0x32fe6;
             foreach (var tileSet in Levels.Select(l => l.TileSet).Distinct())
             {
                 var data = tileSet.GetData();
@@ -332,7 +348,7 @@ namespace sth1edwv
 
             if (offset > 0x3da28)
             {
-                throw new Exception("Tile sets out of space");
+                throw new Exception("Level tile sets out of space");
             }
 
             // - Block mappings (at original offsets)
@@ -366,17 +382,24 @@ namespace sth1edwv
             public int Used { get; set; }
         }
 
+        // All the numbers in these need to match what's in SaveTo
         public Space GetFloorSpace() =>
             new()
             {
                 Total = 0x20000 - 0x16dea,
-                Used = _floors.Values.Sum(x => x.GetData().Count)
+                Used = Levels.Select(x => x.Floor).Distinct().Sum(x => x.GetData().Count)
             };
-        public Space GetTileSetSpace() =>
+        public Space GetFloorTileSetSpace() =>
             new()
             {
                 Total = 0x3da28 - 0x32FE6,
-                Used = _tileSets.Values.Sum(x => x.GetData().Count)
+                Used = Levels.Select(x => x.TileSet).Distinct().Sum(x => x.GetData().Count)
+            };
+        public Space GetSpriteTileSetSpace() =>
+            new()
+            {
+                Total = 0x2f92e - 0x2a12a,
+                Used = Levels.Select(x => x.SpriteTileSet).Distinct().Sum(x => x.GetData().Count)
             };
     }
 }

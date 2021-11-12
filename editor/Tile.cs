@@ -9,11 +9,12 @@ namespace sth1edwv
 {
     public class Tile: IDisposable, IDrawableBlock
     {
-        private readonly byte[] _data = new byte[8 * 8];
+        private readonly byte[] _data;
 
         public int Index { get; }
+        public int Height { get; }
 
-        public int Size => 8;
+        public int Width => 8;
 
         // Images are per-palette
         private readonly Dictionary<Palette, Bitmap> _images = new();
@@ -38,13 +39,13 @@ namespace sth1edwv
             }
 
             // We render only when needed. We do stick to paletted images though..
-            image = new Bitmap(8, 8, PixelFormat.Format8bppIndexed);
+            image = new Bitmap(8, Height, PixelFormat.Format8bppIndexed);
             image.Palette = palette.ImagePalette;
             var data = image.LockBits(
-                new Rectangle(0, 0, 8, 8),
+                new Rectangle(0, 0, 8, Height),
                 ImageLockMode.WriteOnly,
                 PixelFormat.Format8bppIndexed);
-            for (var row = 0; row < 8; ++row)
+            for (var row = 0; row < Height; ++row)
             {
                 // Copy indices one row at a time
                 Marshal.Copy(_data, row * 8, data.Scan0 + row * data.Stride, 8);
@@ -55,10 +56,12 @@ namespace sth1edwv
             return image;
         }
 
-        public Tile(byte[] data, int offset, int index)
+        public Tile(byte[] data, int offset, int index, int height)
         {
             Index = index;
-            Array.Copy(data, offset, _data, 0, 64);
+            Height = height;
+            _data = new byte[8 * height];
+            Array.Copy(data, offset, _data, 0, _data.Length);
         }
 
         public void WriteTo(MemoryStream ms)
@@ -87,13 +90,13 @@ namespace sth1edwv
 
         public void SetData(int x, int y, int index)
         {
-            _data[x + y * 8] = (byte)index;
+            _data[x + y * Width] = (byte)index;
             DisposeImages();
         }
 
-        public void CopyFrom(Tile other)
+        public void Blank()
         {
-            Array.Copy(other._data, _data, _data.Length);
+            Array.Clear(_data, 0, _data.Length);
             DisposeImages();
         }
     }

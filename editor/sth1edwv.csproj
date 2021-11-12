@@ -45,6 +45,7 @@
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
@@ -98,6 +99,12 @@
       <DependentUpon>ItemPicker.cs</DependentUpon>
     </Compile>
     <Compile Include="TileSet.cs" />
+    <Compile Include="TileSetViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TileSetViewer.Designer.cs">
+      <DependentUpon>TileSetViewer.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -119,6 +126,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ItemPicker.resx">
       <DependentUpon>ItemPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TileSetViewer.resx">
+      <DependentUpon>TileSetViewer.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

@@ -71,7 +71,8 @@ namespace sth1edwv
             return image;
         }
 
-        public int Size => 32;
+        public int Width => 32;
+        public int Height => 32;
         
         public int Index { get; }
 

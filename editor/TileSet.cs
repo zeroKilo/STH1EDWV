@@ -11,24 +11,29 @@ namespace sth1edwv
 {
     public class TileSet: IDataItem, IDisposable
     {
+        private readonly bool _isSprites;
         private readonly ushort _magic;
         private readonly ushort _dupRows;
         private readonly ushort _artData;
         private readonly ushort _rowCount;
         private readonly double _compression;
+        private readonly int _tileHeight;
         public List<Tile> Tiles { get; } = new();
 
-        public TileSet(Cartridge cartridge, int offset, bool addRings)
+        public TileSet(Cartridge cartridge, int offset, bool addRings, bool isSprites)
         {
+            _isSprites = isSprites;
             Offset = offset;
             _magic = cartridge.Memory.Word(offset);
             _dupRows = cartridge.Memory.Word(offset + 2);
             _artData = cartridge.Memory.Word(offset + 4);
             _rowCount = cartridge.Memory.Word(offset + 6);
             var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
-            for (var i = 0; i < decompressed.Length; i += 64)
+            _tileHeight = isSprites ? 16 : 8;
+            var tileSizeBytes = _tileHeight * 8;
+            for (var i = 0; i < decompressed.Length; i += tileSizeBytes)
             {
-                Tiles.Add(new Tile(decompressed, i, i / 64));
+                Tiles.Add(new Tile(decompressed, i, i / tileSizeBytes, _tileHeight));
             }
             _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
 
@@ -41,7 +46,7 @@ namespace sth1edwv
                     // We want to convert the data from raw VDP to one byte per pixel
                     const int ringOffset = 0x2FD70 + 32 * 4 * 3; // Frame 3 of the animation looks good
                     var buffer = Compression.PlanarToChunky(cartridge.Memory, ringOffset + i * 32, 8).ToArray();
-                    var ringTile = new Tile(buffer, 0, index);
+                    var ringTile = new Tile(buffer, 0, index, 8);
                     Tiles[index].SetRingVersion(ringTile);
                 }
             }
@@ -99,7 +104,8 @@ namespace sth1edwv
             // We write the tileset to an image
             // Keeping it all in 8bpp is a pain!
             var rows = Tiles.Count / 16;
-            using var image = new Bitmap(128, rows * 8, PixelFormat.Format8bppIndexed);
+            // Caller disposes
+            var image = new Bitmap(128, rows * _tileHeight, PixelFormat.Format8bppIndexed);
             image.Palette = palette.ImagePalette;
             var data = image.LockBits(
                 new Rectangle(0, 0, image.Width, image.Height),
@@ -108,15 +114,15 @@ namespace sth1edwv
             foreach (var tile in Tiles)
             {
                 var x = tile.Index % 16 * 8;
-                var y = tile.Index / 16 * 8;
+                var y = tile.Index / 16 * _tileHeight;
                 // We copy the data from the source image one row at a time
                 var sourceImage = tile.GetImage(palette, false);
                 var sourceData = sourceImage.LockBits(
-                    new Rectangle(0, 0, 8, 8),
+                    new Rectangle(0, 0, 8, _tileHeight),
                     ImageLockMode.ReadOnly,
                     PixelFormat.Format8bppIndexed);
                 var rowData = new byte[8];
-                for (var row = 0; row < 8; ++row)
+                for (var row = 0; row < _tileHeight; ++row)
                 {
                     Marshal.Copy(
                         sourceData.Scan0 + row * sourceData.Stride,
@@ -142,10 +148,10 @@ namespace sth1edwv
                 throw new Exception("Image is not paletted!");
             }
 
-            var expectedHeight = Tiles.Count / 16 * 8;
+            var expectedHeight = Tiles.Count / 16 * _tileHeight;
             if (image.Width != 128 || image.Height != expectedHeight)
             {
-                throw new Exception("Clipboard image is {image.Width}x{image.Height}, we need 128x{expectedHeight}");
+                throw new Exception($"Clipboard image is {image.Width}x{image.Height}, we need 128x{expectedHeight}");
             }
 
             // We walk over the image and extract each tile...
@@ -159,9 +165,9 @@ namespace sth1edwv
             {
                 // First get the tile's source coordinates
                 var tileX = tile.Index % 16 * 8;
-                var tileY = tile.Index / 16 * 8;
+                var tileY = tile.Index / 16 * _tileHeight;
 
-                for (var row = 0; row < 8; ++row)
+                for (var row = 0; row < _tileHeight; ++row)
                 {
                     // Copy source data into the buffer
                     Marshal.Copy(

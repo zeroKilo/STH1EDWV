@@ -1,20 +1,42 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 
 namespace sth1edwv
 {
     public class Palette
     {
         private readonly int _offset;
-        private readonly IList<Color> _colors = new List<Color>();
+        private readonly List<Color> _colors = new();
+        private ColorPalette _imagePalette;
 
-        public ColorPalette ImagePalette { get; }
+        public ColorPalette ImagePalette
+        {
+            get
+            {
+                if (_imagePalette == null)
+                {
+                    // We have to extract a ColorPalette from an image as it blocks us from constructing it...
+                    using var bmp = new Bitmap(1, 1, PixelFormat.Format8bppIndexed);
+                    _imagePalette = bmp.Palette;
+                    // We have to clear the whole palette to non-transparent colours to avoid (1) the default palette and (2) an image that GDI+ transforms to 32bpp on load
+                    for (var i = 0; i < 256; ++i)
+                    {
+                        _imagePalette.Entries[i] = Color.Magenta;
+                    }
 
-        public Palette(IReadOnlyList<byte> mem, int offset, int paletteCount)
+                    // Then we apply the real palette to the start
+                    _colors.CopyTo(_imagePalette.Entries, 0);
+                }
+                return _imagePalette;
+            }
+        }
+
+        public Palette(IReadOnlyList<byte> mem, int offset, int count)
         {
             _offset = offset;
-            for (var i = 0; i < 16*paletteCount; i++)
+            for (var i = 0; i < 16*count; i++)
             {
                 var color = mem[offset + i];
                 var r = ScaleColor((color >> 0) & 0b11);
@@ -22,23 +44,21 @@ namespace sth1edwv
                 var b = ScaleColor((color >> 4) & 0b11);
                 _colors.Add(Color.FromArgb(r, g, b));
             }
+        }
 
-            // We have to extract a ColorPalette from an image as it blocks us from constructing it...
-            using var bmp = new Bitmap(1, 1, PixelFormat.Format8bppIndexed);
-            ImagePalette = bmp.Palette;
-            // We have to clear the whole palette to non-transparent colours to avoid (1) the default palette and (2) an image that GDI+ transforms to 32bpp on load
-            for (var i = 0; i < 256; ++i)
-            {
-                ImagePalette.Entries[i] = Color.Magenta;
-            }
-
-            // Then we apply the real palette to the start
-            _colors.CopyTo(ImagePalette.Entries, 0);
+        private Palette(IList<Color> colors, int offset, int count)
+        {
+            _colors.AddRange(colors.Skip(offset).Take(count));
         }
 
         public override string ToString()
         {
-            return $"{_colors.Count} colours @ {_offset:X}";
+            if (_offset > 0)
+            {
+                return $"{_colors.Count} colours @ {_offset:X}";
+            }
+
+            return $"{_colors.Count} colours (copy, do not save this)";
         }
 
         private static int ScaleColor(int c) => c switch
@@ -83,6 +103,11 @@ namespace sth1edwv
             }
 
             return bmp;
+        }
+
+        public Palette GetSubPalette(int start, int count)
+        {
+            return new Palette(_colors, start, count);
         }
     }
 }

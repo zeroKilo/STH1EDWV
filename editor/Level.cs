@@ -176,6 +176,7 @@ namespace sth1edwv
 
         // Objects representing referenced data
         [Category("General")] public TileSet TileSet { get; }
+        [Category("General")] public TileSet SpriteTileSet { get; }
         [Category("General")] public Floor Floor { get; }
         [Category("General")] public LevelObjectSet Objects { get; }
         [Category("General")] public BlockMapping BlockMapping { get; }
@@ -188,9 +189,6 @@ namespace sth1edwv
 
         [Category("General")] public int Offset { get; }
 
-        //   SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
-        //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
-        //   SR UW TL 00  MU
         private readonly string _label;
         private readonly int _floorWidth;
         private readonly int _floorHeight;
@@ -222,29 +220,32 @@ namespace sth1edwv
             {
                 using (var reader = new BinaryReader(stream))
                 {
-                    _solidityIndex = reader.ReadByte();
-                    _floorWidth = reader.ReadUInt16();
-                    _floorHeight = reader.ReadUInt16();
-                    LeftPixels = reader.ReadUInt16();
-                    _unknownByte = reader.ReadByte();
-                    RightEdgeFactor = reader.ReadByte();
-                    TopPixels = reader.ReadUInt16();
-                    ExtraHeight = reader.ReadByte();
-                    BottomEdgeFactor = reader.ReadByte();
-                    StartX = reader.ReadByte();
-                    StartY = reader.ReadByte();
-                    _floorAddress = reader.ReadUInt16(); // relative to 0x14000
-                    _floorSize = reader.ReadUInt16(); // compressed size in bytes
-                    blockMappingOffset = reader.ReadUInt16(); // relative to 0x10000
-                    _offsetArt = reader.ReadUInt16(); // Relative to 0x30000
-                    _spriteArtAddress = reader.ReadUInt16(); // CPU address when paged in
-                    _spriteArtPage = reader.ReadByte(); // Page for the above, using slot 2
-                    _initPalette = reader.ReadByte(); // Index of palette
-                    PaletteCycleRate = reader.ReadByte(); // Number of frames between palette cycles
-                    _paletteCycleCount = reader.ReadByte(); // Number of palette cycles in a loop
-                    _paletteCycleIndex = reader.ReadByte(); // Which cycling palette to use
-                    _offsetObjectLayout = reader.ReadUInt16(); // relative to 0x15580
-                    var flags = reader.ReadByte();
+                    //   SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
+                    //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
+                    //   SR UW TL 00  MU
+                    _solidityIndex = reader.ReadByte(); // SP
+                    _floorWidth = reader.ReadUInt16(); // FW FW
+                    _floorHeight = reader.ReadUInt16(); // FH FH
+                    LeftPixels = reader.ReadUInt16(); // LX LX
+                    _unknownByte = reader.ReadByte();  // ??
+                    RightEdgeFactor = reader.ReadByte();  // LW
+                    TopPixels = reader.ReadUInt16(); // LY LY
+                    ExtraHeight = reader.ReadByte(); // XH
+                    BottomEdgeFactor = reader.ReadByte(); // LH
+                    StartX = reader.ReadByte(); // SX
+                    StartY = reader.ReadByte(); // SY
+                    _floorAddress = reader.ReadUInt16(); // FL FL: relative to 0x14000
+                    _floorSize = reader.ReadUInt16(); // FS FS: compressed size in bytes
+                    blockMappingOffset = reader.ReadUInt16(); // BM BM: relative to 0x10000
+                    _offsetArt = reader.ReadUInt16(); // LA LA: Relative to 0x30000
+                    _spriteArtPage = reader.ReadByte(); // 09: Page for the below, using slot 1
+                    _spriteArtAddress = reader.ReadUInt16(); // SA SA: offset from start of above bank
+                    _initPalette = reader.ReadByte(); // IP: Index of palette
+                    PaletteCycleRate = reader.ReadByte(); // CS: Number of frames between palette cycles
+                    _paletteCycleCount = reader.ReadByte(); // CC: Number of palette cycles in a loop
+                    _paletteCycleIndex = reader.ReadByte(); // CP: Which cycling palette to use
+                    _offsetObjectLayout = reader.ReadUInt16(); // OL OL: relative to 0x15580
+                    var flags = reader.ReadByte(); // SR
                     // Nothing for bit 0
                     DemoMode = (flags & (1 << 1)) != 0;
                     ShowRings = (flags & (1 << 2)) != 0;
@@ -253,10 +254,10 @@ namespace sth1edwv
                     SlowScroll = (flags & (1 << 5)) != 0;
                     WaveScrollY = (flags & (1 << 6)) != 0;
                     NoScrollDown = (flags & (1 << 7)) != 0;
-                    flags = reader.ReadByte();
+                    flags = reader.ReadByte(); // UW
                     // Nothing for bits 0..6
                     HasWater = (flags & (1 << 7)) != 0;
-                    flags = reader.ReadByte();
+                    flags = reader.ReadByte(); // TL
                     SpecialStageTimer = (flags & (1 << 0)) != 0;
                     HasLightning = (flags & (1 << 1)) != 0;
                     // Nothing for bits 2, 3
@@ -265,9 +266,9 @@ namespace sth1edwv
                     DisableScrolling = (flags & (1 << 6)) != 0;
                     // Nothing for bit 7
                     // Skip unknown byte
-                    reader.ReadByte();
-                    MusicIndex = reader.ReadByte();
-                }
+                    reader.ReadByte(); // 00
+                    MusicIndex = reader.ReadByte(); // MU
+                }       
             }
 
             if (Offset == 0x15580 + 666)
@@ -279,7 +280,13 @@ namespace sth1edwv
             Palette = palettes[_initPalette];
             CyclingPalette = palettes[_paletteCycleIndex + 8];
 
-            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true);
+            // The tile palette is effectively the first cycling palette entry...
+            TilePalette = CyclingPalette.GetSubPalette(0, 16);
+            SpritePalette = Palette.GetSubPalette(16, 16);
+
+            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true, false);
+
+            SpriteTileSet = cartridge.GetTileSet(_spriteArtAddress + _spriteArtPage * 0x4000, false, true);
 
             Floor = cartridge.GetFloor(
                 _floorAddress + 0x14000, 
@@ -288,6 +295,11 @@ namespace sth1edwv
             BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
+
+        [Browsable(false)]
+        public Palette SpritePalette { get; }
+        [Browsable(false)]
+        public Palette TilePalette { get; }
 
 
         public override string ToString()
@@ -338,8 +350,8 @@ namespace sth1edwv
             writer.Write((ushort)Floor.GetData().Count); // compressed size in bytes
             writer.Write((ushort)(BlockMapping.Blocks[0].Offset - 0x10000)); // relative to 0x10000
             writer.Write((ushort)(TileSet.Offset - 0x30000)); // Relative to 0x30000
-            writer.Write((ushort)_spriteArtAddress); // CPU address when paged in
             writer.Write((byte)_spriteArtPage); // Page for the above, using slot 2
+            writer.Write((ushort)_spriteArtAddress); // CPU address when paged in
             writer.Write((byte)_initPalette); // Index of palette
             writer.Write((byte)PaletteCycleRate); // Number of frames between palette cycles
             writer.Write((byte)_paletteCycleCount); // Number of palette cycles in a loop

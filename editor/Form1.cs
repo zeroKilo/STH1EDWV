@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -92,7 +91,8 @@ namespace sth1edwv
             floorEditor1.SetData(level);
             LevelRenderModeChanged(null, EventArgs.Empty);
 
-            levelTilePicker.SetData(level?.TileSet.Tiles, level?.CyclingPalette);
+            tileSetViewer.SetData(level?.TileSet, level?.TilePalette, false, GetTileUsedInBlocks);
+            spriteTileSetViewer.SetData(level?.SpriteTileSet, level?.SpritePalette, true, null);
 
             LoadLevelData();
 
@@ -103,13 +103,22 @@ namespace sth1edwv
 
             dataGridViewBlocks.DataSource = level == null 
                 ? null 
-                : new BindingListView<BlockRow>(level.BlockMapping.Blocks.Select(x => new BlockRow(x, level.CyclingPalette)).ToList());
+                : new BindingListView<BlockRow>(level.BlockMapping.Blocks.Select(x => new BlockRow(x, level.TilePalette)).ToList());
             dataGridViewBlocks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
 
-            layoutBlockChooser.SetData(level?.BlockMapping.Blocks, level?.CyclingPalette);
+            layoutBlockChooser.SetData(level?.BlockMapping.Blocks, level?.TilePalette);
+        }
 
-            // Invalidate the selected tile view
-            levelTilePicker.SelectedIndex = -1;
+        private IList<Block> GetTileUsedInBlocks(int index)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return new List<Block>();
+            }
+
+            return level.BlockMapping.Blocks
+                .Where(block => block.TileIndices.Contains((byte)index))
+                .ToList();
         }
 
         private void LoadLevelData()
@@ -133,65 +142,6 @@ namespace sth1edwv
             floorEditor1.LevelBounds = buttonLevelBounds.Checked;
             floorEditor1.BlockNumbers = buttonBlockNumbers.Checked;
             floorEditor1.WithObjects = buttonShowObjects.Checked;
-        }
-
-        private void tilePicker1_SelectionChanged(object sender, IDrawableBlock b)
-        {
-            var tile = b as Tile;
-            pictureBoxTilePreview.Image = null;
-            pictureBoxTilePreview.Image?.Dispose();
-            pictureBoxTileUsedIn.Image = null;
-            pictureBoxTileUsedIn.Image?.Dispose();
-            if (tile == null)
-            {
-                return;
-            }
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
-            var shortestSize = Math.Min(pictureBoxTilePreview.Width, pictureBoxTilePreview.Height);
-            var zoom = shortestSize / 8.0f;
-            var bmp = new Bitmap(shortestSize, shortestSize);
-            using (var g = Graphics.FromImage(bmp))
-            {
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.ScaleTransform(zoom, zoom);
-                g.DrawImageUnscaled(tile.GetImage(level.CyclingPalette), 0, 0);
-            }
-
-            pictureBoxTilePreview.Image = bmp;
-
-            var blocks = level.BlockMapping.Blocks
-                .Where(block => block.TileIndices.Contains((byte)tile.Index))
-                .ToList();
-            if (blocks.Count == 0)
-            {
-                return;
-            }
-
-            var image = new Bitmap(blocks.Count * 33 - 1, 48);
-            var x = 0;
-            using (var g = Graphics.FromImage(image))
-            {
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.Clear(SystemColors.Window);
-                foreach (var block in blocks)
-                {
-                    g.DrawImageUnscaled(block.GetImage(level.CyclingPalette), x, 0);
-                    g.DrawString(block.Index.ToString("X2"), Font, SystemBrushes.WindowText, 
-                        new RectangleF(x, 32, 32, 16),
-                        new StringFormat
-                        {
-                            Alignment = StringAlignment.Center
-                        });
-                    x += 33;
-                }
-            }
-
-            pictureBoxTileUsedIn.Image = image;
         }
 
         private Block GetSelectedBlock()
@@ -233,7 +183,7 @@ namespace sth1edwv
                     var tile = block.TileSet.Tiles[block.TileIndices[i]];
                     var x = i % 4 * _blockEditorTileSize - 1;
                     var y = i / 4 * _blockEditorTileSize - 1;
-                    g.DrawImage(tile.GetImage(level.CyclingPalette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
+                    g.DrawImage(tile.GetImage(level.TilePalette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
                 }
             }
 
@@ -260,7 +210,7 @@ namespace sth1edwv
             }
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
-            using var tc = new TileChooser(block.TileSet, tileIndex, level.CyclingPalette);
+            using var tc = new TileChooser(block.TileSet, tileIndex, level.TilePalette);
             if (tc.ShowDialog(this) != DialogResult.OK)
             {
                 return;
@@ -493,92 +443,6 @@ namespace sth1edwv
             floorStatus.Text = $"Floor space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
         }
 
-        private void buttonSaveTileset_Click(object sender, EventArgs e)
-        {
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
-
-            using var d = new SaveFileDialog { Filter = "PNG images|*.png" };
-            if (d.ShowDialog(this) != DialogResult.OK)
-            {
-                return;
-            }
-            using var image = level.TileSet.ToImage(level.CyclingPalette);
-            image.Save(d.FileName, ImageFormat.Png);
-        }
-
-        private void buttonLoadTileset_Click(object sender, EventArgs e)
-        {
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
-
-            using var d = new OpenFileDialog { Filter = "Images|*.png" };
-            if (d.ShowDialog(this) != DialogResult.OK)
-            {
-                return;
-            }
-
-            using var image = (Bitmap) new ImageConverter().ConvertFrom(File.ReadAllBytes(d.FileName));
-            if (image == null)
-            {
-                MessageBox.Show(this, "Failed to load image");
-                return;
-            }
-
-            try
-            {
-                level.TileSet.FromImage(image);
-
-                // Invalidate any blocks using it
-                foreach (var block in _cartridge.Levels
-                    .Where(x => x.TileSet == level.TileSet)
-                    .Select(x => x.BlockMapping)
-                    .SelectMany(x => x.Blocks))
-                {
-                    block.ResetImages();
-                }
-
-                // Invalidate the tileset picker
-                levelTilePicker.Invalidate();
-                // Trigger the tile view to redraw
-                tilePicker1_SelectionChanged(levelTilePicker, levelTilePicker.SelectedItem);
-
-                // Mark the level as needing a redraw
-                floorEditor1.Invalidate();
-
-                UpdateTileSetSpace();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(this, ex.Message);
-            }
-        }
-
-        private void buttonBlankUnusedTiles_Click(object sender, EventArgs e)
-        {
-            if (listBoxLevels.SelectedItem is not Level level)
-            {
-                return;
-            }
-
-            var tilesUsed = new HashSet<int>(level.BlockMapping.Blocks.SelectMany(b => b.TileIndices).Select(b => (int)b));
-
-            foreach (var tile in level.TileSet.Tiles.Where(t => !tilesUsed.Contains(t.Index)))
-            {
-                // Tile is unused
-                tile.CopyFrom(level.TileSet.Tiles[0]);
-            }
-
-            // Invalidate the tileset picker
-            levelTilePicker.Invalidate();
-
-            UpdateTileSetSpace();
-        }
-
         private void listBoxScreens_SelectedIndexChanged(object sender, EventArgs e)
         {
             propertyGrid1.SelectedObject = listBoxScreens.SelectedItem;
@@ -602,9 +466,19 @@ namespace sth1edwv
 
         private void UpdateTileSetSpace()
         {
-            var used = _cartridge.GetTileSetSpace();
-            tileSetStatus.Text = $"Tile set space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
+            var backgrounds = _cartridge.GetFloorTileSetSpace();
+            var sprites = _cartridge.GetSpriteTileSetSpace();
+            tileSetStatus.Text = $"Tile set space: backgrounds {backgrounds.Used}/{backgrounds.Total} ({(double)backgrounds.Used/backgrounds.Total:P}), sprites {sprites.Used}/{sprites.Total} ({(double)sprites.Used/sprites.Total:P})";
         }
 
+        private void spriteTileSetViewer_Changed(TileSet tileSet)
+        {
+            UpdateTileSetSpace();
+        }
+
+        private void tileSetViewer_Changed(TileSet obj)
+        {
+            UpdateTileSetSpace();
+        }
     }
 }

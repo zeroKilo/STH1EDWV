@@ -35,15 +35,9 @@ namespace sth1edwv
             // 
             // ItemPicker
             // 
-            this.DoubleBuffered = true;
             this.Name = "ItemPicker";
             this.Size = new System.Drawing.Size(227, 217);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.TilePicker_Paint);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUp);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnMouseClick);
-            this.Resize += new System.EventHandler(this.OnResize);
             this.ResumeLayout(false);
-
         }
 
         #endregion

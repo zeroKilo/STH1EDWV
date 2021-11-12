@@ -42,7 +42,7 @@ namespace sth1edwv
                 return;
             }
             _floor = level.Floor;
-            _palette = level.CyclingPalette;
+            _palette = level.TilePalette;
             _tileSet = level.TileSet;
             _blockMapping = level.BlockMapping;
             _objects = level.Objects;
