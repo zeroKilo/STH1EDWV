@@ -42,9 +42,8 @@ namespace sth1edwv
             {
                 return;
             }
-            var shortestSize = Math.Min(pictureBoxTilePreview.Width, pictureBoxTilePreview.Height);
-            var zoom = shortestSize / 8.0f;
-            var bmp = new Bitmap(shortestSize, shortestSize);
+            var zoom = Math.Min((float)pictureBoxTilePreview.Width / tile.Width, (float)pictureBoxTilePreview.Height / tile.Height);
+            var bmp = new Bitmap((int)(tile.Width * zoom), (int)(tile.Height * zoom));
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
