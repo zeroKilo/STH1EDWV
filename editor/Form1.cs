@@ -43,11 +43,12 @@ namespace sth1edwv
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using var d = new OpenFileDialog{Filter = "*.sms|*.sms"};
-            if (d.ShowDialog(this) == DialogResult.OK)
+            if (d.ShowDialog(this) != DialogResult.OK)
             {
-                _cartridge?.Dispose();
-                LoadFile(d.FileName);
+                return;
             }
+            _cartridge?.Dispose();
+            LoadFile(d.FileName);
         }
 
         private void LoadFile(string filename)
@@ -260,19 +261,20 @@ namespace sth1edwv
             var subBlockIndex = x + y * 4;
             var tileIndex = block.TileIndices[subBlockIndex];
             using var tc = new TileChooser(block.TileSet, tileIndex, level.CyclingPalette);
-            if (tc.ShowDialog(this) == DialogResult.OK)
+            if (tc.ShowDialog(this) != DialogResult.OK)
             {
-                // Apply to the block object
-                block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
-                // Invalidate its cached image
-                block.ResetImages();
-                // Trigger a redraw of the editor
-                DrawBlockEditor();
-                // And the grid
-                dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
-                // And the rendered level
-                floorEditor1.Invalidate();
+                return;
             }
+            // Apply to the block object
+            block.TileIndices[subBlockIndex] = (byte)tc.SelectedTile.Index;
+            // Invalidate its cached image
+            block.ResetImages();
+            // Trigger a redraw of the editor
+            DrawBlockEditor();
+            // And the grid
+            dataGridViewBlocks.InvalidateRow(dataGridViewBlocks.SelectedRows[0].Index);
+            // And the rendered level
+            floorEditor1.Invalidate();
         }
 
         private void saveROMToolStripMenuItem_Click(object sender, EventArgs e)
@@ -293,20 +295,21 @@ namespace sth1edwv
             }
 
             using var chooser = new ObjectChooser(levelObject);
-            if (chooser.ShowDialog(this) == DialogResult.OK)
+            if (chooser.ShowDialog(this) != DialogResult.OK)
             {
-                levelObject.X = Convert.ToByte(chooser.textBoxX.Text);
-                levelObject.Y = Convert.ToByte(chooser.textBoxY.Text);
-                levelObject.Type = Convert.ToByte(chooser.textBoxType.Text);
+                return;
+            }
+            levelObject.X = Convert.ToByte(chooser.textBoxX.Text);
+            levelObject.Y = Convert.ToByte(chooser.textBoxY.Text);
+            levelObject.Type = Convert.ToByte(chooser.textBoxType.Text);
 
-                // Refresh the level data
-                LoadLevelData();
+            // Refresh the level data
+            LoadLevelData();
 
-                // And the level map may be different
-                if (floorEditor1.WithObjects)
-                {
-                    floorEditor1.Invalidate();
-                }
+            // And the level map may be different
+            if (floorEditor1.WithObjects)
+            {
+                floorEditor1.Invalidate();
             }
         }
 
@@ -319,28 +322,29 @@ namespace sth1edwv
             var input = Interaction.InputBox(
                 "Please enter new game text, format X;Y;TEXT\n(TEXT can be 'A'-'Z', ' ' and '©')", "Edit game text",
                 $"{text.X};{text.Y};{text.Text}");
-            if (input != "")
+            if (input == "")
             {
-                try
-                {
-                    var match = Regex.Match(input, "^(?<x>\\d+);(?<y>\\d+);(?<text>.+)$");
-                    if (!match.Success)
-                    {
-                        throw new Exception("Invalid text entered");
-                    }
-
-                    text.Text = match.Groups["text"].Value;
-                    text.X = Convert.ToByte(match.Groups["x"].Value);
-                    text.Y = Convert.ToByte(match.Groups["y"].Value);
-                }
-                catch (Exception exception)
-                {
-                    MessageBox.Show(this, exception.Message);
-                }
-
-                // This makes the listbox re-get the text
-                listBoxGameText.Items[listBoxGameText.SelectedIndex] = text;
+                return;
             }
+            try
+            {
+                var match = Regex.Match(input, "^(?<x>\\d+);(?<y>\\d+);(?<text>.+)$");
+                if (!match.Success)
+                {
+                    throw new Exception("Invalid text entered");
+                }
+
+                text.Text = match.Groups["text"].Value;
+                text.X = Convert.ToByte(match.Groups["x"].Value);
+                text.Y = Convert.ToByte(match.Groups["y"].Value);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(this, exception.Message);
+            }
+
+            // This makes the listbox re-get the text
+            listBoxGameText.Items[listBoxGameText.SelectedIndex] = text;
         }
 
         private void toolStripButtonSaveRenderedLevel_Click(object sender, EventArgs e)
@@ -411,22 +415,24 @@ namespace sth1edwv
 
         private void dataGridViewBlocks_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
-            if (e.Control is ComboBox combo)
+            if (e.Control is not ComboBox combo)
             {
-                combo.DrawMode = DrawMode.OwnerDrawFixed;
-                combo.ItemHeight = _solidityImages.ImageSize.Height + 1;
-                combo.DrawItem -= DrawSolidityComboItem;
-                combo.DrawItem += DrawSolidityComboItem;
+                return;
             }
+            combo.DrawMode = DrawMode.OwnerDrawFixed;
+            combo.ItemHeight = _solidityImages.ImageSize.Height + 1;
+            combo.DrawItem -= DrawSolidityComboItem;
+            combo.DrawItem += DrawSolidityComboItem;
         }
 
         private void DrawSolidityComboItem(object sender, DrawItemEventArgs e)
         {
-            if (e.Index >= 0)
+            if (e.Index < 0)
             {
-                e.DrawBackground();
-                DrawSolidityItem(e.Graphics, e.Index, e.Bounds);
+                return;
             }
+            e.DrawBackground();
+            DrawSolidityItem(e.Graphics, e.Index, e.Bounds);
         }
 
         private void dataGridViewBlocks_DataError(object sender, DataGridViewDataErrorEventArgs e)
@@ -495,11 +501,12 @@ namespace sth1edwv
             }
 
             using var d = new SaveFileDialog { Filter = "PNG images|*.png" };
-            if (d.ShowDialog(this) == DialogResult.OK)
+            if (d.ShowDialog(this) != DialogResult.OK)
             {
-                using var image = level.TileSet.ToImage(level.CyclingPalette);
-                image.Save(d.FileName, ImageFormat.Png);
+                return;
             }
+            using var image = level.TileSet.ToImage(level.CyclingPalette);
+            image.Save(d.FileName, ImageFormat.Png);
         }
 
         private void buttonLoadTileset_Click(object sender, EventArgs e)

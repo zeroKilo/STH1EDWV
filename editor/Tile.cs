@@ -44,7 +44,7 @@ namespace sth1edwv
                 new Rectangle(0, 0, 8, 8),
                 ImageLockMode.WriteOnly,
                 PixelFormat.Format8bppIndexed);
-            for (int row = 0; row < 8; ++row)
+            for (var row = 0; row < 8; ++row)
             {
                 // Copy indices one row at a time
                 Marshal.Copy(_data, row * 8, data.Scan0 + row * data.Stride, 8);

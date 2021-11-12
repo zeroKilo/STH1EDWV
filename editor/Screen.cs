@@ -9,13 +9,15 @@ namespace sth1edwv
     {
         private Bitmap _image;
 
+        // ReSharper disable MemberCanBePrivate.Global
         public string Name { get; }
 
         public TileSet TileSet { get; }
 
         public Palette Palette { get; }
 
-        public List<ushort> Tilemap { get; }
+        public List<ushort> TileMap { get; }
+        // ReSharper restore MemberCanBePrivate.Global
 
         public Screen(Cartridge cartridge, string name, int tileSetReferenceOffset,
             int tileSetBankOffset, int paletteReferenceOffset, int tileMapReferenceOffset, int tileMapSizeOffset,
@@ -26,17 +28,17 @@ namespace sth1edwv
             Palette = cartridge.GetPalette(paletteOffset, 1);
             // Tile set reference is relative to the start of its bank
             var tileSetOffset = cartridge.Memory.Word(tileSetReferenceOffset) + cartridge.Memory[tileSetBankOffset] * 0x4000;
-            TileSet = cartridge.GetTileSet(tileSetOffset, Palette, false);
+            TileSet = cartridge.GetTileSet(tileSetOffset, false);
             // Tile map offset is as pages in slot 1 (TODO always?)
             var tileMapOffset = cartridge.Memory.Word(tileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
             var tileMapSize = cartridge.Memory.Word(tileMapSizeOffset);
-            Tilemap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize)
+            TileMap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize)
                 .Select(b => (ushort)b)
                 .ToList();
             if (secondaryTileMapReferenceOffset != 0)
             {
-                tileMapOffset = cartridge.Memory.Word(tileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
-                tileMapSize = cartridge.Memory.Word(tileMapSizeOffset);
+                tileMapOffset = cartridge.Memory.Word(secondaryTileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
+                tileMapSize = cartridge.Memory.Word(secondaryTileMapSizeOffset);
                 var secondaryTileMap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize);
 
                 // Apply to the tilemap
@@ -46,11 +48,11 @@ namespace sth1edwv
                     if (index == 0xff)
                     {
                         //  Assume the primary one is therefore foreground
-                        Tilemap[i] |= 0x1000;
+                        TileMap[i] |= 0x1000;
                     }
                     else
                     {
-                        Tilemap[i] = secondaryTileMap[i];
+                        TileMap[i] = secondaryTileMap[i];
                     }
                 }
             }
@@ -65,20 +67,21 @@ namespace sth1edwv
         {
             get
             {
-                if (_image == null)
+                if (_image != null)
                 {
-                    _image = new Bitmap(256, 192);
-                    using var g = Graphics.FromImage(_image);
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    for (var i = 0; i < Tilemap.Count; ++i)
+                    return _image;
+                }
+                _image = new Bitmap(256, 192);
+                using var g = Graphics.FromImage(_image);
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                for (var i = 0; i < TileMap.Count; ++i)
+                {
+                    var x = i % 32 * 8;
+                    var y = i / 32 * 8;
+                    var index = TileMap[i];
+                    if (index != 0xff)
                     {
-                        var x = i % 32 * 8;
-                        var y = i / 32 * 8;
-                        var index = Tilemap[i];
-                        if (index != 0xff)
-                        {
-                            g.DrawImageUnscaled(TileSet.Tiles[index].GetImage(Palette), x, y);
-                        }
+                        g.DrawImageUnscaled(TileSet.Tiles[index].GetImage(Palette), x, y);
                     }
                 }
 

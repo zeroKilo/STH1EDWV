@@ -12,7 +12,6 @@ namespace sth1edwv
         // We thinly wrap a list
         public IEnumerator<LevelObject> GetEnumerator() => _objects.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _objects.GetEnumerator();
-        public LevelObject this[int index] => _objects[index];
 
         private readonly List<LevelObject> _objects;
 

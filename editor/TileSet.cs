@@ -18,7 +18,7 @@ namespace sth1edwv
         private readonly double _compression;
         public List<Tile> Tiles { get; } = new();
 
-        public TileSet(Cartridge cartridge, int offset, Palette palette, bool addRings)
+        public TileSet(Cartridge cartridge, int offset, bool addRings)
         {
             Offset = offset;
             _magic = cartridge.Memory.Word(offset);
@@ -116,7 +116,7 @@ namespace sth1edwv
                     ImageLockMode.ReadOnly,
                     PixelFormat.Format8bppIndexed);
                 var rowData = new byte[8];
-                for (int row = 0; row < 8; ++row)
+                for (var row = 0; row < 8; ++row)
                 {
                     Marshal.Copy(
                         sourceData.Scan0 + row * sourceData.Stride,
@@ -161,7 +161,7 @@ namespace sth1edwv
                 var tileX = tile.Index % 16 * 8;
                 var tileY = tile.Index / 16 * 8;
 
-                for (int row = 0; row < 8; ++row)
+                for (var row = 0; row < 8; ++row)
                 {
                     // Copy source data into the buffer
                     Marshal.Copy(

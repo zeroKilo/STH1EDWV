@@ -173,13 +173,14 @@ namespace sth1edwv
 
         private void InvalidateItem(int index)
         {
-            if (index != -1)
+            if (index == -1)
             {
-                // Clear the old selection
-                var rect = ScreenRectFromIndex(index);
-                rect.Inflate(2, 2);
-                Invalidate(rect);
+                return;
             }
+            // Clear the old selection
+            var rect = ScreenRectFromIndex(index);
+            rect.Inflate(2, 2);
+            Invalidate(rect);
         }
 
         public IDrawableBlock SelectedItem => SelectedIndex == -1 ? null : _items[SelectedIndex];
@@ -189,14 +190,15 @@ namespace sth1edwv
             get => _selectedIndex;
             set
             {
-                if (_selectedIndex != value)
+                if (_selectedIndex == value)
                 {
-                    var previousSelection = _selectedIndex;
-                    _selectedIndex = value;
-                    InvalidateItem(previousSelection);
-                    InvalidateItem(_selectedIndex);
-                    SelectionChanged?.Invoke(this, SelectedItem);
+                    return;
                 }
+                var previousSelection = _selectedIndex;
+                _selectedIndex = value;
+                InvalidateItem(previousSelection);
+                InvalidateItem(_selectedIndex);
+                SelectionChanged?.Invoke(this, SelectedItem);
             }
         }
 
@@ -219,6 +221,8 @@ namespace sth1edwv
                 case Keys.Right:
                     ++newSelection;
                     break;
+                default:
+                    return;
             }
 
             SelectedIndex = Math.Max(0, Math.Min(_items.Count - 1, newSelection));

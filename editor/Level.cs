@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Windows.Forms;
-using sth1edwv.Properties;
 
 namespace sth1edwv
 {
@@ -203,9 +200,6 @@ namespace sth1edwv
         private readonly int _offsetObjectLayout;
         private readonly int _initPalette;
 
-        // Size of blocks used when last rendered, used for turning clicks back into block locations
-        private int _blockSize;
-
         // These should be encapsulated by a sprite art object
         private readonly int _spriteArtAddress;
         private readonly int _spriteArtPage;
@@ -285,13 +279,13 @@ namespace sth1edwv
             Palette = palettes[_initPalette];
             CyclingPalette = palettes[_paletteCycleIndex + 8];
 
-            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, CyclingPalette, true);
+            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true);
 
             Floor = cartridge.GetFloor(
                 _floorAddress + 0x14000, 
                 _floorSize, 
                 _floorWidth);
-            BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet, Palette);
+            BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
 
@@ -323,126 +317,6 @@ namespace sth1edwv
             };
             result.Expand();
             return result;
-        }
-
-        public Bitmap Render(bool withObjects, bool blockGaps, bool tileGaps, bool blockLabels, bool levelBounds)
-        {   
-            _blockSize = 32;
-            var tileSize = 8;
-            if (tileGaps)
-            {
-                _blockSize += 4;
-                ++tileSize;
-            }
-
-            if (blockGaps)
-            {
-                ++_blockSize;
-            }
-
-            var result = new Bitmap(_floorWidth * _blockSize, _floorHeight * _blockSize);
-            using var f = new Font(SystemFonts.MessageBoxFont.FontFamily, 8.0f);
-            using var g = Graphics.FromImage(result);
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.Clear(SystemColors.Window);
-
-            for (var blockX = 0; blockX < _floorWidth; ++blockX)
-            for (var blockY = 0; blockY < _floorHeight; ++blockY)
-            {
-                var blockIndex = Floor.BlockIndices[blockX + blockY * _floorWidth];
-                if (blockIndex < BlockMapping.Blocks.Count)
-                {
-                    var block = BlockMapping.Blocks[blockIndex];
-                    for (var tileX = 0; tileX < 4; ++tileX)
-                    for (var tileY = 0; tileY < 4; ++tileY)
-                    {
-                        var tileIndex = block.TileIndices[tileX + tileY * 4];
-                        if (tileIndex < TileSet.Tiles.Count)
-                        {
-                            var tile = TileSet.Tiles[tileIndex];
-                            var x = blockX * _blockSize + tileX * tileSize;
-                            var y = blockY * _blockSize + tileY * tileSize;
-                            g.DrawImageUnscaled(tile.GetImage(CyclingPalette), x, y);
-                        }
-                    }
-                }
-                else
-                {
-                    g.DrawIcon(SystemIcons.Error, new Rectangle(blockX * _blockSize, blockY * _blockSize, 32, 32));
-                }
-
-                if (blockLabels)
-                {
-                    g.DrawString(blockIndex.ToString("X2"), f, Brushes.Black, blockX * _blockSize,
-                        blockY * _blockSize - 1);
-                    g.DrawString(blockIndex.ToString("X2"), f, Brushes.White, blockX * _blockSize - 1,
-                        blockY * _blockSize - 2);
-                }
-            }
-
-            if (withObjects)
-            {
-                var image = Resources.package;
-                // Draw objects
-                void DrawObject(int x, int y, string label)
-                {
-                    x *= _blockSize;
-                    y *= _blockSize;
-                    g.DrawRectangle(Pens.Blue, x, y, _blockSize, _blockSize);
-                    g.DrawImageUnscaled(image, x + _blockSize / 2 - image.Width / 2,
-                        y + _blockSize / 2 - image.Height / 2);
-
-                    var dims = g.MeasureString(label, f).ToSize();
-
-                    y += _blockSize;
-                    if (y + dims.Height > result.Height)
-                    {
-                        y -= _blockSize + dims.Height;
-                    }
-                    g.FillRectangle(Brushes.Blue, x, y, dims.Width, dims.Height);
-                    g.DrawString(label, f, Brushes.White, x, y);
-                }
-
-                foreach (var levelObject in Objects)
-                {
-                    if (LevelObject.Names.TryGetValue(levelObject.Type, out var name))
-                    {
-                        DrawObject(levelObject.X, levelObject.Y, name);
-                    }
-                    else
-                    {
-                        DrawObject(levelObject.X, levelObject.Y, levelObject.Type.ToString("X2"));
-                    }
-                }
-
-                DrawObject(StartX, StartY, "Sonic");
-            }
-
-            if (levelBounds)
-            {
-                var left = LeftPixels + LeftPixels / 32 * (_blockSize - 32) + 8;
-                var top = TopPixels + TopPixels / 32 * (_blockSize - 32);
-                var right = RightEdgeFactor * _blockSize * 8 + (256 / 32 * _blockSize);
-                var bottom = BottomEdgeFactor * _blockSize * 8 + (192 / 32 * _blockSize) + ExtraHeight;
-                var rect = new Rectangle(left, top, right - left, bottom - top);
-                // Draw the grey region
-                using var brush = new SolidBrush(Color.FromArgb(128, Color.Black));
-                g.SetClip(rect, CombineMode.Exclude);
-                g.FillRectangle(brush, 0, 0, result.Width, result.Height);
-                // Draw the red border, a bit bigger so it's on the outside
-                rect.Width += 1;
-                rect.Height += 1;
-                g.DrawRectangle(Pens.Red, rect);
-            }
-
-            return result;
-        }
-
-        public void AdjustPixelsToTile(ref int x, ref int y)
-        {
-            x /= _blockSize;
-            y /= _blockSize;
         }
 
         public IList<byte> GetData()

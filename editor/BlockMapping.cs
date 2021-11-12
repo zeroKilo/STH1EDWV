@@ -8,7 +8,7 @@ namespace sth1edwv
     {
         public List<Block> Blocks { get; } = new();
     
-        public BlockMapping(Cartridge cartridge, int address, int solidityIndex, TileSet tileSet, Palette palette)
+        public BlockMapping(Cartridge cartridge, int address, int solidityIndex, TileSet tileSet)
         {
             // Hard-coded block counts...
             // TODO: make these safer?

@@ -7,7 +7,8 @@ namespace sth1edwv
     public class Palette
     {
         private readonly int _offset;
-        public IList<Color> Colors { get; } = new List<Color>();
+        private readonly IList<Color> _colors = new List<Color>();
+
         public ColorPalette ImagePalette { get; }
 
         public Palette(IReadOnlyList<byte> mem, int offset, int paletteCount)
@@ -19,25 +20,25 @@ namespace sth1edwv
                 var r = ScaleColor((color >> 0) & 0b11);
                 var g = ScaleColor((color >> 2) & 0b11);
                 var b = ScaleColor((color >> 4) & 0b11);
-                Colors.Add(Color.FromArgb(r, g, b));
+                _colors.Add(Color.FromArgb(r, g, b));
             }
 
             // We have to extract a ColorPalette from an image as it blocks us from constructing it...
             using var bmp = new Bitmap(1, 1, PixelFormat.Format8bppIndexed);
             ImagePalette = bmp.Palette;
             // We have to clear the whole palette to non-transparent colours to avoid (1) the default palette and (2) an image that GDI+ transforms to 32bpp on load
-            for (int i = 0; i < 256; ++i)
+            for (var i = 0; i < 256; ++i)
             {
                 ImagePalette.Entries[i] = Color.Magenta;
             }
 
             // Then we apply the real palette to the start
-            Colors.CopyTo(ImagePalette.Entries, 0);
+            _colors.CopyTo(ImagePalette.Entries, 0);
         }
 
         public override string ToString()
         {
-            return $"{Colors.Count} colours @ {_offset:X}";
+            return $"{_colors.Count} colours @ {_offset:X}";
         }
 
         private static int ScaleColor(int c) => c switch
@@ -67,7 +68,7 @@ namespace sth1edwv
 
         public Image ToImage(int width)
         {
-            var rows = Colors.Count / 16;
+            var rows = _colors.Count / 16;
             var rectSize = width / 16;
             var bmp = new Bitmap(width, rows * rectSize);
             using var g = Graphics.FromImage(bmp);
@@ -76,7 +77,7 @@ namespace sth1edwv
                 for (var x = 0; x < 16; x++)
                 {
                     var index = x + y * 16;
-                    using var b = new SolidBrush(Colors[index]);
+                    using var b = new SolidBrush(_colors[index]);
                     g.FillRectangle(b, rectSize*x, rectSize*y, rectSize, rectSize);
                 }
             }

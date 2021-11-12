@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 
 namespace sth1edwv
@@ -89,7 +88,7 @@ namespace sth1edwv
             Offset = tilesOffset;
             SolidityOffset = solidityOffset;
             Index = index;
-            for (int i = 0; i < 16; ++i)
+            for (var i = 0; i < 16; ++i)
             {
                 TileIndices[i] = cartridgeMemory[tilesOffset + i];
             }

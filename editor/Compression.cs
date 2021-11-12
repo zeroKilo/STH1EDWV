@@ -55,8 +55,8 @@ namespace sth1edwv
             {
                 // Look for a run of bytes
                 var b = m.ReadByte();
-                var counter = 1;
-                for (; counter < 257; ++counter)
+                var runLength = 1;
+                for (; runLength < 257; ++runLength)
                 {
                     var next = m.ReadByte();
                     if (next == -1)
@@ -74,11 +74,11 @@ namespace sth1edwv
                 }
                 // And emit
                 result.WriteByte((byte)b);
-                if (counter > 1)
+                if (runLength > 1)
                 {
                     result.WriteByte((byte)b);
-                    --counter; // stored as n-1
-                    result.WriteByte((byte)counter);
+                    --runLength; // stored as n-1
+                    result.WriteByte((byte)runLength);
                 }
             }
             return result.ToArray();
@@ -143,7 +143,7 @@ namespace sth1edwv
 
         public static IEnumerable<byte> PlanarToChunky(IReadOnlyList<byte> data, int offset, int rowCount)
         {
-            for (int row = 0; row < rowCount; ++row)
+            for (var row = 0; row < rowCount; ++row)
             {
                 // Each pixel is from four bitplanes
                 for (var i = 0; i < 8; ++i)

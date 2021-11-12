@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 
 namespace sth1edwv
 {
@@ -60,7 +58,7 @@ namespace sth1edwv
                     TileMapSizeOffset = 0x0cb6,
                     SecondaryTileMapReferenceOffset = 0x0cc4, 
                     SecondaryTileMapSizeOffset = 0x0cc7,
-                    PaletteReferenceOffset = 0x0cd5, 
+                    PaletteReferenceOffset = 0x0cd5
                 },
                 new()
                 {
@@ -72,7 +70,7 @@ namespace sth1edwv
                     TileMapSizeOffset = 0x0d18,
                     TileMapBankOffset = 0x0d0d,
                     SecondaryTileMapReferenceOffset = 0x0d26, 
-                    SecondaryTileMapSizeOffset = 0x0d29,
+                    SecondaryTileMapSizeOffset = 0x0d29
                 },
                 new()
                 {
@@ -82,7 +80,7 @@ namespace sth1edwv
                     TileMapBankOffset = 0x12ad,
                     TileMapReferenceOffset = 0x12b5, 
                     TileMapSizeOffset = 0x12bb,
-                    PaletteReferenceOffset = 0x12cd, 
+                    PaletteReferenceOffset = 0x12cd
                 },
                 new()
                 {
@@ -122,7 +120,7 @@ namespace sth1edwv
                     TileSetBankOffset = 0x25b0,
                     TileMapBankOffset = 0x25b5,
                     TileMapReferenceOffset = 0x25bd,
-                    TileMapSizeOffset = 0x25c0,
+                    TileMapSizeOffset = 0x25c0
                 },
                 new()
                 {
@@ -133,7 +131,7 @@ namespace sth1edwv
                     TileSetBankOffset = 0x25b0,
                     TileMapBankOffset = 0x26c2,
                     TileMapReferenceOffset = 0x267e,
-                    TileMapSizeOffset = 0x2681,
+                    TileMapSizeOffset = 0x2681
                 },
                 new()
                 {
@@ -143,45 +141,45 @@ namespace sth1edwv
                     TileMapBankOffset = 0x26c2,
                     TileMapReferenceOffset = 0x26ca,
                     TileMapSizeOffset = 0x26cd,
-                    PaletteReferenceOffset = 0x2703, // TODO: same tileset, different palette... how to resolve this?
+                    PaletteReferenceOffset = 0x2703 // TODO: same tileset, different palette... how to resolve this?
                 }
             },
             Levels = new List<Game.LevelInfo>
             {
-                new() { Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a, },
-                new() { Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f, },
-                new() { Name = "Green Hill Act 3", Offset = 0x15580 + 0x94, },
-                new() { Name = "Bridge Act 1", Offset = 0x15580 + 0xde, },
-                new() { Name = "Bridge Act 2", Offset = 0x15580 + 0x103, },
-                new() { Name = "Bridge Act 3", Offset = 0x15580 + 0x128, },
-                new() { Name = "Jungle Act 1", Offset = 0x15580 + 0x14d, },
-                new() { Name = "Jungle Act 2", Offset = 0x15580 + 0x172, },
-                new() { Name = "Jungle Act 3", Offset = 0x15580 + 0x197, },
-                new() { Name = "Labyrinth Act 1", Offset = 0x15580 + 0x1bc, },
-                new() { Name = "Labyrinth Act 2", Offset = 0x15580 + 0x1e1, },
-                new() { Name = "Labyrinth Act 3", Offset = 0x15580 + 0x206, },
-                new() { Name = "Scrap Brain Act 1", Offset = 0x15580 + 0x22b, },
-                new() { Name = "Scrap Brain Act 2", Offset = 0x15580 + 0x250, },
-                new() { Name = "Scrap Brain Act 3", Offset = 0x15580 + 0x2bf, },
-                new() { Name = "Sky Base Act 1", Offset = 0x15580 + 0x378, },
-                new() { Name = "Sky Base Act 2", Offset = 0x15580 + 0x39d, },
-                new() { Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2, },
-                new() { Name = "Ending Sequence", Offset = 0x15580 + 0xb9, },
-                new() { Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275, },
-                new() { Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a, },
-                new() { Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e, },
-                new() { Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4, },
-                new() { Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309, },
-                new() { Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7, },
-                new() { Name = "Special Stage 1", Offset = 0x15580 + 0x40c, },
-                new() { Name = "Special Stage 2", Offset = 0x15580 + 0x431, },
-                new() { Name = "Special Stage 3", Offset = 0x15580 + 0x456, },
-                new() { Name = "Special Stage 4", Offset = 0x15580 + 0x47b, },
-                new() { Name = "Special Stage 5", Offset = 0x15580 + 0x4a0, },
-                new() { Name = "Special Stage 6", Offset = 0x15580 + 0x4c5, },
-                new() { Name = "Special Stage 7", Offset = 0x15580 + 0x4ea, },
-                new() { Name = "Special Stage 8", Offset = 0x15580 + 0x50f, }
-            },
+                new() { Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a },
+                new() { Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f },
+                new() { Name = "Green Hill Act 3", Offset = 0x15580 + 0x94 },
+                new() { Name = "Bridge Act 1", Offset = 0x15580 + 0xde },
+                new() { Name = "Bridge Act 2", Offset = 0x15580 + 0x103 },
+                new() { Name = "Bridge Act 3", Offset = 0x15580 + 0x128 },
+                new() { Name = "Jungle Act 1", Offset = 0x15580 + 0x14d },
+                new() { Name = "Jungle Act 2", Offset = 0x15580 + 0x172 },
+                new() { Name = "Jungle Act 3", Offset = 0x15580 + 0x197 },
+                new() { Name = "Labyrinth Act 1", Offset = 0x15580 + 0x1bc },
+                new() { Name = "Labyrinth Act 2", Offset = 0x15580 + 0x1e1 },
+                new() { Name = "Labyrinth Act 3", Offset = 0x15580 + 0x206 },
+                new() { Name = "Scrap Brain Act 1", Offset = 0x15580 + 0x22b },
+                new() { Name = "Scrap Brain Act 2", Offset = 0x15580 + 0x250 },
+                new() { Name = "Scrap Brain Act 3", Offset = 0x15580 + 0x2bf },
+                new() { Name = "Sky Base Act 1", Offset = 0x15580 + 0x378 },
+                new() { Name = "Sky Base Act 2", Offset = 0x15580 + 0x39d },
+                new() { Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2 },
+                new() { Name = "Ending Sequence", Offset = 0x15580 + 0xb9 },
+                new() { Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275 },
+                new() { Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a },
+                new() { Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e },
+                new() { Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4 },
+                new() { Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309 },
+                new() { Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7 },
+                new() { Name = "Special Stage 1", Offset = 0x15580 + 0x40c },
+                new() { Name = "Special Stage 2", Offset = 0x15580 + 0x431 },
+                new() { Name = "Special Stage 3", Offset = 0x15580 + 0x456 },
+                new() { Name = "Special Stage 4", Offset = 0x15580 + 0x47b },
+                new() { Name = "Special Stage 5", Offset = 0x15580 + 0x4a0 },
+                new() { Name = "Special Stage 6", Offset = 0x15580 + 0x4c5 },
+                new() { Name = "Special Stage 7", Offset = 0x15580 + 0x4ea },
+                new() { Name = "Special Stage 8", Offset = 0x15580 + 0x50f }
+            }
         };
 
         public Memory Memory { get; }
@@ -233,9 +231,9 @@ namespace sth1edwv
             }
         }
 
-        public TileSet GetTileSet(int offset, Palette palette, bool addRings)
+        public TileSet GetTileSet(int offset, bool addRings)
         {
-            return GetItem(_tileSets, offset, () => new TileSet(this, offset, palette, addRings));
+            return GetItem(_tileSets, offset, () => new TileSet(this, offset, addRings));
         }
 
         public Floor GetFloor(int offset, int compressedSize, int width)
@@ -243,14 +241,14 @@ namespace sth1edwv
             return GetItem(_floors, offset, () => new Floor(this, offset, compressedSize, width));
         }
 
-        public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet, Palette palette)
+        public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet)
         {
-            return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet, palette));
+            return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet));
         }
 
         public Palette GetPalette(int offset, int count)
         {
-            return GetItem(_palettes, offset, () => new Palette(this.Memory, offset, count));
+            return GetItem(_palettes, offset, () => new Palette(Memory, offset, count));
         }
 
         private static T GetItem<T>(IDictionary<int, T> dictionary, int offset, Func<T> generatorFunc) 
@@ -275,85 +273,6 @@ namespace sth1edwv
             {
                 GameText.Add(new GameText(this, 0x197E + i * 0x10, true));
             }
-        }
-
-        private static string RomSizes(int size)
-        {
-            var sb = new StringBuilder();
-            sb.Append(" (");
-            switch (size)
-            {
-                case 0xA:
-                    sb.Append("8KB");
-                    break;
-                case 0xB:
-                    sb.Append("16KB");
-                    break;
-                case 0xC:
-                    sb.Append("32KB");
-                    break;
-                case 0xD:
-                    sb.Append("48KB");
-                    break;
-                case 0xE:
-                    sb.Append("64KB");
-                    break;
-                case 0xF:
-                    sb.Append("128KB");
-                    break;
-                case 0x0:
-                    sb.Append("256KB");
-                    break;
-                case 0x1:
-                    sb.Append("512KB");
-                    break;
-                case 0x2:
-                    sb.Append("1MB");
-                    break;
-            }
-            sb.Append(")");
-            return sb.ToString();
-        }
-
-        private static string Regions(int region)
-        {
-            var sb = new StringBuilder();
-            sb.Append(" (");
-            switch (region)
-            {
-                case 0x3:
-                    sb.Append("SMS Japan");
-                    break;
-                case 0x4:
-                    sb.Append("SMS Export");
-                    break;
-                case 0x5:
-                    sb.Append("GG Japan");
-                    break;
-                case 0x6:
-                    sb.Append("GG Export");
-                    break;
-                case 0x7:
-                    sb.Append("GG International");
-                    break;
-            }
-            sb.Append(")");
-            return sb.ToString();
-        }
-
-        public string MakeSummary()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("Cartridge Header");
-            sb.AppendLine($"Magic        : \"{Memory.String(0x7ff0, 8)}\"");
-            sb.AppendLine($"Reserved     : 0x{Memory[0x7ff8]:X2}{Memory[0x7ff8]:X2}");
-            sb.AppendLine($"Checksum     : 0x{Memory.Word(0x7ffa)}");
-            sb.AppendLine($"Product code : {Memory[0x7ffe] >> 4:X1}{Memory[0x7ffd]:X2}{Memory[0x7ffc]:X2}");
-            sb.AppendLine($"Version      : 0x{Memory[0x7ffe] & 0xf:X1}");
-            sb.AppendLine($"Region       : 0x{Memory[0x7fff] >> 4:X1}{Regions(Memory[0x7fff] >> 4)}");
-            sb.AppendLine($"ROM Size     : 0x{Memory[0x7fff] & 0xf:X1}{RomSizes(Memory[0x7fff] & 0xf)}");
-            sb.AppendLine($"ROM message  : \"{Memory.String(0x3B, 0x2A)}\"");
-            return sb.ToString();
         }
 
         public void Dispose()
@@ -413,7 +332,7 @@ namespace sth1edwv
 
             if (offset > 0x3da28)
             {
-                throw new Exception("Tilesets out of space");
+                throw new Exception("Tile sets out of space");
             }
 
             // - Block mappings (at original offsets)

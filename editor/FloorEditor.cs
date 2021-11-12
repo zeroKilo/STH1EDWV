@@ -37,19 +37,20 @@ namespace sth1edwv
         public void SetData(Level level)
         {
             _level = level;
-            if (level != null)
+            if (level == null)
             {
-                _floor = level.Floor;
-                _palette = level.CyclingPalette;
-                _tileSet = level.TileSet;
-                _blockMapping = level.BlockMapping;
-                _objects = level.Objects;
-
-                _width = _floor.Width;
-                _height = _floor.BlockIndices.Length / _width;
-
-                UpdateSize();
+                return;
             }
+            _floor = level.Floor;
+            _palette = level.CyclingPalette;
+            _tileSet = level.TileSet;
+            _blockMapping = level.BlockMapping;
+            _objects = level.Objects;
+
+            _width = _floor.Width;
+            _height = _floor.BlockIndices.Length / _width;
+
+            UpdateSize();
         }
 
         private void UpdateSize()
@@ -85,12 +86,12 @@ namespace sth1edwv
             }
 
             // We render only the blocks intersecting with the area in question
-            int minX = (clipRectangle.Left - AutoScrollPosition.X)/ _blockSize;
-            int maxX = Math.Min((clipRectangle.Right - AutoScrollPosition.X - 1) / _blockSize, _width - 1);
-            int minY = (clipRectangle.Top - AutoScrollPosition.Y) / _blockSize;
-            int maxY = Math.Min((clipRectangle.Bottom - AutoScrollPosition.Y - 1) / _blockSize, _height - 1);
-            for (int blockY = minY; blockY <= maxY; ++blockY)
-            for (int blockX = minX; blockX <= maxX; ++blockX)
+            var minX = (clipRectangle.Left - AutoScrollPosition.X)/ _blockSize;
+            var maxX = Math.Min((clipRectangle.Right - AutoScrollPosition.X - 1) / _blockSize, _width - 1);
+            var minY = (clipRectangle.Top - AutoScrollPosition.Y) / _blockSize;
+            var maxY = Math.Min((clipRectangle.Bottom - AutoScrollPosition.Y - 1) / _blockSize, _height - 1);
+            for (var blockY = minY; blockY <= maxY; ++blockY)
+            for (var blockX = minX; blockX <= maxX; ++blockX)
             {
                 var blockIndex = _floor.BlockIndices[blockX + blockY * _width];
                 if (blockIndex < _blockMapping.Blocks.Count)
@@ -148,14 +149,12 @@ namespace sth1edwv
 
                 foreach (var levelObject in _objects)
                 {
-                    if (LevelObject.Names.TryGetValue(levelObject.Type, out var name))
-                    {
-                        DrawObject(levelObject.X, levelObject.Y, name);
-                    }
-                    else
-                    {
-                        DrawObject(levelObject.X, levelObject.Y, levelObject.Type.ToString("X2"));
-                    }
+                    DrawObject(
+                        levelObject.X, 
+                        levelObject.Y,
+                        LevelObject.Names.TryGetValue(levelObject.Type, out var name)
+                            ? name
+                            : levelObject.Type.ToString("X2"));
                 }
 
                 DrawObject(_level.StartX, _level.StartY, "Sonic");
@@ -165,8 +164,8 @@ namespace sth1edwv
             {
                 var left = _level.LeftPixels + _level.LeftPixels / 32 * (_blockSize - 32) + 8;
                 var top = _level.TopPixels + _level.TopPixels / 32 * (_blockSize - 32);
-                var right = _level.RightEdgeFactor * _blockSize * 8 + (256 / 32 * _blockSize);
-                var bottom = _level.BottomEdgeFactor * _blockSize * 8 + (192 / 32 * _blockSize) + _level.ExtraHeight;
+                var right = _level.RightEdgeFactor * _blockSize * 8 + 256 / 32 * _blockSize;
+                var bottom = _level.BottomEdgeFactor * _blockSize * 8 + 192 / 32 * _blockSize + _level.ExtraHeight;
                 var rect = new Rectangle(left, top, right - left, bottom - top);
                 // Draw the grey region
                 using var brush = new SolidBrush(Color.FromArgb(128, Color.Black));
