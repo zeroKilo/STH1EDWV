@@ -198,7 +198,6 @@ namespace sth1edwv
         private readonly int _offsetObjectLayout;
         private readonly int _initPalette;
 
-        // These should be encapsulated by a sprite art object
         private readonly int _spriteArtAddress;
         private readonly int _spriteArtPage;
 
@@ -350,8 +349,8 @@ namespace sth1edwv
             writer.Write((ushort)Floor.GetData().Count); // compressed size in bytes
             writer.Write((ushort)(BlockMapping.Blocks[0].Offset - 0x10000)); // relative to 0x10000
             writer.Write((ushort)(TileSet.Offset - 0x30000)); // Relative to 0x30000
-            writer.Write((byte)_spriteArtPage); // Page for the above, using slot 2
-            writer.Write((ushort)_spriteArtAddress); // CPU address when paged in
+            writer.Write((byte)(SpriteTileSet.Offset / 0x4000)); // Page for the below
+            writer.Write((ushort)(SpriteTileSet.Offset % 0x4000)); // Offset from the page above
             writer.Write((byte)_initPalette); // Index of palette
             writer.Write((byte)PaletteCycleRate); // Number of frames between palette cycles
             writer.Write((byte)_paletteCycleCount); // Number of palette cycles in a loop
