@@ -58,7 +58,7 @@ jobs:
       run: |
         cd editor
         nuget restore
-        msbuild sth1edwv.sln /p:Configuration=Release
+        msbuild sth1edwv.sln /p:Configuration=Release /p:UseSharedCompilation=false
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
