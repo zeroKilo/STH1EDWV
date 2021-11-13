@@ -219,9 +219,9 @@ namespace sth1edwv
             {
                 using (var reader = new BinaryReader(stream))
                 {
-                    //   SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
-                    //   FL FS FS BM  BM LA LA 09  SA SA IP CS  CC CP OL OL 
-                    //   SR UW TL 00  MU
+                    // SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
+                    // FL FS FS BM  BM LA LA SP  SA SA IP CS  CC CP OL OL 
+                    // SR UW TL 00  MU
                     _solidityIndex = reader.ReadByte(); // SP
                     _floorWidth = reader.ReadUInt16(); // FW FW
                     _floorHeight = reader.ReadUInt16(); // FH FH
@@ -237,7 +237,7 @@ namespace sth1edwv
                     _floorSize = reader.ReadUInt16(); // FS FS: compressed size in bytes
                     blockMappingOffset = reader.ReadUInt16(); // BM BM: relative to 0x10000
                     _offsetArt = reader.ReadUInt16(); // LA LA: Relative to 0x30000
-                    _spriteArtPage = reader.ReadByte(); // 09: Page for the below, using slot 1
+                    _spriteArtPage = reader.ReadByte(); // SP: Page for the below
                     _spriteArtAddress = reader.ReadUInt16(); // SA SA: offset from start of above bank
                     _initPalette = reader.ReadByte(); // IP: Index of palette
                     PaletteCycleRate = reader.ReadByte(); // CS: Number of frames between palette cycles
@@ -334,28 +334,31 @@ namespace sth1edwv
         {
             using var stream = new MemoryStream();
             using var writer = new BinaryWriter(stream);
-            writer.Write((byte)_solidityIndex);
-            writer.Write((ushort)_floorWidth);
-            writer.Write((ushort)_floorHeight);
-            writer.Write((ushort)LeftPixels);
-            writer.Write(_unknownByte);
-            writer.Write((byte)RightEdgeFactor);
-            writer.Write((ushort)TopPixels);
-            writer.Write((byte)ExtraHeight);
-            writer.Write((byte)BottomEdgeFactor);
-            writer.Write((byte)StartX);
-            writer.Write((byte)StartY);
-            writer.Write((ushort)(Floor.Offset - 0x14000)); // relative to 0x14000
-            writer.Write((ushort)Floor.GetData().Count); // compressed size in bytes
-            writer.Write((ushort)(BlockMapping.Blocks[0].Offset - 0x10000)); // relative to 0x10000
-            writer.Write((ushort)(TileSet.Offset - 0x30000)); // Relative to 0x30000
-            writer.Write((byte)(SpriteTileSet.Offset / 0x4000)); // Page for the below
-            writer.Write((ushort)(SpriteTileSet.Offset % 0x4000)); // Offset from the page above
-            writer.Write((byte)_initPalette); // Index of palette
-            writer.Write((byte)PaletteCycleRate); // Number of frames between palette cycles
-            writer.Write((byte)_paletteCycleCount); // Number of palette cycles in a loop
-            writer.Write((byte)_paletteCycleIndex); // Which cycling palette to use
-            writer.Write((ushort)_offsetObjectLayout); // relative to 0x15580
+            // SP FW FW FH  FH LX LX ??  LW LY LY XH  LH SX SY FL 
+            // FL FS FS BM  BM LA LA SP  SA SA IP CS  CC CP OL OL 
+            // SR UW TL 00  MU
+            writer.Write((byte)_solidityIndex); // SP
+            writer.Write((ushort)_floorWidth); // FW FW
+            writer.Write((ushort)_floorHeight); // FH FH
+            writer.Write((ushort)LeftPixels); // LX LX
+            writer.Write(_unknownByte); // ??
+            writer.Write((byte)RightEdgeFactor); // LW
+            writer.Write((ushort)TopPixels); // LY LY
+            writer.Write((byte)ExtraHeight); // XH
+            writer.Write((byte)BottomEdgeFactor); // LH
+            writer.Write((byte)StartX); // SX
+            writer.Write((byte)StartY); // SY
+            writer.Write((ushort)(Floor.Offset - 0x14000)); // FL FL: relative to 0x14000
+            writer.Write((ushort)Floor.GetData().Count); // FS FS: compressed size in bytes
+            writer.Write((ushort)(BlockMapping.Blocks[0].Offset - 0x10000)); // BM BM: relative to 0x10000
+            writer.Write((ushort)(TileSet.Offset - 0x30000)); // LA LA: Relative to 0x30000
+            writer.Write((byte)(SpriteTileSet.Offset / 0x4000)); // SP: Page for the below
+            writer.Write((ushort)(SpriteTileSet.Offset % 0x4000)); // SA SA: Offset from the page above
+            writer.Write((byte)_initPalette); // IP: Index of palette
+            writer.Write((byte)PaletteCycleRate); // CS: Number of frames between palette cycles
+            writer.Write((byte)_paletteCycleCount); // CC: Number of palette cycles in a loop
+            writer.Write((byte)_paletteCycleIndex); // CP: Which cycling palette to use
+            writer.Write((ushort)_offsetObjectLayout); // OL OL: relative to 0x15580
             var flags = 0;
             if (DemoMode) flags |= 1 << 1;
             if (ShowRings) flags |= 1 << 2;
@@ -364,19 +367,19 @@ namespace sth1edwv
             if (SlowScroll) flags |= 1 << 5;
             if (WaveScrollY) flags |= 1 << 6;
             if (NoScrollDown) flags |= 1 << 7;
-            writer.Write((byte)flags);
+            writer.Write((byte)flags); // SR
             flags = 0;
             if (HasWater) flags |= 1 << 7;
-            writer.Write((byte)flags);
+            writer.Write((byte)flags); // UW
             flags = 0;
             if (SpecialStageTimer) flags |= 1 << 0;
             if (HasLightning) flags |= 1 << 1;
             if (UseUnderwaterBossPalette) flags |= 1 << 4;
             if (ShowTime) flags |= 1 << 5;
             if (DisableScrolling) flags |= 1 << 6;
-            writer.Write((byte)flags);
-            writer.Write((byte)0); // Always 0
-            writer.Write((byte)MusicIndex);
+            writer.Write((byte)flags); // TL
+            writer.Write((byte)0); // 00: Always 0
+            writer.Write((byte)MusicIndex); // MU
             return stream.ToArray();
         }
     }
