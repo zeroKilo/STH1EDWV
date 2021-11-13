@@ -85,6 +85,8 @@ namespace sth1edwv
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.buttonDraw = new System.Windows.Forms.ToolStripButton();
             this.buttonSelect = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.listBoxPalettes = new System.Windows.Forms.ListBox();
@@ -457,9 +459,9 @@ namespace sth1edwv
             this.panel1.AutoScroll = true;
             this.panel1.Controls.Add(this.splitContainer7);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 28);
+            this.panel1.Location = new System.Drawing.Point(3, 26);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(997, 474);
+            this.panel1.Size = new System.Drawing.Size(997, 476);
             this.panel1.TabIndex = 4;
             // 
             // splitContainer7
@@ -477,7 +479,7 @@ namespace sth1edwv
             // splitContainer7.Panel2
             // 
             this.splitContainer7.Panel2.Controls.Add(this.layoutBlockChooser);
-            this.splitContainer7.Size = new System.Drawing.Size(997, 474);
+            this.splitContainer7.Size = new System.Drawing.Size(997, 476);
             this.splitContainer7.SplitterDistance = 705;
             this.splitContainer7.TabIndex = 3;
             // 
@@ -491,7 +493,7 @@ namespace sth1edwv
             this.floorEditor1.LevelBounds = false;
             this.floorEditor1.Location = new System.Drawing.Point(0, 0);
             this.floorEditor1.Name = "floorEditor1";
-            this.floorEditor1.Size = new System.Drawing.Size(705, 474);
+            this.floorEditor1.Size = new System.Drawing.Size(705, 476);
             this.floorEditor1.TabIndex = 0;
             this.floorEditor1.Text = "floorEditor1";
             this.floorEditor1.TileGaps = false;
@@ -507,7 +509,7 @@ namespace sth1edwv
             this.layoutBlockChooser.Name = "layoutBlockChooser";
             this.layoutBlockChooser.Scaling = 1;
             this.layoutBlockChooser.SelectedIndex = -1;
-            this.layoutBlockChooser.Size = new System.Drawing.Size(288, 474);
+            this.layoutBlockChooser.Size = new System.Drawing.Size(288, 476);
             this.layoutBlockChooser.TabIndex = 0;
             // 
             // toolStripLayout
@@ -526,10 +528,13 @@ namespace sth1edwv
             this.toolStripSeparator2,
             this.toolStripLabel2,
             this.buttonDraw,
-            this.buttonSelect});
+            this.buttonSelect,
+            this.toolStripSeparator3,
+            this.toolStripButton1});
+            this.toolStripLayout.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.toolStripLayout.Location = new System.Drawing.Point(3, 3);
             this.toolStripLayout.Name = "toolStripLayout";
-            this.toolStripLayout.Size = new System.Drawing.Size(997, 25);
+            this.toolStripLayout.Size = new System.Drawing.Size(997, 23);
             this.toolStripLayout.TabIndex = 3;
             this.toolStripLayout.Text = "toolStrip1";
             // 
@@ -537,7 +542,7 @@ namespace sth1edwv
             // 
             this.toolStripLabel1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(41, 22);
+            this.toolStripLabel1.Size = new System.Drawing.Size(41, 15);
             this.toolStripLabel1.Text = "Show:";
             // 
             // buttonShowObjects
@@ -548,7 +553,7 @@ namespace sth1edwv
             this.buttonShowObjects.Image = global::sth1edwv.Properties.Resources.package;
             this.buttonShowObjects.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonShowObjects.Name = "buttonShowObjects";
-            this.buttonShowObjects.Size = new System.Drawing.Size(67, 22);
+            this.buttonShowObjects.Size = new System.Drawing.Size(67, 20);
             this.buttonShowObjects.Text = "Objects";
             this.buttonShowObjects.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
@@ -560,7 +565,7 @@ namespace sth1edwv
             this.buttonBlockNumbers.Image = ((System.Drawing.Image)(resources.GetObject("buttonBlockNumbers.Image")));
             this.buttonBlockNumbers.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonBlockNumbers.Name = "buttonBlockNumbers";
-            this.buttonBlockNumbers.Size = new System.Drawing.Size(106, 22);
+            this.buttonBlockNumbers.Size = new System.Drawing.Size(106, 20);
             this.buttonBlockNumbers.Text = "Block numbers";
             this.buttonBlockNumbers.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
@@ -570,7 +575,7 @@ namespace sth1edwv
             this.buttonBlockGaps.Image = ((System.Drawing.Image)(resources.GetObject("buttonBlockGaps.Image")));
             this.buttonBlockGaps.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonBlockGaps.Name = "buttonBlockGaps";
-            this.buttonBlockGaps.Size = new System.Drawing.Size(84, 22);
+            this.buttonBlockGaps.Size = new System.Drawing.Size(84, 20);
             this.buttonBlockGaps.Text = "Block gaps";
             this.buttonBlockGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
@@ -580,7 +585,7 @@ namespace sth1edwv
             this.buttonTileGaps.Image = ((System.Drawing.Image)(resources.GetObject("buttonTileGaps.Image")));
             this.buttonTileGaps.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonTileGaps.Name = "buttonTileGaps";
-            this.buttonTileGaps.Size = new System.Drawing.Size(73, 22);
+            this.buttonTileGaps.Size = new System.Drawing.Size(73, 20);
             this.buttonTileGaps.Text = "Tile gaps";
             this.buttonTileGaps.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
@@ -590,21 +595,21 @@ namespace sth1edwv
             this.buttonLevelBounds.Image = ((System.Drawing.Image)(resources.GetObject("buttonLevelBounds.Image")));
             this.buttonLevelBounds.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonLevelBounds.Name = "buttonLevelBounds";
-            this.buttonLevelBounds.Size = new System.Drawing.Size(97, 22);
+            this.buttonLevelBounds.Size = new System.Drawing.Size(97, 20);
             this.buttonLevelBounds.Text = "Level bounds";
             this.buttonLevelBounds.CheckedChanged += new System.EventHandler(this.LevelRenderModeChanged);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 23);
             // 
             // toolStripButtonSaveRenderedLevel
             // 
             this.toolStripButtonSaveRenderedLevel.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSaveRenderedLevel.Image")));
             this.toolStripButtonSaveRenderedLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonSaveRenderedLevel.Name = "toolStripButtonSaveRenderedLevel";
-            this.toolStripButtonSaveRenderedLevel.Size = new System.Drawing.Size(60, 22);
+            this.toolStripButtonSaveRenderedLevel.Size = new System.Drawing.Size(60, 20);
             this.toolStripButtonSaveRenderedLevel.Text = "Save...";
             this.toolStripButtonSaveRenderedLevel.Click += new System.EventHandler(this.toolStripButtonSaveRenderedLevel_Click);
             // 
@@ -613,7 +618,7 @@ namespace sth1edwv
             this.buttonCopyFloor.Image = ((System.Drawing.Image)(resources.GetObject("buttonCopyFloor.Image")));
             this.buttonCopyFloor.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonCopyFloor.Name = "buttonCopyFloor";
-            this.buttonCopyFloor.Size = new System.Drawing.Size(55, 22);
+            this.buttonCopyFloor.Size = new System.Drawing.Size(55, 20);
             this.buttonCopyFloor.Text = "Copy";
             this.buttonCopyFloor.Click += new System.EventHandler(this.buttonCopyFloor_Click);
             // 
@@ -622,20 +627,20 @@ namespace sth1edwv
             this.buttonPasteFloor.Image = ((System.Drawing.Image)(resources.GetObject("buttonPasteFloor.Image")));
             this.buttonPasteFloor.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonPasteFloor.Name = "buttonPasteFloor";
-            this.buttonPasteFloor.Size = new System.Drawing.Size(55, 22);
+            this.buttonPasteFloor.Size = new System.Drawing.Size(55, 20);
             this.buttonPasteFloor.Text = "Paste";
             this.buttonPasteFloor.Click += new System.EventHandler(this.buttonPasteFloor_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 23);
             // 
             // toolStripLabel2
             // 
             this.toolStripLabel2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(57, 22);
+            this.toolStripLabel2.Size = new System.Drawing.Size(57, 15);
             this.toolStripLabel2.Text = "Drawing:";
             // 
             // buttonDraw
@@ -646,7 +651,7 @@ namespace sth1edwv
             this.buttonDraw.Image = ((System.Drawing.Image)(resources.GetObject("buttonDraw.Image")));
             this.buttonDraw.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonDraw.Name = "buttonDraw";
-            this.buttonDraw.Size = new System.Drawing.Size(54, 22);
+            this.buttonDraw.Size = new System.Drawing.Size(54, 20);
             this.buttonDraw.Text = "Draw";
             this.buttonDraw.CheckedChanged += new System.EventHandler(this.DrawingButtonCheckedChanged);
             // 
@@ -656,9 +661,23 @@ namespace sth1edwv
             this.buttonSelect.Image = ((System.Drawing.Image)(resources.GetObject("buttonSelect.Image")));
             this.buttonSelect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.buttonSelect.Name = "buttonSelect";
-            this.buttonSelect.Size = new System.Drawing.Size(58, 22);
+            this.buttonSelect.Size = new System.Drawing.Size(58, 20);
             this.buttonSelect.Text = "Select";
             this.buttonSelect.CheckedChanged += new System.EventHandler(this.DrawingButtonCheckedChanged);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 23);
+            // 
+            // toolStripButton1
+            // 
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(68, 20);
+            this.toolStripButton1.Text = "Resize...";
+            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
             // tabPage2
             // 
@@ -949,6 +968,8 @@ namespace sth1edwv
         private TabPage tabPageSprites;
         private TileSetViewer spriteTileSetViewer;
         private TileSetViewer tileSetViewer;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripButton toolStripButton1;
     }
 }
 

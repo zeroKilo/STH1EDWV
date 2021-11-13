@@ -12,6 +12,12 @@ namespace sth1edwv
         // ReSharper disable UnusedAutoPropertyAccessor.Global
 
         [Category("Level bounds")]
+        public int FloorWidth { get; internal set; }
+
+        [Category("Level bounds")]
+        public int FloorHeight { get; internal set; }
+
+        [Category("Level bounds")]
         [Description("Pixel location of the left of the level")]
         public int LeftPixels { get; set; }
 
@@ -190,8 +196,6 @@ namespace sth1edwv
         [Category("General")] public int Offset { get; }
 
         private readonly string _label;
-        private readonly int _floorWidth;
-        private readonly int _floorHeight;
         private readonly int _floorAddress;
         private readonly int _floorSize;
         private readonly int _offsetArt;
@@ -223,8 +227,8 @@ namespace sth1edwv
                     // FL FS FS BM  BM LA LA SP  SA SA IP CS  CC CP OL OL 
                     // SR UW TL 00  MU
                     _solidityIndex = reader.ReadByte(); // SP
-                    _floorWidth = reader.ReadUInt16(); // FW FW
-                    _floorHeight = reader.ReadUInt16(); // FH FH
+                    FloorWidth = reader.ReadUInt16(); // FW FW
+                    FloorHeight = reader.ReadUInt16(); // FH FH
                     LeftPixels = reader.ReadUInt16(); // LX LX
                     _unknownByte = reader.ReadByte();  // ??
                     RightEdgeFactor = reader.ReadByte();  // LW
@@ -273,7 +277,7 @@ namespace sth1edwv
             if (Offset == 0x15580 + 666)
             {
                 // Scrap Brain 2 (BallHog area) has only enough data to fill 2KB 
-                _floorHeight /= 2;
+                FloorHeight /= 2;
             }
 
             Palette = palettes[_initPalette];
@@ -290,7 +294,7 @@ namespace sth1edwv
             Floor = cartridge.GetFloor(
                 _floorAddress + 0x14000, 
                 _floorSize, 
-                _floorWidth);
+                FloorWidth);
             BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
@@ -308,12 +312,12 @@ namespace sth1edwv
 
         public TreeNode ToNode()
         {
-            var uncompressedSize = _floorWidth * _floorHeight;
+            var uncompressedSize = FloorWidth * FloorHeight;
             var result = new TreeNode("Header")
             {
                 Nodes =
                 {
-                    new TreeNode($"Floor Size           = {_floorWidth} x {_floorHeight} ({uncompressedSize}B)"),
+                    new TreeNode($"Floor Size           = {FloorWidth} x {FloorHeight} ({uncompressedSize}B)"),
                     new TreeNode($"Floor Data           = @0x{_floorAddress:X} Size: {_floorSize}B ({(double)(uncompressedSize - _floorSize) / uncompressedSize:P})"),
                     new TreeNode($"Level Limits         = ({RightEdgeFactor}, {BottomEdgeFactor})"),
                     new TreeNode($"Level Offset         = ({LeftPixels}, {TopPixels})"),
@@ -338,8 +342,8 @@ namespace sth1edwv
             // FL FS FS BM  BM LA LA SP  SA SA IP CS  CC CP OL OL 
             // SR UW TL 00  MU
             writer.Write((byte)_solidityIndex); // SP
-            writer.Write((ushort)_floorWidth); // FW FW
-            writer.Write((ushort)_floorHeight); // FH FH
+            writer.Write((ushort)FloorWidth); // FW FW
+            writer.Write((ushort)FloorHeight); // FH FH
             writer.Write((ushort)LeftPixels); // LX LX
             writer.Write(_unknownByte); // ??
             writer.Write((byte)RightEdgeFactor); // LW

@@ -51,6 +51,7 @@ namespace sth1edwv
             _height = _floor.BlockIndices.Length / _width;
 
             UpdateSize();
+            Invalidate();
         }
 
         private void UpdateSize()
