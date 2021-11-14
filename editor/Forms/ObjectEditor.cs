@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using sth1edwv.GameObjects;
 
 namespace sth1edwv.Forms
 {
-    public partial class ObjectEditor : Form
+    public sealed partial class ObjectEditor : Form
     {
         public ObjectEditor(LevelObject levelObject)
         {
             InitializeComponent();
+            Font = SystemFonts.MessageBoxFont;
 
             comboBoxNames.Items.AddRange(LevelObject.Names.Values.ToArray<object>());
             if (LevelObject.Names.TryGetValue(levelObject.Type, out var name))

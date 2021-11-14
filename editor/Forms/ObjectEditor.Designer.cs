@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace sth1edwv.Forms
 {
-    partial class ObjectEditor
+    sealed partial class ObjectEditor
     {
         /// <summary>
         /// Required designer variable.
