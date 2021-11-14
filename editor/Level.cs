@@ -202,9 +202,6 @@ namespace sth1edwv
         private readonly int _offsetObjectLayout;
         private readonly int _initPalette;
 
-        private readonly int _spriteArtAddress;
-        private readonly int _spriteArtPage;
-
         // These should be encapsulated by a cycling palette object
         private readonly int _paletteCycleCount;
         private readonly int _paletteCycleIndex;
@@ -218,6 +215,8 @@ namespace sth1edwv
             _label = label;
             Offset = offset;
             int blockMappingOffset;
+            int spriteArtPage;
+            int spriteArtAddress;
 
             using (var stream = cartridge.Memory.GetStream(offset, 37))
             {
@@ -241,8 +240,8 @@ namespace sth1edwv
                     _floorSize = reader.ReadUInt16(); // FS FS: compressed size in bytes
                     blockMappingOffset = reader.ReadUInt16(); // BM BM: relative to 0x10000
                     _offsetArt = reader.ReadUInt16(); // LA LA: Relative to 0x30000
-                    _spriteArtPage = reader.ReadByte(); // SP: Page for the below
-                    _spriteArtAddress = reader.ReadUInt16(); // SA SA: offset from start of above bank
+                    spriteArtPage = reader.ReadByte(); // SP: Page for the below
+                    spriteArtAddress = reader.ReadUInt16(); // SA SA: offset from start of above bank
                     _initPalette = reader.ReadByte(); // IP: Index of palette
                     PaletteCycleRate = reader.ReadByte(); // CS: Number of frames between palette cycles
                     _paletteCycleCount = reader.ReadByte(); // CC: Number of palette cycles in a loop
@@ -274,12 +273,6 @@ namespace sth1edwv
                 }       
             }
 
-            if (Offset == 0x15580 + 666)
-            {
-                // Scrap Brain 2 (BallHog area) has only enough data to fill 2KB 
-                FloorHeight /= 2;
-            }
-
             Palette = palettes[_initPalette];
             CyclingPalette = palettes[_paletteCycleIndex + 8];
 
@@ -289,12 +282,17 @@ namespace sth1edwv
 
             TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true, false);
 
-            SpriteTileSet = cartridge.GetTileSet(_spriteArtAddress + _spriteArtPage * 0x4000, false, true);
+            SpriteTileSet = cartridge.GetTileSet(spriteArtAddress + spriteArtPage * 0x4000, false, true);
 
             Floor = cartridge.GetFloor(
                 _floorAddress + 0x14000, 
                 _floorSize, 
                 FloorWidth);
+
+            // We rewrite FloorHeight to match the data size.
+            // The original has a mistake in Scrap Brain 2 (BallHog area).
+            FloorHeight = Floor.BlockIndices.Length / FloorWidth;
+
             BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
         }
