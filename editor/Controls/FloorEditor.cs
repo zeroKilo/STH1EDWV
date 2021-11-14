@@ -272,7 +272,7 @@ namespace sth1edwv.Controls
             x = (x - AutoScrollPosition.X) / _blockSize;
             y = (y - AutoScrollPosition.Y) / _blockSize;
             var index = y * _width + x;
-            if (x <= _width && y <= _height && index < _floor.BlockIndices.Length)
+            if (x >= 0 && y >= 0 && x <= _width && y <= _height && index < _floor.BlockIndices.Length)
             {
                 return index;
             }
