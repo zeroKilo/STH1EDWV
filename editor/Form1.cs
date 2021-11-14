@@ -248,7 +248,7 @@ namespace sth1edwv
                 return;
             }
 
-            using var chooser = new ObjectChooser(levelObject);
+            using var chooser = new ObjectEditor(levelObject);
             if (chooser.ShowDialog(this) != DialogResult.OK)
             {
                 return;
@@ -494,7 +494,7 @@ namespace sth1edwv
                 return;
             }
 
-            using var form = new FloorSizeForm(selectedLevel);
+            using var form = new FloorSizeEditor(selectedLevel);
             if (form.ShowDialog(this) != DialogResult.OK)
             {
                 return;

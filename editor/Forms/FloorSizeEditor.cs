@@ -5,18 +5,11 @@ using sth1edwv.GameObjects;
 
 namespace sth1edwv.Forms
 {
-    public sealed partial class FloorSizeForm : Form
+    public sealed partial class FloorSizeEditor : Form
     {
         private readonly Level _level;
 
-        public FloorSizeForm()
-        {
-            // For the designer
-            InitializeComponent();
-            Font = SystemFonts.MessageBoxFont;
-        }
-
-        public FloorSizeForm(Level level)
+        public FloorSizeEditor(Level level)
         {
             _level = level;
             InitializeComponent();

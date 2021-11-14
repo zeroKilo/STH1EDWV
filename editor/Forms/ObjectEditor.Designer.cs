@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace sth1edwv.Forms
 {
-    partial class ObjectChooser
+    partial class ObjectEditor
     {
         /// <summary>
         /// Required designer variable.
@@ -119,7 +119,7 @@ namespace sth1edwv.Forms
             this.label4.TabIndex = 8;
             this.label4.Text = "Known Objects";
             // 
-            // ObjectChooser
+            // ObjectEditor
             // 
             this.AcceptButton = this.button1;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -137,7 +137,7 @@ namespace sth1edwv.Forms
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "ObjectChooser";
+            this.Name = "ObjectEditor";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Object Editor";

@@ -69,22 +69,22 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FloorSizeForm.cs">
+    <Compile Include="Forms\FloorSizeEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FloorSizeForm.Designer.cs">
-      <DependentUpon>FloorSizeForm.cs</DependentUpon>
+    <Compile Include="Forms\FloorSizeEditor.Designer.cs">
+      <DependentUpon>FloorSizeEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GameObjects\GameText.cs" />
     <Compile Include="GameObjects\Level.cs" />
     <Compile Include="GameObjects\LevelObject.cs" />
     <Compile Include="GameObjects\LevelObjectSet.cs" />
     <Compile Include="Memory.cs" />
-    <Compile Include="Forms\ObjectChooser.cs">
+    <Compile Include="Forms\ObjectEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ObjectChooser.Designer.cs">
-      <DependentUpon>ObjectChooser.cs</DependentUpon>
+    <Compile Include="Forms\ObjectEditor.Designer.cs">
+      <DependentUpon>ObjectEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="GameObjects\Palette.cs" />
     <Compile Include="Program.cs" />
@@ -111,14 +111,14 @@
     <Compile Include="Controls\TileSetViewer.Designer.cs">
       <DependentUpon>TileSetViewer.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Forms\FloorSizeForm.resx">
-      <DependentUpon>FloorSizeForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\FloorSizeEditor.resx">
+      <DependentUpon>FloorSizeEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ObjectChooser.resx">
-      <DependentUpon>ObjectChooser.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\ObjectEditor.resx">
+      <DependentUpon>ObjectEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

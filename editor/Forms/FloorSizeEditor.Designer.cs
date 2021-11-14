@@ -1,6 +1,6 @@
 ﻿namespace sth1edwv.Forms
 {
-    sealed partial class FloorSizeForm
+    sealed partial class FloorSizeEditor
     {
         /// <summary>
         /// Required designer variable.
@@ -166,7 +166,7 @@
             this.finalSizeLabel.TabIndex = 8;
             this.finalSizeLabel.Text = "Final map size:";
             // 
-            // FloorSizeForm
+            // FloorSizeEditor
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -187,7 +187,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "FloorSizeForm";
+            this.Name = "FloorSizeEditor";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

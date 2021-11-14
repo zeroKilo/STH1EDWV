@@ -5,9 +5,9 @@ using sth1edwv.GameObjects;
 
 namespace sth1edwv.Forms
 {
-    public partial class ObjectChooser : Form
+    public partial class ObjectEditor : Form
     {
-        public ObjectChooser(LevelObject levelObject)
+        public ObjectEditor(LevelObject levelObject)
         {
             InitializeComponent();
 
