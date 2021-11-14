@@ -451,12 +451,14 @@ namespace sth1edwv
 
         private void DrawingButtonCheckedChanged(object sender, EventArgs e)
         {
-            foreach (var button in new[]{buttonDraw, buttonSelect}.Where(x => x.Checked && x != sender))
+            foreach (var button in new[]{buttonDraw, buttonSelect, buttonFloodFill})
             {
-                button.Checked = false;
+                button.Checked = button == sender;
             }
 
-            floorEditor1.DrawingMode = buttonDraw.Checked ? FloorEditor.Modes.Draw : FloorEditor.Modes.Select;
+            floorEditor1.DrawingMode = buttonDraw.Checked ? FloorEditor.Modes.Draw 
+                : buttonSelect.Checked ? FloorEditor.Modes.Select 
+                : FloorEditor.Modes.FloodFill;
         }
 
         private void floorEditor1_FloorChanged()
@@ -481,44 +483,45 @@ namespace sth1edwv
             UpdateTileSetSpace();
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void ResizeFloorButtonClick(object sender, EventArgs e)
         {
-            if (listBoxLevels.SelectedItem is not Level level)
+            if (listBoxLevels.SelectedItem is not Level selectedLevel)
             {
                 return;
             }
 
-            using var form = new FloorSizeForm(level);
+            using var form = new FloorSizeForm(selectedLevel);
             if (form.ShowDialog(this) != DialogResult.OK)
             {
                 return;
             }
 
             // Floor size changed!
-            // We need to change a bunch of stuff...
-            // - The level header
-            level.FloorWidth += form.Result.Horizontal;
-            level.FloorHeight += form.Result.Vertical;
-            // - The floor itself
-            level.Floor.Resize(form.Result);
-            // - The level bounds
-            level.LeftPixels = Math.Max(0, level.LeftPixels + form.Result.Left * 32);
-            level.TopPixels = Math.Max(0, level.TopPixels+ form.Result.Top * 32);
-            level.RightEdgeFactor += form.Result.Horizontal / 8;
-            level.BottomEdgeFactor += form.Result.Vertical / 8;
-            // - Start position
-            level.StartX += form.Result.Left;
-            level.StartY += form.Result.Top;
-            // - Object positions
-            foreach (var levelObject in level.Objects)
+            // We need to change stuff for every level using this floor...
+            foreach (var level in _cartridge.Levels.Where(x => x.Floor == selectedLevel.Floor))
             {
-                levelObject.X = (byte)Math.Min(level.FloorWidth - 1, Math.Max(0, levelObject.X + form.Result.Left));
-                levelObject.Y = (byte)Math.Min(level.FloorHeight - 1, Math.Max(0, levelObject.Y + form.Result.Top));
+                // - The level header
+                level.FloorWidth += form.Result.Horizontal;
+                level.FloorHeight += form.Result.Vertical;
+                // - The level bounds - top/left only
+                level.LeftPixels = Math.Max(0, level.LeftPixels + form.Result.Left * 32);
+                level.TopPixels = Math.Max(0, level.TopPixels + form.Result.Top * 32);
+                // - Start position
+                level.StartX += form.Result.Left;
+                level.StartY += form.Result.Top;
+                // - Object positions
+                foreach (var levelObject in level.Objects)
+                {
+                    levelObject.X = (byte)Math.Min(level.FloorWidth - 1, Math.Max(0, levelObject.X + form.Result.Left));
+                    levelObject.Y = (byte)Math.Min(level.FloorHeight - 1, Math.Max(0, levelObject.Y + form.Result.Top));
+                }
             }
-            // TODO: other levels using the same floor
+            // Then the floor itself
+            selectedLevel.Floor.Resize(form.Result);
+
             // Reset the floor editor so it picks up the new size
-            floorEditor1.SetData(level);
-            
+            floorEditor1.SetData(selectedLevel);
+            // Update space counts
             UpdateFloorSpace();
         }
     }

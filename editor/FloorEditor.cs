@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using sth1edwv.Properties;
 
@@ -201,6 +205,50 @@ namespace sth1edwv
             {
                 SetBlockIndex(index, BlockChooser.SelectedIndex);
             }
+            else if (DrawingMode == Modes.FloodFill)
+            {
+                FloodFill(index, BlockChooser.SelectedIndex);
+            }
+        }
+
+        private void FloodFill(int index, int value)
+        {
+            var oldValue = _floor.BlockIndices[index];
+            if (oldValue == value)
+            {
+                return;
+            }
+            // We want to traverse the area from the clicked block and find any adjacent ones of the same value.
+            // We work in x, y space.
+            var queue = new HashSet<Point> { new Point(index % _width, index / _width) };
+            while (queue.Count > 0)
+            {
+                // Get a point
+                var point = queue.First();
+                queue.Remove(point);
+                // Set it
+                _floor.BlockIndices[point.X + point.Y * _width] = (byte)value;
+                // Add neighbours of the same colour
+                if (point.X > 0 && _floor.BlockIndices[point.X - 1 + point.Y * _width] == oldValue)
+                {
+                    queue.Add(new Point(point.X - 1, point.Y));
+                }
+                if (point.X < _width - 1 && _floor.BlockIndices[point.X + 1 + point.Y * _width] == oldValue)
+                {
+                    queue.Add(new Point(point.X + 1, point.Y));
+                }
+                if (point.Y > 0 && _floor.BlockIndices[point.X + (point.Y - 1) * _width] == oldValue)
+                {
+                    queue.Add(new Point(point.X, point.Y - 1));
+                }
+                if (point.Y < _height - 1 && _floor.BlockIndices[point.X + (point.Y + 1) * _width] == oldValue)
+                {
+                    queue.Add(new Point(point.X, point.Y + 1));
+                }
+            }
+            // Invalidate the whole view
+            Invalidate();
+            FloorChanged?.Invoke();
         }
 
         private void SetBlockIndex(int index, int value)
@@ -284,7 +332,8 @@ namespace sth1edwv
         public enum Modes
         {
             Draw,
-            Select
+            Select,
+            FloodFill
         }
 
         public Modes DrawingMode { get; set; }
