@@ -531,7 +531,18 @@ namespace sth1edwv
 
         private void SharingButton_Click(object sender, EventArgs e)
         {
+            if (listBoxLevels.SelectedItem is not Level selectedLevel)
+            {
+                return;
+            }
 
+            using var d = new FloorSharingEditor(selectedLevel, _cartridge);
+            if (d.ShowDialog(this) == DialogResult.OK)
+            {
+                // Invalidate stuff
+                floorEditor1.SetData(selectedLevel);
+                UpdateFloorSpace();
+            }
         }
     }
 }

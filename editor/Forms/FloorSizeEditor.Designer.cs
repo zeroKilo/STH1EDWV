@@ -72,8 +72,13 @@
             // LeftDelta
             // 
             this.LeftDelta.Location = new System.Drawing.Point(108, 12);
+            this.LeftDelta.Maximum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
             this.LeftDelta.Minimum = new decimal(new int[] {
-            100,
+            128,
             0,
             0,
             -2147483648});
@@ -103,8 +108,13 @@
             // RightDelta
             // 
             this.RightDelta.Location = new System.Drawing.Point(108, 38);
+            this.RightDelta.Maximum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
             this.RightDelta.Minimum = new decimal(new int[] {
-            100,
+            128,
             0,
             0,
             -2147483648});
@@ -125,8 +135,13 @@
             // TopDelta
             // 
             this.TopDelta.Location = new System.Drawing.Point(108, 64);
+            this.TopDelta.Maximum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
             this.TopDelta.Minimum = new decimal(new int[] {
-            100,
+            128,
             0,
             0,
             -2147483648});
@@ -147,8 +162,13 @@
             // BottomDelta
             // 
             this.BottomDelta.Location = new System.Drawing.Point(108, 90);
+            this.BottomDelta.Maximum = new decimal(new int[] {
+            128,
+            0,
+            0,
+            0});
             this.BottomDelta.Minimum = new decimal(new int[] {
-            100,
+            128,
             0,
             0,
             -2147483648});

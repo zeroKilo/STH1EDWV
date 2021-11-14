@@ -183,7 +183,7 @@ namespace sth1edwv.GameObjects
         // Objects representing referenced data
         [Category("General")] public TileSet TileSet { get; }
         [Category("General")] public TileSet SpriteTileSet { get; }
-        [Category("General")] public Floor Floor { get; }
+        [Category("General")] public Floor Floor { get; set; }
         [Category("General")] public LevelObjectSet Objects { get; }
         [Category("General")] public BlockMapping BlockMapping { get; }
         [Category("General")] public Palette Palette { get; }

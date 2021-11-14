@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace sth1edwv.GameObjects
 {
-    public class Floor: IDataItem
+    public class Floor : IDataItem
     {
         public byte[] BlockIndices { get; private set; }
 
@@ -12,6 +12,12 @@ namespace sth1edwv.GameObjects
             Offset = offset;
             BlockIndices = Compression.DecompressRle(cartridge, offset, compressedSize);
             Width = width;
+        }
+
+        private Floor(Floor other)
+        {
+            Width = other.Width;
+            BlockIndices = (byte[])other.BlockIndices.Clone();
         }
 
         public int Offset { get; set; }
@@ -43,6 +49,7 @@ namespace sth1edwv.GameObjects
                     // No longer present
                     continue;
                 }
+
                 for (var x = 0; x < Width; ++x)
                 {
                     var newX = x + padding.Left;
@@ -59,6 +66,11 @@ namespace sth1edwv.GameObjects
             // Apply it
             BlockIndices = newData;
             Width = newWidth;
+        }
+
+        public Floor Clone()
+        {
+            return new Floor(this);
         }
     }
 }
