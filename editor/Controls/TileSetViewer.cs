@@ -6,8 +6,9 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using sth1edwv.GameObjects;
 
-namespace sth1edwv
+namespace sth1edwv.Controls
 {
     public partial class TileSetViewer : UserControl
     {

@@ -4,8 +4,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
+using sth1edwv.GameObjects;
 
-namespace sth1edwv
+namespace sth1edwv.Controls
 {
     public interface IDrawableBlock
     {

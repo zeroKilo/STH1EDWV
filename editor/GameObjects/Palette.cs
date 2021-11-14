@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class Palette
     {

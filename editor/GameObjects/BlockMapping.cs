@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class BlockMapping: IDisposable
     {

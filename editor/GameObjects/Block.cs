@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using sth1edwv.Controls;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     // Wrapper class for use in the grid
     public class BlockRow

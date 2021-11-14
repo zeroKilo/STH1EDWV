@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace sth1edwv
+namespace sth1edwv.Forms
 {
     partial class ObjectChooser
     {

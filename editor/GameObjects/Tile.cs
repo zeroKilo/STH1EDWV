@@ -4,8 +4,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using sth1edwv.Controls;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class Tile: IDisposable, IDrawableBlock
     {

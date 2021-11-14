@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using sth1edwv.Controls;
+using sth1edwv.GameObjects;
 using sth1edwv.Properties;
 
 namespace sth1edwv
@@ -34,9 +36,9 @@ namespace sth1edwv
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -52,9 +54,9 @@ namespace sth1edwv
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPagePalettes = new System.Windows.Forms.TabPage();
             this.tabPageTiles = new System.Windows.Forms.TabPage();
-            this.tileSetViewer = new sth1edwv.TileSetViewer();
+            this.tileSetViewer = new TileSetViewer();
             this.tabPageSprites = new System.Windows.Forms.TabPage();
-            this.spriteTileSetViewer = new sth1edwv.TileSetViewer();
+            this.spriteTileSetViewer = new TileSetViewer();
             this.tabPageBlocks = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
@@ -68,8 +70,8 @@ namespace sth1edwv
             this.tabPageLayout = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
-            this.floorEditor1 = new sth1edwv.FloorEditor();
-            this.layoutBlockChooser = new sth1edwv.ItemPicker();
+            this.floorEditor1 = new FloorEditor();
+            this.layoutBlockChooser = new ItemPicker();
             this.toolStripLayout = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.buttonShowObjects = new System.Windows.Forms.ToolStripButton();
@@ -103,6 +105,7 @@ namespace sth1edwv
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.SharingButton = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -305,7 +308,7 @@ namespace sth1edwv
             this.tileSetViewer.Name = "tileSetViewer";
             this.tileSetViewer.Size = new System.Drawing.Size(997, 499);
             this.tileSetViewer.TabIndex = 1;
-            this.tileSetViewer.Changed += new System.Action<sth1edwv.TileSet>(this.tileSetViewer_Changed);
+            this.tileSetViewer.Changed += new System.Action<TileSet>(this.tileSetViewer_Changed);
             // 
             // tabPageSprites
             // 
@@ -325,7 +328,7 @@ namespace sth1edwv
             this.spriteTileSetViewer.Name = "spriteTileSetViewer";
             this.spriteTileSetViewer.Size = new System.Drawing.Size(997, 499);
             this.spriteTileSetViewer.TabIndex = 0;
-            this.spriteTileSetViewer.Changed += new System.Action<sth1edwv.TileSet>(this.spriteTileSetViewer_Changed);
+            this.spriteTileSetViewer.Changed += new System.Action<TileSet>(this.spriteTileSetViewer_Changed);
             // 
             // tabPageBlocks
             // 
@@ -394,8 +397,8 @@ namespace sth1edwv
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle4.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -417,8 +420,8 @@ namespace sth1edwv
             // Used
             // 
             this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
             this.Used.HeaderText = "Used";
             this.Used.Name = "Used";
             this.Used.ReadOnly = true;
@@ -426,8 +429,8 @@ namespace sth1edwv
             // UsedGlobal
             // 
             this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
             this.UsedGlobal.HeaderText = "Total used";
             this.UsedGlobal.Name = "UsedGlobal";
             this.UsedGlobal.ReadOnly = true;
@@ -460,9 +463,9 @@ namespace sth1edwv
             this.panel1.AutoScroll = true;
             this.panel1.Controls.Add(this.splitContainer7);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 45);
+            this.panel1.Location = new System.Drawing.Point(3, 49);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(997, 457);
+            this.panel1.Size = new System.Drawing.Size(997, 453);
             this.panel1.TabIndex = 4;
             // 
             // splitContainer7
@@ -480,7 +483,7 @@ namespace sth1edwv
             // splitContainer7.Panel2
             // 
             this.splitContainer7.Panel2.Controls.Add(this.layoutBlockChooser);
-            this.splitContainer7.Size = new System.Drawing.Size(997, 457);
+            this.splitContainer7.Size = new System.Drawing.Size(997, 453);
             this.splitContainer7.SplitterDistance = 705;
             this.splitContainer7.TabIndex = 3;
             // 
@@ -490,11 +493,11 @@ namespace sth1edwv
             this.floorEditor1.BlockGaps = false;
             this.floorEditor1.BlockNumbers = true;
             this.floorEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.floorEditor1.DrawingMode = sth1edwv.FloorEditor.Modes.Draw;
+            this.floorEditor1.DrawingMode = FloorEditor.Modes.Draw;
             this.floorEditor1.LevelBounds = false;
             this.floorEditor1.Location = new System.Drawing.Point(0, 0);
             this.floorEditor1.Name = "floorEditor1";
-            this.floorEditor1.Size = new System.Drawing.Size(705, 457);
+            this.floorEditor1.Size = new System.Drawing.Size(705, 453);
             this.floorEditor1.TabIndex = 0;
             this.floorEditor1.Text = "floorEditor1";
             this.floorEditor1.TileGaps = false;
@@ -510,7 +513,7 @@ namespace sth1edwv
             this.layoutBlockChooser.Name = "layoutBlockChooser";
             this.layoutBlockChooser.Scaling = 1;
             this.layoutBlockChooser.SelectedIndex = -1;
-            this.layoutBlockChooser.Size = new System.Drawing.Size(288, 457);
+            this.layoutBlockChooser.Size = new System.Drawing.Size(288, 453);
             this.layoutBlockChooser.TabIndex = 0;
             // 
             // toolStripLayout
@@ -532,11 +535,12 @@ namespace sth1edwv
             this.buttonSelect,
             this.buttonFloodFill,
             this.toolStripSeparator3,
-            this.buttonResizeFloor});
+            this.buttonResizeFloor,
+            this.SharingButton});
             this.toolStripLayout.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.toolStripLayout.Location = new System.Drawing.Point(3, 3);
             this.toolStripLayout.Name = "toolStripLayout";
-            this.toolStripLayout.Size = new System.Drawing.Size(997, 42);
+            this.toolStripLayout.Size = new System.Drawing.Size(997, 46);
             this.toolStripLayout.TabIndex = 3;
             this.toolStripLayout.Text = "toolStrip1";
             // 
@@ -852,6 +856,15 @@ namespace sth1edwv
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
             // 
+            // SharingButton
+            // 
+            this.SharingButton.Image = ((System.Drawing.Image)(resources.GetObject("SharingButton.Image")));
+            this.SharingButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.SharingButton.Name = "SharingButton";
+            this.SharingButton.Size = new System.Drawing.Size(76, 20);
+            this.SharingButton.Text = "Sharing...";
+            this.SharingButton.Click += new System.EventHandler(this.SharingButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -980,6 +993,7 @@ namespace sth1edwv
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripButton buttonResizeFloor;
         private ToolStripButton buttonFloodFill;
+        private ToolStripButton SharingButton;
     }
 }
 

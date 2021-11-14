@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using sth1edwv.GameObjects;
 
-namespace sth1edwv
+namespace sth1edwv.Forms
 {
     public sealed partial class FloorSizeForm : Form
     {

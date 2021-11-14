@@ -7,7 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class TileSet: IDataItem, IDisposable
     {

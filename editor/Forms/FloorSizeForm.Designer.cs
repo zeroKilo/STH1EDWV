@@ -1,4 +1,4 @@
-﻿namespace sth1edwv
+﻿namespace sth1edwv.Forms
 {
     sealed partial class FloorSizeForm
     {

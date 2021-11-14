@@ -10,7 +10,11 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Equin.ApplicationFramework;
 using Microsoft.VisualBasic;
+using sth1edwv.Controls;
+using sth1edwv.Forms;
+using sth1edwv.GameObjects;
 using sth1edwv.Properties;
+using Screen = sth1edwv.GameObjects.Screen;
 
 namespace sth1edwv
 {
@@ -523,6 +527,11 @@ namespace sth1edwv
             floorEditor1.SetData(selectedLevel);
             // Update space counts
             UpdateFloorSpace();
+        }
+
+        private void SharingButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

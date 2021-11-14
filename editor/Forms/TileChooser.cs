@@ -1,6 +1,8 @@
 ﻿using System.Windows.Forms;
+using sth1edwv.Controls;
+using sth1edwv.GameObjects;
 
-namespace sth1edwv
+namespace sth1edwv.Forms
 {
     public partial class TileChooser : Form
     {

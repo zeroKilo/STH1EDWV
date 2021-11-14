@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class GameText: IDataItem
     {

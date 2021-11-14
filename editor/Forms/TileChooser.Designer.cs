@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
+using sth1edwv.Controls;
 
-namespace sth1edwv
+namespace sth1edwv.Forms
 {
     partial class TileChooser
     {
@@ -30,7 +31,7 @@ namespace sth1edwv
         /// </summary>
         private void InitializeComponent()
         {
-            this.tilePicker1 = new sth1edwv.ItemPicker();
+            this.tilePicker1 = new ItemPicker();
             this.SuspendLayout();
             // 
             // tilePicker1
@@ -43,7 +44,7 @@ namespace sth1edwv
             this.tilePicker1.SelectedIndex = -1;
             this.tilePicker1.Size = new System.Drawing.Size(522, 524);
             this.tilePicker1.TabIndex = 1;
-            this.tilePicker1.SelectionChanged += new System.EventHandler<sth1edwv.IDrawableBlock>(this.tilePicker1_SelectionChanged);
+            this.tilePicker1.SelectionChanged += new System.EventHandler<IDrawableBlock>(this.tilePicker1_SelectionChanged);
             // 
             // TileChooser
             // 

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class Level : IDataItem
     {

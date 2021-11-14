@@ -1,4 +1,4 @@
-﻿namespace sth1edwv
+﻿namespace sth1edwv.Controls
 {
     partial class TileSetViewer
     {
@@ -34,7 +34,7 @@
             this.buttonLoadTileset = new System.Windows.Forms.ToolStripButton();
             this.buttonBlankUnusedTiles = new System.Windows.Forms.ToolStripButton();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.tilePicker = new sth1edwv.ItemPicker();
+            this.tilePicker = new ItemPicker();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
             this.pictureBoxTilePreview = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -122,7 +122,7 @@
             this.tilePicker.SelectedIndex = -1;
             this.tilePicker.Size = new System.Drawing.Size(331, 387);
             this.tilePicker.TabIndex = 0;
-            this.tilePicker.SelectionChanged += new System.EventHandler<sth1edwv.IDrawableBlock>(this.tilePicker_SelectionChanged);
+            this.tilePicker.SelectionChanged += new System.EventHandler<IDrawableBlock>(this.tilePicker_SelectionChanged);
             // 
             // splitContainer5
             // 

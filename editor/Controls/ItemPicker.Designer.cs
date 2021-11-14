@@ -1,12 +1,14 @@
 ﻿
-namespace sth1edwv
+using System.ComponentModel;
+
+namespace sth1edwv.Controls
 {
-    sealed partial class FloorEditor
+    sealed partial class ItemPicker
     {
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -29,7 +31,13 @@ namespace sth1edwv
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // ItemPicker
+            // 
+            this.Name = "ItemPicker";
+            this.Size = new System.Drawing.Size(227, 217);
+            this.ResumeLayout(false);
         }
 
         #endregion

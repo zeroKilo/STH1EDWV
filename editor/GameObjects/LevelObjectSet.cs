@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class LevelObjectSet: IEnumerable<LevelObject>
     {

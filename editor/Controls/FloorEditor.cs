@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
+using sth1edwv.GameObjects;
 using sth1edwv.Properties;
 
-namespace sth1edwv
+namespace sth1edwv.Controls
 {
     public sealed partial class FloorEditor : ScrollableControl
     {

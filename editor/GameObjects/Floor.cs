@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace sth1edwv
+namespace sth1edwv.GameObjects
 {
     public class Floor: IDataItem
     {
