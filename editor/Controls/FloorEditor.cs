@@ -184,13 +184,13 @@ namespace sth1edwv.Controls
 
         private void OnMouseDown(object sender, MouseEventArgs e)
         {
+            LastClickedBlockIndex = GetClickedBlockIndex(e.X, e.Y);
             if (e.Button != MouseButtons.Left || BlockChooser == null)
             {
                 return;
             }
 
-            var index = GetClickedBlockIndex(e.X, e.Y);
-            if (index == -1)
+            if (LastClickedBlockIndex == -1)
             {
                 return;
             }
@@ -198,15 +198,15 @@ namespace sth1edwv.Controls
             // Ctrl key pressed forces select mode
             if (DrawingMode == Modes.Select || (ModifierKeys & Keys.Control) != 0)
             {
-                BlockChooser.SelectedIndex = _floor.BlockIndices[index];
+                BlockChooser.SelectedIndex = _floor.BlockIndices[LastClickedBlockIndex];
             }
             else if (DrawingMode == Modes.Draw && BlockChooser.SelectedIndex >= 0)
             {
-                SetBlockIndex(index, BlockChooser.SelectedIndex);
+                SetBlockIndex(LastClickedBlockIndex, BlockChooser.SelectedIndex);
             }
             else if (DrawingMode == Modes.FloodFill)
             {
-                FloodFill(index, BlockChooser.SelectedIndex);
+                FloodFill(LastClickedBlockIndex, BlockChooser.SelectedIndex);
             }
         }
 
@@ -269,6 +269,10 @@ namespace sth1edwv.Controls
 
         private int GetClickedBlockIndex(int x, int y)
         {
+            if (_blockSize == 0)
+            {
+                return -1;
+            }
             x = (x - AutoScrollPosition.X) / _blockSize;
             y = (y - AutoScrollPosition.Y) / _blockSize;
             var index = y * _width + x;
@@ -336,6 +340,7 @@ namespace sth1edwv.Controls
         }
 
         public Modes DrawingMode { get; set; }
+        public int LastClickedBlockIndex { get; set; }
 
         public event Action FloorChanged;
     }

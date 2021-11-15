@@ -580,5 +580,46 @@ namespace sth1edwv
                 UpdateFloorSpace();
             }
         }
+
+        private void selectBlockToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+            layoutBlockChooser.SelectedIndex = level.Floor.BlockIndices[floorEditor1.LastClickedBlockIndex];
+        }
+
+        private void editObjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+            var index = floorEditor1.LastClickedBlockIndex;
+            var x = index % level.FloorWidth;
+            var y = index / level.FloorWidth;
+            // See if we have an object here
+            var levelObject = level.Objects.FirstOrDefault(o => o.X == x && o.Y == y);
+            if (levelObject != null)
+            {
+                using var editor = new ObjectEditor(levelObject);
+                if (editor.ShowDialog(this) == DialogResult.OK)
+                {
+                    levelObject.X = Convert.ToByte(editor.textBoxX.Text);
+                    levelObject.Y = Convert.ToByte(editor.textBoxY.Text);
+                    levelObject.Type = Convert.ToByte(editor.textBoxType.Text);
+
+                    // Refresh the level data
+                    LoadLevelData();
+
+                    // And the level map may be different
+                    if (floorEditor1.WithObjects)
+                    {
+                        floorEditor1.Invalidate();
+                    }
+                }
+            }
+        }
     }
 }
