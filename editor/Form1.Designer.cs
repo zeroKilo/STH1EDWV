@@ -108,6 +108,8 @@ namespace sth1edwv
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.ringTileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -147,6 +149,7 @@ namespace sth1edwv
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.statusStrip1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -779,6 +782,7 @@ namespace sth1edwv
             this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage9);
             this.tabControl1.Controls.Add(this.tabPageScreens);
+            this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
             this.tabControl1.Name = "tabControl1";
@@ -865,6 +869,25 @@ namespace sth1edwv
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.ringTileSetViewer);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1323, 537);
+            this.tabPage1.TabIndex = 9;
+            this.tabPage1.Text = "Rings";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // ringTileSetViewer
+            // 
+            this.ringTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ringTileSetViewer.Location = new System.Drawing.Point(3, 3);
+            this.ringTileSetViewer.Name = "ringTileSetViewer";
+            this.ringTileSetViewer.Size = new System.Drawing.Size(1317, 531);
+            this.ringTileSetViewer.TabIndex = 0;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -923,6 +946,7 @@ namespace sth1edwv
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -997,6 +1021,8 @@ namespace sth1edwv
         private ContextMenuStrip levelEditorContextMenu;
         private ToolStripMenuItem selectBlockToolStripMenuItem;
         private ToolStripMenuItem editObjectToolStripMenuItem;
+        private TabPage tabPage1;
+        private TileSetViewer ringTileSetViewer;
     }
 }
 

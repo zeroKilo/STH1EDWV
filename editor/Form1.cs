@@ -64,6 +64,8 @@ namespace sth1edwv
             listBoxScreens.Items.Clear();
             listBoxScreens.Items.AddRange(_cartridge.Screens.ToArray<object>());
 
+            ringTileSetViewer.SetData(_cartridge.Rings, _cartridge.Levels[0].TilePalette, null);
+
             // Add or replace filename in title bar
             Text = $"{Regex.Replace(Text, " \\[.+\\]$", "")} [{Path.GetFileName(filename)}]";
 

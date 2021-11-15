@@ -237,21 +237,24 @@ namespace sth1edwv
             return result.ToArray();
         }
 
-        private static IEnumerable<byte> ChunkyToPlanar(byte[] data)
+        public static IEnumerable<byte> ChunkyToPlanar(byte[] data)
         {
-            for (var plane = 0; plane < 4; ++plane)
+            // Each byte is a chunky index in the range 0..15.
+            // We interleave each 8 bytes to four bitplanes.
+            for (int offset = 0; offset < data.Length; offset += 8)
             {
-                var b = 0;
-                for (var i = 0; i < 8; ++i)
+                for (var plane = 0; plane < 4; ++plane)
                 {
-                    var bit = (data[i] >> plane) & 1;
-                    b |= bit << (7 - i);
-                }
+                    var b = 0;
+                    for (var i = 0; i < 8; ++i)
+                    {
+                        var bit = (data[offset+i] >> plane) & 1;
+                        b |= bit << (7 - i);
+                    }
 
-                yield return (byte)b;
+                    yield return (byte)b;
+                }
             }
         }
-
-
     }
 }

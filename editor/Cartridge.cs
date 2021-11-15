@@ -187,6 +187,7 @@ namespace sth1edwv
         public IList<Level> Levels { get; } = new List<Level>();
         public IList<GameText> GameText { get; } = new List<GameText>();
         public IList<Screen> Screens { get; } = new List<Screen>();
+        public TileSet Rings { get; set; }
 
         private readonly Dictionary<int, TileSet> _tileSets = new();
         private readonly Dictionary<int, Floor> _floors = new();
@@ -196,9 +197,16 @@ namespace sth1edwv
         public Cartridge(string path)
         {
             Memory = new Memory(File.ReadAllBytes(path));
+            ReadRings();
             ReadLevels();
             ReadGameText();
             ReadScreens();
+        }
+
+        private void ReadRings()
+        {
+            // Rings are at 0x2Fcf0
+            Rings = new TileSet(this, 0x2Fcf0, 24*32);
         }
 
         private void ReadScreens()
@@ -232,7 +240,7 @@ namespace sth1edwv
 
         public TileSet GetTileSet(int offset, bool addRings, bool isSprites)
         {
-            return GetItem(_tileSets, offset, () => new TileSet(this, offset, addRings, isSprites));
+            return GetItem(_tileSets, offset, () => new TileSet(this, offset, addRings ? Rings : null, isSprites));
         }
 
         public Floor GetFloor(int offset, int compressedSize, int width)
@@ -354,6 +362,9 @@ namespace sth1edwv
             {
                 throw new Exception("Level tile sets out of space");
             }
+
+            // Rings art (at original offset)
+            Rings.GetData().CopyTo(memory, Rings.Offset);
 
             // - Block mappings (at original offsets)
             // TODO make these flexible if I make it possible to change sizes

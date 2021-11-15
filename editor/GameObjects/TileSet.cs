@@ -17,11 +17,27 @@ namespace sth1edwv.GameObjects
         private readonly ushort _rowCount;
         private readonly double _compression;
         private readonly int _tileHeight;
+        private readonly bool _compressed;
         public List<Tile> Tiles { get; } = new();
 
-        public TileSet(Cartridge cartridge, int offset, bool addRings, bool isSprites)
+        public TileSet(Cartridge cartridge, int offset, int length)
+        {
+            // Raw VRAM data
+            Offset = offset;
+            _tileHeight = 8;
+            _compressed = false;
+
+            for (var i = 0; i < length; i += _tileHeight * 4)
+            {
+                var data = Compression.PlanarToChunky(cartridge.Memory, offset + i, 8).ToArray();
+                Tiles.Add(new Tile(data, 0, i / _tileHeight / 4, _tileHeight));
+            }
+        }
+
+        public TileSet(Cartridge cartridge, int offset, TileSet rings, bool isSprites)
         {
             Offset = offset;
+            _compressed = true;
             _magic = cartridge.Memory.Word(offset);
             _dupRows = cartridge.Memory.Word(offset + 2);
             _artData = cartridge.Memory.Word(offset + 4);
@@ -35,17 +51,13 @@ namespace sth1edwv.GameObjects
             }
             _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
 
-            if (addRings)
+            if (rings != null)
             {
-                // We replace the last 4 tiles' image
+                // We replace the last 4 tiles' images with the third frame
                 for (var i = 0; i < 4; ++i)
                 {
                     var index = 252 + i;
-                    // We want to convert the data from raw VDP to one byte per pixel
-                    const int ringOffset = 0x2FD70 + 32 * 4 * 3; // Frame 3 of the animation looks good
-                    var buffer = Compression.PlanarToChunky(cartridge.Memory, ringOffset + i * 32, 8).ToArray();
-                    var ringTile = new Tile(buffer, 0, index, 8);
-                    Tiles[index].SetRingVersion(ringTile);
+                    Tiles[index].SetRingVersion(rings.Tiles[i]);
                 }
             }
         }
@@ -76,16 +88,28 @@ namespace sth1edwv.GameObjects
 
         public IList<byte> GetData()
         {
-            using var ms = new MemoryStream();
-            // We gather our tiles back into a big buffer...
-            foreach (var tile in Tiles)
+            if (_compressed)
             {
-                tile.WriteTo(ms);
+                using var ms = new MemoryStream();
+                // We gather our tiles back into a big buffer...
+                foreach (var tile in Tiles)
+                {
+                    tile.WriteTo(ms);
+                }
+                // Then we compress it...
+                ms.Position = 0;
+                return Compression.CompressArt(ms);
             }
-
-            // Then we compress it...
-            ms.Position = 0;
-            return Compression.CompressArt(ms);
+            else
+            {
+                // Uncompressed, we want to convert planar to chunky as we go. This is a bit ugly...
+                using var ms = new MemoryStream();
+                foreach (var tile in Tiles)
+                {
+                    tile.WriteTo(ms);
+                }
+                return Compression.ChunkyToPlanar(ms.ToArray()).ToList();
+            }
         }
 
         public void Dispose()
@@ -101,7 +125,9 @@ namespace sth1edwv.GameObjects
         {
             // We write the tileset to an image
             // Keeping it all in 8bpp is a pain!
-            var rows = Tiles.Count / 16;
+            var rows = Tiles.Count % 16 == 0
+                ? Tiles.Count / 16
+                : Tiles.Count / 16 + 1;
             // Caller disposes
             var image = new Bitmap(128, rows * _tileHeight, PixelFormat.Format8bppIndexed);
             image.Palette = palette.ImagePalette;
@@ -146,10 +172,16 @@ namespace sth1edwv.GameObjects
                 throw new Exception("Image is not paletted!");
             }
 
-            var expectedHeight = Tiles.Count / 16 * _tileHeight;
-            if (image.Width != 128 || image.Height != expectedHeight)
+            if (image.Width % 8 != 0 || image.Height % _tileHeight != 0)
             {
-                throw new Exception($"Clipboard image is {image.Width}x{image.Height}, we need 128x{expectedHeight}");
+                throw new Exception($"Image is {image.Width}x{image.Height}, width must be a multiple of 8x{_tileHeight}");
+            }
+
+            var tilesPerRow = image.Width / 8;
+            var imageTileCount =  tilesPerRow * (image.Height / _tileHeight);
+            if (imageTileCount < Tiles.Count)
+            {
+                throw new Exception($"Image defines {imageTileCount} tiles, we need {Tiles.Count}");
             }
 
             // We walk over the image and extract each tile...
@@ -162,8 +194,8 @@ namespace sth1edwv.GameObjects
             foreach (var tile in Tiles)
             {
                 // First get the tile's source coordinates
-                var tileX = tile.Index % 16 * 8;
-                var tileY = tile.Index / 16 * _tileHeight;
+                var tileX = tile.Index % tilesPerRow * 8;
+                var tileY = tile.Index / tilesPerRow * _tileHeight;
 
                 for (var row = 0; row < _tileHeight; ++row)
                 {
