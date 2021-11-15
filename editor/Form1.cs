@@ -482,8 +482,18 @@ namespace sth1edwv
             UpdateTileSetSpace();
         }
 
-        private void tileSetViewer_Changed(TileSet obj)
+        private void tileSetViewer_Changed(TileSet tileSet)
         {
+            // We need to reset any cached images in block mappings using this tile set
+            foreach (var block in _cartridge.Levels
+                .Where(x => x.TileSet == tileSet)
+                .Select(x => x.BlockMapping)
+                .Distinct()
+                .SelectMany(x => x.Blocks))
+            {
+                block.ResetImages();
+            }
+
             UpdateTileSetSpace();
         }
 
