@@ -276,10 +276,6 @@ namespace sth1edwv.GameObjects
             Palette = palettes[_initPalette];
             CyclingPalette = palettes[_paletteCycleIndex + 8];
 
-            // The tile palette is effectively the first cycling palette entry...
-            TilePalette = CyclingPalette.GetSubPalette(0, 16);
-            SpritePalette = Palette.GetSubPalette(16, 16);
-
             TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true, false);
 
             SpriteTileSet = cartridge.GetTileSet(spriteArtAddress + spriteArtPage * 0x4000, false, true);
@@ -295,12 +291,16 @@ namespace sth1edwv.GameObjects
 
             BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
+
+            // We generate sub-palettes for rendering
+            UpdateRenderingPalettes();
         }
 
         [Browsable(false)]
-        public Palette SpritePalette { get; }
+        public Palette SpritePalette { get; private set; }
+
         [Browsable(false)]
-        public Palette TilePalette { get; }
+        public Palette TilePalette { get; private set; }
 
 
         public override string ToString()
@@ -383,6 +383,28 @@ namespace sth1edwv.GameObjects
             writer.Write((byte)0); // 00: Always 0
             writer.Write((byte)MusicIndex); // MU
             return stream.ToArray();
+        }
+
+        public void UpdateRenderingPalettes()
+        {
+            // The tile palette is effectively the first cycling palette entry...
+            TilePalette = CyclingPalette.GetSubPalette(0, 16);
+            SpritePalette = Palette.GetSubPalette(16, 16);
+
+            foreach (var block in BlockMapping.Blocks)
+            {
+                block.ResetImages();
+            }
+
+            foreach (var tile in TileSet.Tiles)
+            {
+                tile.ResetImages();
+            }
+
+            foreach (var tile in SpriteTileSet.Tiles)
+            {
+                tile.ResetImages();
+            }
         }
     }
 }

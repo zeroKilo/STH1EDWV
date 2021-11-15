@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace sth1edwv.GameObjects
 {
-    public class Palette
+    public class Palette: IDataItem
     {
-        private readonly int _offset;
         private readonly List<Color> _colors = new();
         private ColorPalette _imagePalette;
 
@@ -35,7 +38,7 @@ namespace sth1edwv.GameObjects
 
         public Palette(IReadOnlyList<byte> mem, int offset, int count)
         {
-            _offset = offset;
+            Offset = offset;
             for (var i = 0; i < 16*count; i++)
             {
                 var color = mem[offset + i];
@@ -53,9 +56,9 @@ namespace sth1edwv.GameObjects
 
         public override string ToString()
         {
-            if (_offset > 0)
+            if (Offset > 0)
             {
-                return $"{_colors.Count} colours @ {_offset:X}";
+                return $"{_colors.Count} colours @ {Offset:X}";
             }
 
             return $"{_colors.Count} colours (copy, do not save this)";
@@ -108,6 +111,127 @@ namespace sth1edwv.GameObjects
         public Palette GetSubPalette(int start, int count)
         {
             return new Palette(_colors, start, count);
+        }
+
+        public void SaveAsText(string fileName)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("JASC-PAL")
+                .AppendLine("0100")
+                .AppendLine("256");
+            foreach (var color in _colors)
+            {
+                sb.AppendLine($"{color.R} {color.G} {color.B}");
+            }
+            // Pad to 256 colours
+            for (var i = 0; i < 256 - _colors.Count; ++i)
+            {
+                sb.AppendLine("255 0 255");
+            }
+            File.WriteAllText(fileName, sb.ToString());
+        }
+
+        public void SaveAsImage(string fileName)
+        {
+            using var image = ToImage(16);
+            image.Save(fileName);
+        }
+
+        public void LoadFromText(string fileName)
+        {
+            var lines = File.ReadLines(fileName).ToList();
+            // We are not very tolerant...
+            if (lines.Count != 256 + 3 ||
+                lines[0] != "JASC-PAL" ||
+                lines[1] != "0100" ||
+                lines[2] != "256")
+            {
+                throw new Exception("Incorrect palette file");
+            }
+
+            for (var i = 0; i < _colors.Count; ++i)
+            {
+                var match = Regex.Match(lines[i + 3], "(?<R>\\d+) (?<G>\\d+) (?<G>\\d+)");
+                if (!match.Success)
+                {
+                    throw new Exception($"Failed to parse line: {lines[i + 3]}");
+                }
+
+                // Local function...
+                int GetIndex(string s)
+                {
+                    var x = Convert.ToInt32(match.Groups[s].Value);
+                    if (x is < 0 or > 255)
+                    {
+                        throw new Exception($"Value out of range: {x}");
+                    }
+
+                    return x;
+                }
+
+                _colors[i] = Color.FromArgb(GetIndex("R"), GetIndex("G"), GetIndex("B"));
+                // Reset the image palette
+                _imagePalette = null;
+            }
+        }
+
+        public void LoadFromImage(string fileName)
+        {
+            using var image = Image.FromFile(fileName);
+            if (image is not Bitmap bitmap)
+            {
+                throw new Exception("Unsupported image format");
+            }
+
+            // Rounds a colour to the SMS palette
+            Color ToSms(Color color) =>
+                Color.FromArgb(
+                    color.R / 0x55 * 0x55,
+                    color.G / 0x55 * 0x55,
+                    color.B / 0x55 * 0x55);
+
+            // If it's an 8-bit paletted image, we copy its palette.
+            // If it's anything else, we expect a 16px wide image.
+            if (bitmap.PixelFormat == PixelFormat.Format8bppIndexed)
+            {
+                // We read the colours out of its palette
+                var palette = bitmap.Palette;
+                if (palette.Entries.Length < _colors.Count)
+                {
+                    throw new Exception($"Image palette has {palette.Entries.Length} colours, we need at least {_colors.Count}");
+                }
+                for (var i = 0; i < _colors.Count; ++i)
+                {
+                    _colors[i] = ToSms(palette.Entries[i]);
+                }
+            }
+            else
+            {
+                // We read the colours straight out of the bitmap
+                if (image.Width * image.Height < _colors.Count)
+                {
+                    throw new Exception($"Image is too small to define {_colors.Count} colours");
+                }
+                for (var i = 0; i < _colors.Count; ++i)
+                {
+                    _colors[i] = ToSms(bitmap.GetPixel(i % 16, i / 16));
+                }
+            }
+
+            // Reset the image palette
+            _imagePalette = null;
+        }
+
+        public int Offset { get; } = -1;
+        public IList<byte> GetData()
+        {
+            // We truncate each colour to its top two bits and merge...
+            return _colors.Select(color => 
+                (byte)(
+                    ((color.R >> 6) << 4) | 
+                    ((color.G >> 6) << 2) | 
+                    ((color.B >> 6) << 0)))
+                .ToList();
         }
     }
 }

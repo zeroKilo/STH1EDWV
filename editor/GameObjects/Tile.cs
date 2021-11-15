@@ -72,10 +72,10 @@ namespace sth1edwv.GameObjects
 
         public void Dispose()
         {
-            DisposeImages();
+            ResetImages();
         }
 
-        private void DisposeImages()
+        public void ResetImages()
         {
             foreach (var image in _images.Values)
             {
@@ -92,13 +92,13 @@ namespace sth1edwv.GameObjects
         public void SetData(int x, int y, int index)
         {
             _data[x + y * Width] = (byte)index;
-            DisposeImages();
+            ResetImages();
         }
 
         public void Blank()
         {
             Array.Clear(_data, 0, _data.Length);
-            DisposeImages();
+            ResetImages();
         }
     }
 }

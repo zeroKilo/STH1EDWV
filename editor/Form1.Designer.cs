@@ -36,9 +36,9 @@ namespace sth1edwv
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -53,10 +53,11 @@ namespace sth1edwv
             this.propertyGridLevel = new System.Windows.Forms.PropertyGrid();
             this.treeViewLevelData = new System.Windows.Forms.TreeView();
             this.tabPagePalettes = new System.Windows.Forms.TabPage();
+            this.PalettesLayout = new System.Windows.Forms.FlowLayoutPanel();
             this.tabPageTiles = new System.Windows.Forms.TabPage();
-            this.tileSetViewer = new TileSetViewer();
+            this.tileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.tabPageSprites = new System.Windows.Forms.TabPage();
-            this.spriteTileSetViewer = new TileSetViewer();
+            this.spriteTileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.tabPageBlocks = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
@@ -70,8 +71,8 @@ namespace sth1edwv
             this.tabPageLayout = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
-            this.floorEditor1 = new FloorEditor();
-            this.layoutBlockChooser = new ItemPicker();
+            this.floorEditor1 = new sth1edwv.Controls.FloorEditor();
+            this.layoutBlockChooser = new sth1edwv.Controls.ItemPicker();
             this.toolStripLayout = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.buttonShowObjects = new System.Windows.Forms.ToolStripButton();
@@ -90,6 +91,7 @@ namespace sth1edwv
             this.buttonFloodFill = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.buttonResizeFloor = new System.Windows.Forms.ToolStripButton();
+            this.SharingButton = new System.Windows.Forms.ToolStripButton();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.listBoxPalettes = new System.Windows.Forms.ListBox();
@@ -105,7 +107,7 @@ namespace sth1edwv
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.SharingButton = new System.Windows.Forms.ToolStripButton();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -114,6 +116,7 @@ namespace sth1edwv
             this.splitContainer6.SuspendLayout();
             this.tabControlLevel.SuspendLayout();
             this.tabPageMetadata.SuspendLayout();
+            this.tabPagePalettes.SuspendLayout();
             this.tabPageTiles.SuspendLayout();
             this.tabPageSprites.SuspendLayout();
             this.tabPageBlocks.SuspendLayout();
@@ -145,6 +148,10 @@ namespace sth1edwv
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.statusStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -248,8 +255,7 @@ namespace sth1edwv
             // 
             // tabPageMetadata
             // 
-            this.tabPageMetadata.Controls.Add(this.propertyGridLevel);
-            this.tabPageMetadata.Controls.Add(this.treeViewLevelData);
+            this.tabPageMetadata.Controls.Add(this.splitContainer2);
             this.tabPageMetadata.Location = new System.Drawing.Point(4, 22);
             this.tabPageMetadata.Name = "tabPageMetadata";
             this.tabPageMetadata.Padding = new System.Windows.Forms.Padding(3);
@@ -260,28 +266,26 @@ namespace sth1edwv
             // 
             // propertyGridLevel
             // 
-            this.propertyGridLevel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.propertyGridLevel.Location = new System.Drawing.Point(734, 6);
+            this.propertyGridLevel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGridLevel.Location = new System.Drawing.Point(0, 0);
             this.propertyGridLevel.Name = "propertyGridLevel";
-            this.propertyGridLevel.Size = new System.Drawing.Size(263, 493);
+            this.propertyGridLevel.Size = new System.Drawing.Size(661, 499);
             this.propertyGridLevel.TabIndex = 2;
             this.propertyGridLevel.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridLevel_PropertyValueChanged);
             // 
             // treeViewLevelData
             // 
-            this.treeViewLevelData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.treeViewLevelData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeViewLevelData.Font = new System.Drawing.Font("Consolas", 8.25F);
-            this.treeViewLevelData.Location = new System.Drawing.Point(3, 6);
+            this.treeViewLevelData.Location = new System.Drawing.Point(0, 0);
             this.treeViewLevelData.Name = "treeViewLevelData";
-            this.treeViewLevelData.Size = new System.Drawing.Size(725, 493);
+            this.treeViewLevelData.Size = new System.Drawing.Size(332, 499);
             this.treeViewLevelData.TabIndex = 1;
             this.treeViewLevelData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeViewLevelDataItemSelected);
             // 
             // tabPagePalettes
             // 
+            this.tabPagePalettes.Controls.Add(this.PalettesLayout);
             this.tabPagePalettes.Location = new System.Drawing.Point(4, 22);
             this.tabPagePalettes.Name = "tabPagePalettes";
             this.tabPagePalettes.Padding = new System.Windows.Forms.Padding(3);
@@ -289,6 +293,16 @@ namespace sth1edwv
             this.tabPagePalettes.TabIndex = 4;
             this.tabPagePalettes.Text = "Palettes";
             this.tabPagePalettes.UseVisualStyleBackColor = true;
+            // 
+            // PalettesLayout
+            // 
+            this.PalettesLayout.AutoSize = true;
+            this.PalettesLayout.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PalettesLayout.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.PalettesLayout.Location = new System.Drawing.Point(3, 3);
+            this.PalettesLayout.Name = "PalettesLayout";
+            this.PalettesLayout.Size = new System.Drawing.Size(997, 499);
+            this.PalettesLayout.TabIndex = 0;
             // 
             // tabPageTiles
             // 
@@ -308,7 +322,7 @@ namespace sth1edwv
             this.tileSetViewer.Name = "tileSetViewer";
             this.tileSetViewer.Size = new System.Drawing.Size(997, 499);
             this.tileSetViewer.TabIndex = 1;
-            this.tileSetViewer.Changed += new System.Action<TileSet>(this.tileSetViewer_Changed);
+            this.tileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.tileSetViewer_Changed);
             // 
             // tabPageSprites
             // 
@@ -328,7 +342,7 @@ namespace sth1edwv
             this.spriteTileSetViewer.Name = "spriteTileSetViewer";
             this.spriteTileSetViewer.Size = new System.Drawing.Size(997, 499);
             this.spriteTileSetViewer.TabIndex = 0;
-            this.spriteTileSetViewer.Changed += new System.Action<TileSet>(this.spriteTileSetViewer_Changed);
+            this.spriteTileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.spriteTileSetViewer_Changed);
             // 
             // tabPageBlocks
             // 
@@ -397,8 +411,8 @@ namespace sth1edwv
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle10.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle10;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -420,8 +434,8 @@ namespace sth1edwv
             // Used
             // 
             this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle11;
             this.Used.HeaderText = "Used";
             this.Used.Name = "Used";
             this.Used.ReadOnly = true;
@@ -429,8 +443,8 @@ namespace sth1edwv
             // UsedGlobal
             // 
             this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle12;
             this.UsedGlobal.HeaderText = "Total used";
             this.UsedGlobal.Name = "UsedGlobal";
             this.UsedGlobal.ReadOnly = true;
@@ -493,7 +507,7 @@ namespace sth1edwv
             this.floorEditor1.BlockGaps = false;
             this.floorEditor1.BlockNumbers = true;
             this.floorEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.floorEditor1.DrawingMode = FloorEditor.Modes.Draw;
+            this.floorEditor1.DrawingMode = sth1edwv.Controls.FloorEditor.Modes.Draw;
             this.floorEditor1.LevelBounds = false;
             this.floorEditor1.Location = new System.Drawing.Point(0, 0);
             this.floorEditor1.Name = "floorEditor1";
@@ -692,6 +706,15 @@ namespace sth1edwv
             this.buttonResizeFloor.Text = "Resize...";
             this.buttonResizeFloor.Click += new System.EventHandler(this.ResizeFloorButtonClick);
             // 
+            // SharingButton
+            // 
+            this.SharingButton.Image = ((System.Drawing.Image)(resources.GetObject("SharingButton.Image")));
+            this.SharingButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.SharingButton.Name = "SharingButton";
+            this.SharingButton.Size = new System.Drawing.Size(76, 20);
+            this.SharingButton.Text = "Sharing...";
+            this.SharingButton.Click += new System.EventHandler(this.SharingButton_Click);
+            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.splitContainer3);
@@ -856,14 +879,22 @@ namespace sth1edwv
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
             // 
-            // SharingButton
+            // splitContainer2
             // 
-            this.SharingButton.Image = ((System.Drawing.Image)(resources.GetObject("SharingButton.Image")));
-            this.SharingButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.SharingButton.Name = "SharingButton";
-            this.SharingButton.Size = new System.Drawing.Size(76, 20);
-            this.SharingButton.Text = "Sharing...";
-            this.SharingButton.Click += new System.EventHandler(this.SharingButton_Click);
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.treeViewLevelData);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.propertyGridLevel);
+            this.splitContainer2.Size = new System.Drawing.Size(997, 499);
+            this.splitContainer2.SplitterDistance = 332;
+            this.splitContainer2.TabIndex = 3;
             // 
             // Form1
             // 
@@ -873,6 +904,7 @@ namespace sth1edwv
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "STH1 Editor by WV :: extended by Maxim";
@@ -886,6 +918,8 @@ namespace sth1edwv
             this.splitContainer6.ResumeLayout(false);
             this.tabControlLevel.ResumeLayout(false);
             this.tabPageMetadata.ResumeLayout(false);
+            this.tabPagePalettes.ResumeLayout(false);
+            this.tabPagePalettes.PerformLayout();
             this.tabPageTiles.ResumeLayout(false);
             this.tabPageSprites.ResumeLayout(false);
             this.tabPageBlocks.ResumeLayout(false);
@@ -921,6 +955,10 @@ namespace sth1edwv
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+            this.splitContainer2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -994,6 +1032,8 @@ namespace sth1edwv
         private ToolStripButton buttonResizeFloor;
         private ToolStripButton buttonFloodFill;
         private ToolStripButton SharingButton;
+        private FlowLayoutPanel PalettesLayout;
+        private SplitContainer splitContainer2;
     }
 }
 

@@ -302,6 +302,11 @@ namespace sth1edwv
             {
                 gameText.GetData().CopyTo(memory, gameText.Offset);
             }
+            // - Palettes (at original offsets)
+            foreach (var palette in Levels.Select(x => x.Palette))
+            {
+                palette.GetData().CopyTo(memory, palette.Offset);
+            }
             // - Floors (filling space)
             // TODO: 16000-18de9 is tilemaps, I should repack them and then append (when I add an editor?)
             var offset = 0x16dea;

@@ -53,6 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\PaletteEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PaletteEditor.Designer.cs">
+      <DependentUpon>PaletteEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FloorSharingEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +123,9 @@
     <Compile Include="Controls\TileSetViewer.Designer.cs">
       <DependentUpon>TileSetViewer.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Controls\PaletteEditor.resx">
+      <DependentUpon>PaletteEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FloorSharingEditor.resx">
       <DependentUpon>FloorSharingEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -141,9 +150,6 @@
     </Compile>
     <EmbeddedResource Include="Forms\TileChooser.resx">
       <DependentUpon>TileChooser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ItemPicker.resx">
-      <DependentUpon>ItemPicker.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\TileSetViewer.resx">
       <DependentUpon>TileSetViewer.cs</DependentUpon>

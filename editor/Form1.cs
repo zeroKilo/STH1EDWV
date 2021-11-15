@@ -100,6 +100,17 @@ namespace sth1edwv
 
             LoadLevelData();
 
+            foreach (Control control in PalettesLayout.Controls)
+            {
+                control.Dispose();
+            }
+            PalettesLayout.Controls.Clear();
+            if (level != null)
+            {
+                PalettesLayout.Controls.Add(new PaletteEditor(level.Palette, "Base palette (only sprites part is used)", OnPaletteChanged));
+                PalettesLayout.Controls.Add(new PaletteEditor(level.CyclingPalette, "Colour cycling", OnPaletteChanged));
+            }
+
             propertyGridLevel.SelectedObject = level;
 
             level?.BlockMapping.UpdateUsageForLevel(level);
@@ -111,6 +122,21 @@ namespace sth1edwv
             dataGridViewBlocks.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
 
             layoutBlockChooser.SetData(level?.BlockMapping.Blocks, level?.TilePalette);
+        }
+
+        private void OnPaletteChanged(Palette palette)
+        {
+            // We invalidate everything based on it...
+            foreach (var level in _cartridge.Levels.Where(x => x.Palette == palette))
+            {
+                level.UpdateRenderingPalettes();
+            }
+
+            if (listBoxLevels.SelectedItem is Level selectedLevel)
+            {
+                tileSetViewer.SetData(selectedLevel?.TileSet, selectedLevel?.TilePalette, false, GetTileUsedInBlocks);
+                spriteTileSetViewer.SetData(selectedLevel?.SpriteTileSet, selectedLevel?.SpritePalette, true, null);
+            }
         }
 
         private IList<Block> GetTileUsedInBlocks(int index)
