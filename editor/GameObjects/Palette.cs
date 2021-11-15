@@ -185,9 +185,9 @@ namespace sth1edwv.GameObjects
             // Rounds a colour to the SMS palette
             Color ToSms(Color color) =>
                 Color.FromArgb(
-                    color.R / 0x55 * 0x55,
-                    color.G / 0x55 * 0x55,
-                    color.B / 0x55 * 0x55);
+                    (color.R + 42) / 0x55 * 0x55,
+                    (color.G + 42) / 0x55 * 0x55,
+                    (color.B + 42) / 0x55 * 0x55);
 
             // If it's an 8-bit paletted image, we copy its palette.
             // If it's anything else, we expect a 16px wide image.
