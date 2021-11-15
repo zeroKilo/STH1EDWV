@@ -228,9 +228,9 @@ namespace sth1edwv.GameObjects
             // We truncate each colour to its top two bits and merge...
             return _colors.Select(color => 
                 (byte)(
-                    ((color.R >> 6) << 4) | 
+                    ((color.R >> 6) << 0) | 
                     ((color.G >> 6) << 2) | 
-                    ((color.B >> 6) << 0)))
+                    ((color.B >> 6) << 4)))
                 .ToList();
         }
     }
