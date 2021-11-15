@@ -210,7 +210,7 @@ namespace sth1edwv.GameObjects
 
         private readonly byte _unknownByte;
 
-        public Level(Cartridge cartridge, int offset, IList<Palette> palettes, string label)
+        public Level(Cartridge cartridge, int offset, string label)
         {
             _label = label;
             Offset = offset;
@@ -273,8 +273,8 @@ namespace sth1edwv.GameObjects
                 }       
             }
 
-            Palette = palettes[_initPalette];
-            CyclingPalette = palettes[_paletteCycleIndex + 8];
+            Palette = cartridge.GetPalette(cartridge.Memory.Word(0x627C + _initPalette*2), 2);
+            CyclingPalette = cartridge.GetPalette(cartridge.Memory.Word(0x628C + _paletteCycleIndex*2), _paletteCycleCount);
 
             TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true, false);
 

@@ -75,6 +75,9 @@ namespace sth1edwv
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
             this.floorEditor1 = new sth1edwv.Controls.FloorEditor();
             this.layoutBlockChooser = new sth1edwv.Controls.ItemPicker();
+            this.levelEditorContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.selectBlockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripLayout = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.buttonShowObjects = new System.Windows.Forms.ToolStripButton();
@@ -94,10 +97,6 @@ namespace sth1edwv
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.buttonResizeFloor = new System.Windows.Forms.ToolStripButton();
             this.SharingButton = new System.Windows.Forms.ToolStripButton();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
-            this.listBoxPalettes = new System.Windows.Forms.ListBox();
-            this.pictureBoxPalette = new System.Windows.Forms.PictureBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
@@ -109,9 +108,6 @@ namespace sth1edwv
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.levelEditorContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.selectBlockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -140,13 +136,8 @@ namespace sth1edwv
             this.splitContainer7.Panel1.SuspendLayout();
             this.splitContainer7.Panel2.SuspendLayout();
             this.splitContainer7.SuspendLayout();
+            this.levelEditorContextMenu.SuspendLayout();
             this.toolStripLayout.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
-            this.splitContainer3.Panel1.SuspendLayout();
-            this.splitContainer3.Panel2.SuspendLayout();
-            this.splitContainer3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPalette)).BeginInit();
             this.tabPage9.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPageScreens.SuspendLayout();
@@ -156,7 +147,6 @@ namespace sth1edwv
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.statusStrip1.SuspendLayout();
-            this.levelEditorContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -554,6 +544,28 @@ namespace sth1edwv
             this.layoutBlockChooser.Size = new System.Drawing.Size(288, 453);
             this.layoutBlockChooser.TabIndex = 0;
             // 
+            // levelEditorContextMenu
+            // 
+            this.levelEditorContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectBlockToolStripMenuItem,
+            this.editObjectToolStripMenuItem});
+            this.levelEditorContextMenu.Name = "levelEditorContextMenu";
+            this.levelEditorContextMenu.Size = new System.Drawing.Size(140, 48);
+            // 
+            // selectBlockToolStripMenuItem
+            // 
+            this.selectBlockToolStripMenuItem.Name = "selectBlockToolStripMenuItem";
+            this.selectBlockToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.selectBlockToolStripMenuItem.Text = "Select block";
+            this.selectBlockToolStripMenuItem.Click += new System.EventHandler(this.selectBlockToolStripMenuItem_Click);
+            // 
+            // editObjectToolStripMenuItem
+            // 
+            this.editObjectToolStripMenuItem.Name = "editObjectToolStripMenuItem";
+            this.editObjectToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
+            this.editObjectToolStripMenuItem.Text = "Edit object...";
+            this.editObjectToolStripMenuItem.Click += new System.EventHandler(this.editObjectToolStripMenuItem_Click);
+            // 
             // toolStripLayout
             // 
             this.toolStripLayout.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -739,55 +751,6 @@ namespace sth1edwv
             this.SharingButton.Text = "Sharing...";
             this.SharingButton.Click += new System.EventHandler(this.SharingButton_Click);
             // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.splitContainer3);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1323, 537);
-            this.tabPage2.TabIndex = 3;
-            this.tabPage2.Text = "Palettes";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // splitContainer3
-            // 
-            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer3.Location = new System.Drawing.Point(3, 3);
-            this.splitContainer3.Name = "splitContainer3";
-            // 
-            // splitContainer3.Panel1
-            // 
-            this.splitContainer3.Panel1.Controls.Add(this.listBoxPalettes);
-            // 
-            // splitContainer3.Panel2
-            // 
-            this.splitContainer3.Panel2.Controls.Add(this.pictureBoxPalette);
-            this.splitContainer3.Size = new System.Drawing.Size(1317, 531);
-            this.splitContainer3.SplitterDistance = 436;
-            this.splitContainer3.TabIndex = 1;
-            // 
-            // listBoxPalettes
-            // 
-            this.listBoxPalettes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxPalettes.Font = new System.Drawing.Font("Consolas", 8.25F);
-            this.listBoxPalettes.FormattingEnabled = true;
-            this.listBoxPalettes.IntegralHeight = false;
-            this.listBoxPalettes.Location = new System.Drawing.Point(0, 0);
-            this.listBoxPalettes.Name = "listBoxPalettes";
-            this.listBoxPalettes.Size = new System.Drawing.Size(436, 531);
-            this.listBoxPalettes.TabIndex = 0;
-            this.listBoxPalettes.SelectedIndexChanged += new System.EventHandler(this.ListBoxPalettesSelectedIndexChanged);
-            // 
-            // pictureBoxPalette
-            // 
-            this.pictureBoxPalette.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxPalette.Location = new System.Drawing.Point(0, 0);
-            this.pictureBoxPalette.Name = "pictureBoxPalette";
-            this.pictureBoxPalette.Size = new System.Drawing.Size(877, 531);
-            this.pictureBoxPalette.TabIndex = 1;
-            this.pictureBoxPalette.TabStop = false;
-            // 
             // tabPage9
             // 
             this.tabPage9.Controls.Add(this.listBoxGameText);
@@ -815,7 +778,6 @@ namespace sth1edwv
             // 
             this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage9);
-            this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPageScreens);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
@@ -903,28 +865,6 @@ namespace sth1edwv
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
             // 
-            // levelEditorContextMenu
-            // 
-            this.levelEditorContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectBlockToolStripMenuItem,
-            this.editObjectToolStripMenuItem});
-            this.levelEditorContextMenu.Name = "levelEditorContextMenu";
-            this.levelEditorContextMenu.Size = new System.Drawing.Size(140, 48);
-            // 
-            // selectBlockToolStripMenuItem
-            // 
-            this.selectBlockToolStripMenuItem.Name = "selectBlockToolStripMenuItem";
-            this.selectBlockToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
-            this.selectBlockToolStripMenuItem.Text = "Select block";
-            this.selectBlockToolStripMenuItem.Click += new System.EventHandler(this.selectBlockToolStripMenuItem_Click);
-            // 
-            // editObjectToolStripMenuItem
-            // 
-            this.editObjectToolStripMenuItem.Name = "editObjectToolStripMenuItem";
-            this.editObjectToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
-            this.editObjectToolStripMenuItem.Text = "Edit object...";
-            this.editObjectToolStripMenuItem.Click += new System.EventHandler(this.editObjectToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -970,14 +910,9 @@ namespace sth1edwv
             this.splitContainer7.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
             this.splitContainer7.ResumeLayout(false);
+            this.levelEditorContextMenu.ResumeLayout(false);
             this.toolStripLayout.ResumeLayout(false);
             this.toolStripLayout.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.splitContainer3.Panel1.ResumeLayout(false);
-            this.splitContainer3.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
-            this.splitContainer3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxPalette)).EndInit();
             this.tabPage9.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPageScreens.ResumeLayout(false);
@@ -988,7 +923,6 @@ namespace sth1edwv
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.levelEditorContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1032,10 +966,6 @@ namespace sth1edwv
         private ToolStripButton toolStripButtonSaveRenderedLevel;
         private ToolStripButton buttonCopyFloor;
         private ToolStripButton buttonPasteFloor;
-        private TabPage tabPage2;
-        private SplitContainer splitContainer3;
-        private ListBox listBoxPalettes;
-        private PictureBox pictureBoxPalette;
         private TabPage tabPage9;
         private ListBox listBoxGameText;
         private TabControl tabControl1;

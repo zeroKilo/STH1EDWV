@@ -21,7 +21,7 @@ namespace sth1edwv.Controls
 
         public event Action<TileSet> Changed;
 
-        public void SetData(TileSet tileSet, Palette palette, bool stackedMode,
+        public void SetData(TileSet tileSet, Palette palette,
             Func<int, IList<Block>> getUsedInBlocks)
         {
             _tileSet = tileSet;

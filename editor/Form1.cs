@@ -59,8 +59,6 @@ namespace sth1edwv
             _cartridge = new Cartridge(filename);
             listBoxLevels.Items.Clear();
             listBoxLevels.Items.AddRange(_cartridge.Levels.ToArray<object>());
-            listBoxPalettes.Items.Clear();
-            listBoxPalettes.Items.AddRange(_cartridge.Palettes.ToArray<object>());
             listBoxGameText.Items.Clear();
             listBoxGameText.Items.AddRange(_cartridge.GameText.ToArray<object>());
             listBoxScreens.Items.Clear();
@@ -76,18 +74,6 @@ namespace sth1edwv
             UpdateTileSetSpace();
         }
 
-        private void ListBoxPalettesSelectedIndexChanged(object sender, EventArgs e)
-        {
-            pictureBoxPalette.Image?.Dispose();
-            if (listBoxPalettes.SelectedItem is not Palette palette)
-            {
-                pictureBoxPalette.Image = null;
-                return;
-            }
-
-            pictureBoxPalette.Image = palette.ToImage(512);
-        }
-
         private void SelectedLevelChanged(object sender, EventArgs e)
         {
             var level = listBoxLevels.SelectedItem as Level;
@@ -95,8 +81,8 @@ namespace sth1edwv
             floorEditor1.SetData(level);
             LevelRenderModeChanged(null, EventArgs.Empty);
 
-            tileSetViewer.SetData(level?.TileSet, level?.TilePalette, false, GetTileUsedInBlocks);
-            spriteTileSetViewer.SetData(level?.SpriteTileSet, level?.SpritePalette, true, null);
+            tileSetViewer.SetData(level?.TileSet, level?.TilePalette, GetTileUsedInBlocks);
+            spriteTileSetViewer.SetData(level?.SpriteTileSet, level?.SpritePalette, null);
 
             LoadLevelData();
 
@@ -134,8 +120,8 @@ namespace sth1edwv
 
             if (listBoxLevels.SelectedItem is Level selectedLevel)
             {
-                tileSetViewer.SetData(selectedLevel?.TileSet, selectedLevel?.TilePalette, false, GetTileUsedInBlocks);
-                spriteTileSetViewer.SetData(selectedLevel?.SpriteTileSet, selectedLevel?.SpritePalette, true, null);
+                tileSetViewer.SetData(selectedLevel.TileSet, selectedLevel.TilePalette, GetTileUsedInBlocks);
+                spriteTileSetViewer.SetData(selectedLevel.SpriteTileSet, selectedLevel.SpritePalette, null);
             }
         }
 

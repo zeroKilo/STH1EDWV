@@ -41,7 +41,7 @@ namespace sth1edwv.GameObjects
                 tileMapSize = cartridge.Memory.Word(secondaryTileMapSizeOffset);
                 var secondaryTileMap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize);
 
-                // Apply to the tilemap
+                // Apply to the tile map
                 for (var i = 0; i < secondaryTileMap.Length; i++)
                 {
                     var index = secondaryTileMap[i];

@@ -18,20 +18,21 @@ namespace sth1edwv.GameObjects
         {
             get
             {
-                if (_imagePalette == null)
+                if (_imagePalette != null)
                 {
-                    // We have to extract a ColorPalette from an image as it blocks us from constructing it...
-                    using var bmp = new Bitmap(1, 1, PixelFormat.Format8bppIndexed);
-                    _imagePalette = bmp.Palette;
-                    // We have to clear the whole palette to non-transparent colours to avoid (1) the default palette and (2) an image that GDI+ transforms to 32bpp on load
-                    for (var i = 0; i < 256; ++i)
-                    {
-                        _imagePalette.Entries[i] = Color.Magenta;
-                    }
-
-                    // Then we apply the real palette to the start
-                    _colors.CopyTo(_imagePalette.Entries, 0);
+                    return _imagePalette;
                 }
+                // We have to extract a ColorPalette from an image as it blocks us from constructing it...
+                using var bmp = new Bitmap(1, 1, PixelFormat.Format8bppIndexed);
+                _imagePalette = bmp.Palette;
+                // We have to clear the whole palette to non-transparent colours to avoid (1) the default palette and (2) an image that GDI+ transforms to 32bpp on load
+                for (var i = 0; i < 256; ++i)
+                {
+                    _imagePalette.Entries[i] = Color.Magenta;
+                }
+
+                // Then we apply the real palette to the start
+                _colors.CopyTo(_imagePalette.Entries, 0);
                 return _imagePalette;
             }
         }
@@ -49,19 +50,16 @@ namespace sth1edwv.GameObjects
             }
         }
 
-        private Palette(IList<Color> colors, int offset, int count)
+        private Palette(IEnumerable<Color> colors, int offset, int count)
         {
             _colors.AddRange(colors.Skip(offset).Take(count));
         }
 
         public override string ToString()
         {
-            if (Offset > 0)
-            {
-                return $"{_colors.Count} colours @ {Offset:X}";
-            }
-
-            return $"{_colors.Count} colours (copy, do not save this)";
+            return Offset > 0 
+                ? $"{_colors.Count} colours @ {Offset:X}" 
+                : $"{_colors.Count} colours (copy, do not save this)";
         }
 
         private static int ScaleColor(int c) => c switch
@@ -72,6 +70,7 @@ namespace sth1edwv.GameObjects
             _ => 0xff
         };
 
+        /*
         public static IEnumerable<Palette> ReadPalettes(Memory mem, int offset, int count)
         {
             var counts = new[]
@@ -87,7 +86,7 @@ namespace sth1edwv.GameObjects
                 yield return palette;
                 offset += 2;
             }
-        }
+        }*/
 
         public Image ToImage(int width)
         {

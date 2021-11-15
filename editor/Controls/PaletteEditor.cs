@@ -33,7 +33,7 @@ namespace sth1edwv.Controls
             pictureBox1.Image = _palette.ToImage(pictureBox1.Width);
         }
 
-        private void saveToolStripMenuItem_Click(object sender, System.EventArgs e)
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using var d = new SaveFileDialog
             {
@@ -55,7 +55,7 @@ namespace sth1edwv.Controls
             }
         }
 
-        private void loadToolStripMenuItem_Click(object sender, System.EventArgs e)
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             try
             {

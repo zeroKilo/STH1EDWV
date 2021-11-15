@@ -11,7 +11,6 @@ namespace sth1edwv.GameObjects
 {
     public class TileSet: IDataItem, IDisposable
     {
-        private readonly bool _isSprites;
         private readonly ushort _magic;
         private readonly ushort _dupRows;
         private readonly ushort _artData;
@@ -22,7 +21,6 @@ namespace sth1edwv.GameObjects
 
         public TileSet(Cartridge cartridge, int offset, bool addRings, bool isSprites)
         {
-            _isSprites = isSprites;
             Offset = offset;
             _magic = cartridge.Memory.Word(offset);
             _dupRows = cartridge.Memory.Word(offset + 2);

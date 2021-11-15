@@ -30,8 +30,8 @@ namespace sth1edwv.Forms
             sharedLevelsList.Items.AddRange(cartridge.Levels.Where(x => x.Floor == level.Floor).ToArray<object>());
 
             var comboItems = cartridge.Levels
-                .GroupBy(x => x.Floor)
-                .Select(x => new ComboItem{Floor = x.Key, Label = string.Join(", ", x.Select(x => x.ToString()))})
+                .GroupBy(l => l.Floor)
+                .Select(g => new ComboItem{Floor = g.Key, Label = string.Join(", ", g.Select(l => l.ToString()))})
                 .ToList();
             uniqueFloorsCombo.Items.AddRange(comboItems.ToArray<object>());
             uniqueFloorsCombo.SelectedItem = comboItems.First(x => x.Floor == level.Floor);

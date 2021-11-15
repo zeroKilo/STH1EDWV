@@ -195,18 +195,23 @@ namespace sth1edwv.Controls
                 return;
             }
 
-            // Ctrl key pressed forces select mode
-            if (DrawingMode == Modes.Select || (ModifierKeys & Keys.Control) != 0)
+            var mode = DrawingMode;
+            if ((ModifierKeys & Keys.Control) != 0)
             {
-                BlockChooser.SelectedIndex = _floor.BlockIndices[LastClickedBlockIndex];
+                // Ctrl key pressed forces select mode
+                mode = Modes.Select;
             }
-            else if (DrawingMode == Modes.Draw && BlockChooser.SelectedIndex >= 0)
+            switch (mode)
             {
-                SetBlockIndex(LastClickedBlockIndex, BlockChooser.SelectedIndex);
-            }
-            else if (DrawingMode == Modes.FloodFill)
-            {
-                FloodFill(LastClickedBlockIndex, BlockChooser.SelectedIndex);
+                case Modes.Select:
+                    BlockChooser.SelectedIndex = _floor.BlockIndices[LastClickedBlockIndex];
+                    break;
+                case Modes.Draw when BlockChooser.SelectedIndex >= 0:
+                    SetBlockIndex(LastClickedBlockIndex, BlockChooser.SelectedIndex);
+                    break;
+                case Modes.FloodFill:
+                    FloodFill(LastClickedBlockIndex, BlockChooser.SelectedIndex);
+                    break;
             }
         }
 
@@ -219,7 +224,7 @@ namespace sth1edwv.Controls
             }
             // We want to traverse the area from the clicked block and find any adjacent ones of the same value.
             // We work in x, y space.
-            var queue = new HashSet<Point> { new Point(index % _width, index / _width) };
+            var queue = new HashSet<Point> { new(index % _width, index / _width) };
             while (queue.Count > 0)
             {
                 // Get a point

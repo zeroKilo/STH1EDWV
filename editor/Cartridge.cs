@@ -186,7 +186,6 @@ namespace sth1edwv
         public Memory Memory { get; }
         public IList<Level> Levels { get; } = new List<Level>();
         public IList<GameText> GameText { get; } = new List<GameText>();
-        public IList<Palette> Palettes { get; }
         public IList<Screen> Screens { get; } = new List<Screen>();
 
         private readonly Dictionary<int, TileSet> _tileSets = new();
@@ -197,7 +196,6 @@ namespace sth1edwv
         public Cartridge(string path)
         {
             Memory = new Memory(File.ReadAllBytes(path));
-            Palettes = Palette.ReadPalettes(Memory, 0x627C, 8+9).ToList();
             ReadLevels();
             ReadGameText();
             ReadScreens();
@@ -228,7 +226,7 @@ namespace sth1edwv
             Levels.Clear();
             foreach (var level in Sonic1MasterSystem.Levels)
             {
-                Levels.Add(new Level(this, level.Offset, Palettes, level.Name));
+                Levels.Add(new Level(this, level.Offset, level.Name));
             }
         }
 
