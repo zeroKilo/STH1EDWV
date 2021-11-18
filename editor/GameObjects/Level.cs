@@ -276,9 +276,9 @@ namespace sth1edwv.GameObjects
             Palette = cartridge.GetPalette(cartridge.Memory.Word(0x627C + _initPalette*2), 2);
             CyclingPalette = cartridge.GetPalette(cartridge.Memory.Word(0x628C + _paletteCycleIndex*2), _paletteCycleCount);
 
-            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true, false);
+            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true, null);
 
-            SpriteTileSet = cartridge.GetTileSet(spriteArtAddress + spriteArtPage * 0x4000, false, true);
+            SpriteTileSet = cartridge.GetTileSet(spriteArtAddress + spriteArtPage * 0x4000, false, TileSet.Groupings.Sprite);
 
             Floor = cartridge.GetFloor(
                 _floorAddress + 0x14000, 
@@ -289,7 +289,24 @@ namespace sth1edwv.GameObjects
             // The original has a mistake in Scrap Brain 2 (BallHog area).
             FloorHeight = Floor.BlockIndices.Length / FloorWidth;
 
-            BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, _solidityIndex, TileSet);
+            // Hard-coded block counts. It's hard to avoid these...
+            // we could imply them from the gaps but then we'd need to know all the offsets
+            // (and whatever comes after - the blinking items art by default) before loading anything.
+            // If/when we support changing the mapping sizes, we will need to address this.
+            var blockCount = blockMappingOffset switch
+            {
+                0x0000 => 184,
+                0x0B80 => 144,
+                0x1480 => 160,
+                0x1E80 => 176,
+                0x2980 => 192,
+                0x3580 => 216,
+                0x4300 => 104,
+                0x4980 => 128,
+                _ => 0
+            };
+
+            BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, blockCount, _solidityIndex, TileSet);
             Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
 
             // We generate sub-palettes for rendering

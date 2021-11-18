@@ -8,14 +8,6 @@ using sth1edwv.GameObjects;
 
 namespace sth1edwv.Controls
 {
-    public interface IDrawableBlock
-    {
-        public Bitmap GetImage(Palette palette);
-        public void ResetImages();
-        public int Width { get; }
-        public int Height { get; }
-    }
-
     public sealed partial class ItemPicker : ScrollableControl
     {
         private int _tileWidth;
@@ -23,6 +15,8 @@ namespace sth1edwv.Controls
         private List<IDrawableBlock> _items;
         private Palette _palette;
         private int _selectedIndex = -1;
+        private bool _showTransparency;
+        private Palette _transparentPalette;
 
         public ItemPicker()
         {
@@ -33,15 +27,14 @@ namespace sth1edwv.Controls
         public void SetData(IEnumerable<IDrawableBlock> items, Palette palette)
         {
             _palette = palette;
-            _items = items?.ToList();
-            if (AutoSize && FixedItemsPerRow && ItemsPerRow > 0 && _items is { Count: > 0 })
+            if (palette != null)
             {
-                // We want to auto-size
-                var rowCount = _items.Count / ItemsPerRow + (_items.Count % ItemsPerRow == 0 ? 0 : 1);
-                var itemWidth = _items[0].Width * Math.Max(1, Scaling) + 1;
-                var itemHeight = _items[0].Height * Math.Max(1, Scaling) + 1;
-                Size = new Size(ItemsPerRow * itemWidth + 1, rowCount * itemHeight + 1);
+                // We make a new palette with hot pink for colour 0
+                var data = palette.GetData().ToArray();
+                data[0] = 0b00110011;
+                _transparentPalette = new Palette(data, 0, data.Length / 16);
             }
+            _items = items?.ToList();
             CheckDrawingSettings();
             Invalidate();
         }
@@ -64,7 +57,7 @@ namespace sth1edwv.Controls
                 // We compute the tile size
                 if (ItemsPerRow > 0)
                 {
-                    var tileWidth = (Width - ItemsPerRow - 1) / ItemsPerRow;
+                    var tileWidth = (Width - ItemsPerRow - 1 - SystemInformation.VerticalScrollBarWidth) / ItemsPerRow;
                     var tileHeight = _items is { Count: > 0 } 
                         ? tileWidth * _items[0].Height / _items[0].Width 
                         : tileWidth;
@@ -73,6 +66,11 @@ namespace sth1edwv.Controls
                     {
                         _tileWidth = tileWidth;
                         _tileHeight = tileHeight;
+                        if (_items is { Count: > 0 })
+                        {
+                            var numRows = _items.Count / ItemsPerRow + (_items.Count % ItemsPerRow == 0 ? 0 : 1);
+                            AutoScrollMinSize = new Size(ItemsPerRow * (_tileWidth + 1), numRows * (_tileHeight + 1));
+                        }
                         Invalidate();
                     }
                 }
@@ -89,7 +87,7 @@ namespace sth1edwv.Controls
 
                     // Set scroll bounds
                     var numRows = _items.Count / ItemsPerRow + (_items.Count % ItemsPerRow == 0 ? 0 : 1);
-                    AutoScrollMinSize = new Size(ItemsPerRow * _tileWidth, numRows * _tileHeight);
+                    AutoScrollMinSize = new Size(ItemsPerRow * (_tileWidth + 1), numRows * (_tileHeight + 1));
 
                     Invalidate();
                 }
@@ -114,6 +112,7 @@ namespace sth1edwv.Controls
             // Draw all tiles overlapping the rect
             e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
             e.Graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            var palette = _showTransparency ? _transparentPalette : _palette;
             for (var index = 0; index < _items.Count; ++index)
             {
                 // Is this tile in the clip rectangle?
@@ -123,7 +122,7 @@ namespace sth1edwv.Controls
                     continue;
                 }
                 var tile = _items[index];
-                e.Graphics.DrawImage(tile.GetImage(_palette), tileRect);
+                e.Graphics.DrawImage(tile.GetImage(palette), tileRect);
             }
 
             if (SelectedIndex > -1)
@@ -216,6 +215,16 @@ namespace sth1edwv.Controls
                 InvalidateItem(previousSelection);
                 InvalidateItem(_selectedIndex);
                 SelectionChanged?.Invoke(this, SelectedItem);
+            }
+        }
+
+        public bool ShowTransparency
+        {
+            get => _showTransparency;
+            set
+            {
+                _showTransparency = value;
+                Invalidate();
             }
         }
 

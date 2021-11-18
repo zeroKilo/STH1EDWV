@@ -141,7 +141,7 @@ namespace sth1edwv
             return result.ToArray();
         }
 
-        public static IEnumerable<byte> PlanarToChunky(IReadOnlyList<byte> data, int offset, int rowCount)
+        public static IEnumerable<byte> PlanarToChunky(IReadOnlyList<byte> data, int offset, int rowCount, int bytes = 4)
         {
             for (var row = 0; row < rowCount; ++row)
             {
@@ -149,9 +149,56 @@ namespace sth1edwv
                 for (var i = 0; i < 8; ++i)
                 {
                     var value = 0;
-                    for (var b = 0; b < 4; ++b)
+                    for (var b = 0; b < bytes; ++b)
                     {
-                        var bit = (data[offset + row * 4 + b] >> (7 - i)) & 1;
+                        var bit = (data[offset + row * bytes + b] >> (7 - i)) & 1;
+                        value |= bit << b;
+                    }
+
+                    yield return (byte)value;
+                }
+            }
+        }
+
+        public static IEnumerable<byte[]> ToChunks(this IEnumerable<byte> input, int bytesPerChunk)
+        {
+            var buffer = new byte[bytesPerChunk];
+            var index = 0;
+            foreach (var b in input)
+            {
+                buffer[index++] = b;
+                if (index == bytesPerChunk)
+                {
+                    yield return buffer;
+                    buffer = new byte[bytesPerChunk];
+                    index = 0;
+                }
+            }
+        }
+
+        public static IEnumerable<byte> PlanarToChunky(this IEnumerable<byte> input, int bitPlanes = 4)
+        {
+            using var enumerator = input.GetEnumerator();
+            var data = new byte[bitPlanes];
+            for (;;)
+            {
+                // Get planar bytes for 8 pixels
+                for (int i = 0; i < bitPlanes; ++i)
+                {
+                    if (!enumerator.MoveNext())
+                    {
+                        yield break;
+                    }
+
+                    data[i] = enumerator.Current;
+                }
+                // Each pixel is from four bitplanes
+                for (var i = 0; i < 8; ++i)
+                {
+                    var value = 0;
+                    for (var b = 0; b < bitPlanes; ++b)
+                    {
+                        var bit = (data[b] >> (7 - i)) & 1;
                         value |= bit << b;
                     }
 
@@ -233,22 +280,35 @@ namespace sth1edwv
                 }
             }
             // And the art data, converting to chunky
-            resultWriter.Write(artData.SelectMany(ChunkyToPlanar).ToArray());
+            resultWriter.Write(artData.SelectMany(row => ChunkyToPlanar(row)).ToArray());
             return result.ToArray();
         }
 
-        public static IEnumerable<byte> ChunkyToPlanar(byte[] data)
+        public static IEnumerable<byte> ChunkyToPlanar(this IEnumerable<byte> input, int bitPlanes = 4)
         {
             // Each byte is a chunky index in the range 0..15.
             // We interleave each 8 bytes to four bitplanes.
-            for (int offset = 0; offset < data.Length; offset += 8)
+            using var enumerator = input.GetEnumerator();
+            var data = new byte[8];
+            for (;;)
             {
-                for (var plane = 0; plane < 4; ++plane)
+                // Get 8 bytes
+                for (int i = 0; i < 8; ++i)
+                {
+                    if (!enumerator.MoveNext())
+                    {
+                        yield break;
+                    }
+
+                    data[i] = enumerator.Current;
+                }
+                // Convert them
+                for (var plane = 0; plane < bitPlanes; ++plane)
                 {
                     var b = 0;
                     for (var i = 0; i < 8; ++i)
                     {
-                        var bit = (data[offset+i] >> plane) & 1;
+                        var bit = (data[i] >> plane) & 1;
                         b |= bit << (7 - i);
                     }
 

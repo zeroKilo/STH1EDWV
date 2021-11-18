@@ -17,12 +17,20 @@ namespace sth1edwv.Controls
         public TileSetViewer()
         {
             InitializeComponent();
+            toolStrip2.Items.Add(new ToolStripControlHost(checkBoxTransparency));
         }
 
         public event Action<TileSet> Changed;
 
+        public int TilesPerRow
+        {
+            get => tilePicker.ItemsPerRow;
+            set => tilePicker.ItemsPerRow = value;
+        }
+
         public void SetData(TileSet tileSet, Palette palette,
-            Func<int, IList<Block>> getUsedInBlocks)
+            Func<int, IList<Block>> getUsedInBlocks = null,
+            bool allowShowingTransparency = false)
         {
             _tileSet = tileSet;
             _palette = palette;
@@ -30,33 +38,35 @@ namespace sth1edwv.Controls
             tilePicker.SelectedIndex = -1;
             _getUsedInBlocks = getUsedInBlocks;
             buttonBlankUnusedTiles.Visible = getUsedInBlocks != null;
+            splitContainer5.Panel2Collapsed = getUsedInBlocks == null;
+            checkBoxTransparency.Visible = allowShowingTransparency;
+            checkBoxTransparency.Checked = allowShowingTransparency;
+            tilePicker.ShowTransparency = checkBoxTransparency.Checked;
         }
 
         private void tilePicker_SelectionChanged(object sender, IDrawableBlock b)
         {
-            var tile = b as Tile;
             pictureBoxTilePreview.Image = null;
             pictureBoxTilePreview.Image?.Dispose();
             pictureBoxTileUsedIn.Image = null;
             pictureBoxTileUsedIn.Image?.Dispose();
-            if (tile == null)
+            if (b == null)
             {
                 return;
             }
-            var zoom = Math.Min((float)pictureBoxTilePreview.Width / tile.Width, (float)pictureBoxTilePreview.Height / tile.Height);
-            var bmp = new Bitmap((int)(tile.Width * zoom), (int)(tile.Height * zoom));
+            var zoom = Math.Min((float)pictureBoxTilePreview.Width / b.Width, (float)pictureBoxTilePreview.Height / b.Height);
+            var bmp = new Bitmap((int)(b.Width * zoom), (int)(b.Height * zoom));
             using (var g = Graphics.FromImage(bmp))
             {
                 g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 g.ScaleTransform(zoom, zoom);
-                g.DrawImageUnscaled(tile.GetImage(_palette), 0, 0);
+                g.DrawImageUnscaled(b.GetImage(_palette), 0, 0);
             }
 
             pictureBoxTilePreview.Image = bmp;
 
-
-            if (_getUsedInBlocks == null)
+            if (_getUsedInBlocks == null || b is not Tile tile)
             {
                 return;
             }
@@ -77,12 +87,12 @@ namespace sth1edwv.Controls
                 {
                     g.DrawImageUnscaled(block.GetImage(_palette), x, 0);
                     g.DrawString(block.Index.ToString("X2"), Font, SystemBrushes.WindowText, 
-                        new RectangleF(x, 32, 32, 16),
+                        new RectangleF(x, block.Height, block.Width, 16),
                         new StringFormat
                         {
                             Alignment = StringAlignment.Center
                         });
-                    x += 33;
+                    x += block.Width + 1;
                 }
             }
 
@@ -100,7 +110,7 @@ namespace sth1edwv.Controls
             {
                 return;
             }
-            using var image = _tileSet.ToImage(_palette);
+            using var image = _tileSet.ToImage(_palette, tilePicker.ItemsPerRow);
             image.Save(d.FileName, ImageFormat.Png);
         }
 
@@ -145,6 +155,11 @@ namespace sth1edwv.Controls
             tilePicker.Invalidate();
             tilePicker_SelectionChanged(tilePicker, tilePicker.SelectedItem);
             Changed?.Invoke(_tileSet);
+        }
+
+        private void checkBoxTransparency_CheckedChanged(object sender, EventArgs e)
+        {
+            tilePicker.ShowTransparency = checkBoxTransparency.Checked;
         }
     }
 }

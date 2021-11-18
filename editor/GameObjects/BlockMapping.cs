@@ -8,22 +8,8 @@ namespace sth1edwv.GameObjects
     {
         public List<Block> Blocks { get; } = new();
     
-        public BlockMapping(Cartridge cartridge, int address, int solidityIndex, TileSet tileSet)
+        public BlockMapping(Cartridge cartridge, int address, int blockCount, int solidityIndex, TileSet tileSet)
         {
-            // Hard-coded block counts...
-            // TODO: make these safer?
-            var blockCount = address switch
-            {
-                0x10000 => 184,
-                0x10B80 => 144,
-                0x11480 => 160,
-                0x11E80 => 176,
-                0x12980 => 192,
-                0x13580 => 216,
-                0x14300 => 104,
-                0x14980 => 128,
-                _ => 0
-            };
             var solidityOffset = cartridge.Memory.Word(0x3A65 + solidityIndex * 2);
             for (var i = 0; i < blockCount; ++i)
             {

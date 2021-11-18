@@ -1,4 +1,6 @@
-﻿namespace sth1edwv.Controls
+﻿using sth1edwv.GameObjects;
+
+namespace sth1edwv.Controls
 {
     partial class TileSetViewer
     {
@@ -40,6 +42,7 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.pictureBoxTileUsedIn = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.checkBoxTransparency = new System.Windows.Forms.CheckBox();
             this.toolStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
@@ -122,7 +125,7 @@
             this.tilePicker.SelectedIndex = -1;
             this.tilePicker.Size = new System.Drawing.Size(331, 387);
             this.tilePicker.TabIndex = 0;
-            this.tilePicker.SelectionChanged += new System.EventHandler<sth1edwv.Controls.IDrawableBlock>(this.tilePicker_SelectionChanged);
+            this.tilePicker.SelectionChanged += new System.EventHandler<sth1edwv.GameObjects.IDrawableBlock>(this.tilePicker_SelectionChanged);
             // 
             // splitContainer5
             // 
@@ -183,10 +186,22 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Used in blocks:";
             // 
+            // checkBoxTransparency
+            // 
+            this.checkBoxTransparency.AutoSize = true;
+            this.checkBoxTransparency.Location = new System.Drawing.Point(301, 3);
+            this.checkBoxTransparency.Name = "checkBoxTransparency";
+            this.checkBoxTransparency.Size = new System.Drawing.Size(117, 17);
+            this.checkBoxTransparency.TabIndex = 6;
+            this.checkBoxTransparency.Text = "Show transparency";
+            this.checkBoxTransparency.UseVisualStyleBackColor = true;
+            this.checkBoxTransparency.CheckedChanged += new System.EventHandler(this.checkBoxTransparency_CheckedChanged);
+            // 
             // TileSetViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.checkBoxTransparency);
             this.Controls.Add(this.splitContainer2);
             this.Controls.Add(this.toolStrip2);
             this.Name = "TileSetViewer";
@@ -224,5 +239,6 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.PictureBox pictureBoxTileUsedIn;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox checkBoxTransparency;
     }
 }

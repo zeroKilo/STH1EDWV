@@ -28,7 +28,7 @@ namespace sth1edwv.GameObjects
             Palette = cartridge.GetPalette(paletteOffset, 1);
             // Tile set reference is relative to the start of its bank
             var tileSetOffset = cartridge.Memory.Word(tileSetReferenceOffset) + cartridge.Memory[tileSetBankOffset] * 0x4000;
-            TileSet = cartridge.GetTileSet(tileSetOffset, false, false);
+            TileSet = cartridge.GetTileSet(tileSetOffset, false, null);
             // Tile map offset is as pages in slot 1 (TODO always?)
             var tileMapOffset = cartridge.Memory.Word(tileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
             var tileMapSize = cartridge.Memory.Word(tileMapSizeOffset);
@@ -81,6 +81,8 @@ namespace sth1edwv.GameObjects
                     var index = TileMap[i];
                     if (index != 0xff)
                     {
+                        // Mask off high bits
+                        index &= 0xff;
                         g.DrawImageUnscaled(TileSet.Tiles[index].GetImage(Palette), x, y);
                     }
                 }

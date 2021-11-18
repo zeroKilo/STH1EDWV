@@ -100,16 +100,18 @@ namespace sth1edwv
             this.tabPage9 = new System.Windows.Forms.TabPage();
             this.listBoxGameText = new System.Windows.Forms.ListBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPageScreens = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.listBoxScreens = new System.Windows.Forms.ListBox();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this.listBoxArt = new System.Windows.Forms.ListBox();
+            this.tabControlArt = new System.Windows.Forms.TabControl();
+            this.tabPageArtTiles = new System.Windows.Forms.TabPage();
+            this.otherArtTileSetViewer = new sth1edwv.Controls.TileSetViewer();
+            this.tabPageArtPalette = new System.Windows.Forms.TabPage();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.ringTileSetViewer = new sth1edwv.Controls.TileSetViewer();
+            this.tabPageArtLayout = new System.Windows.Forms.TabPage();
+            this.pictureBoxArtLayout = new System.Windows.Forms.PictureBox();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -142,14 +144,16 @@ namespace sth1edwv
             this.toolStripLayout.SuspendLayout();
             this.tabPage9.SuspendLayout();
             this.tabControl1.SuspendLayout();
-            this.tabPageScreens.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.statusStrip1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
+            this.splitContainer3.Panel1.SuspendLayout();
+            this.splitContainer3.Panel2.SuspendLayout();
+            this.splitContainer3.SuspendLayout();
+            this.tabControlArt.SuspendLayout();
+            this.tabPageArtTiles.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
+            this.tabPageArtLayout.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -337,6 +341,7 @@ namespace sth1edwv
             this.tileSetViewer.Name = "tileSetViewer";
             this.tileSetViewer.Size = new System.Drawing.Size(997, 499);
             this.tileSetViewer.TabIndex = 1;
+            this.tileSetViewer.TilesPerRow = 16;
             this.tileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.tileSetViewer_Changed);
             // 
             // tabPageSprites
@@ -357,6 +362,7 @@ namespace sth1edwv
             this.spriteTileSetViewer.Name = "spriteTileSetViewer";
             this.spriteTileSetViewer.Size = new System.Drawing.Size(997, 499);
             this.spriteTileSetViewer.TabIndex = 0;
+            this.spriteTileSetViewer.TilesPerRow = 16;
             this.spriteTileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.spriteTileSetViewer_Changed);
             // 
             // tabPageBlocks
@@ -544,6 +550,7 @@ namespace sth1edwv
             this.layoutBlockChooser.Name = "layoutBlockChooser";
             this.layoutBlockChooser.Scaling = 1;
             this.layoutBlockChooser.SelectedIndex = -1;
+            this.layoutBlockChooser.ShowTransparency = false;
             this.layoutBlockChooser.Size = new System.Drawing.Size(288, 453);
             this.layoutBlockChooser.TabIndex = 0;
             // 
@@ -781,7 +788,6 @@ namespace sth1edwv
             // 
             this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage9);
-            this.tabControl1.Controls.Add(this.tabPageScreens);
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
@@ -790,61 +796,85 @@ namespace sth1edwv
             this.tabControl1.Size = new System.Drawing.Size(1331, 563);
             this.tabControl1.TabIndex = 1;
             // 
-            // tabPageScreens
+            // tabPage1
             // 
-            this.tabPageScreens.Controls.Add(this.splitContainer1);
-            this.tabPageScreens.Location = new System.Drawing.Point(4, 22);
-            this.tabPageScreens.Name = "tabPageScreens";
-            this.tabPageScreens.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageScreens.Size = new System.Drawing.Size(1323, 537);
-            this.tabPageScreens.TabIndex = 8;
-            this.tabPageScreens.Text = "Screens";
-            this.tabPageScreens.UseVisualStyleBackColor = true;
+            this.tabPage1.Controls.Add(this.splitContainer3);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(1323, 537);
+            this.tabPage1.TabIndex = 9;
+            this.tabPage1.Text = "Other art";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // splitContainer1
+            // splitContainer3
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(3, 3);
-            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer3.Name = "splitContainer3";
             // 
-            // splitContainer1.Panel1
+            // splitContainer3.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.listBoxScreens);
+            this.splitContainer3.Panel1.Controls.Add(this.listBoxArt);
             // 
-            // splitContainer1.Panel2
+            // splitContainer3.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.propertyGrid1);
-            this.splitContainer1.Panel2.Controls.Add(this.pictureBox1);
-            this.splitContainer1.Size = new System.Drawing.Size(1317, 531);
-            this.splitContainer1.SplitterDistance = 439;
-            this.splitContainer1.TabIndex = 0;
+            this.splitContainer3.Panel2.Controls.Add(this.tabControlArt);
+            this.splitContainer3.Size = new System.Drawing.Size(1317, 531);
+            this.splitContainer3.SplitterDistance = 261;
+            this.splitContainer3.TabIndex = 1;
             // 
-            // listBoxScreens
+            // listBoxArt
             // 
-            this.listBoxScreens.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listBoxScreens.FormattingEnabled = true;
-            this.listBoxScreens.Location = new System.Drawing.Point(0, 0);
-            this.listBoxScreens.Name = "listBoxScreens";
-            this.listBoxScreens.Size = new System.Drawing.Size(439, 531);
-            this.listBoxScreens.TabIndex = 0;
-            this.listBoxScreens.SelectedIndexChanged += new System.EventHandler(this.listBoxScreens_SelectedIndexChanged);
+            this.listBoxArt.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBoxArt.FormattingEnabled = true;
+            this.listBoxArt.Location = new System.Drawing.Point(0, 0);
+            this.listBoxArt.Name = "listBoxArt";
+            this.listBoxArt.Size = new System.Drawing.Size(261, 531);
+            this.listBoxArt.TabIndex = 0;
+            this.listBoxArt.SelectedIndexChanged += new System.EventHandler(this.listBoxArt_SelectedIndexChanged);
             // 
-            // propertyGrid1
+            // tabControlArt
             // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(618, 531);
-            this.propertyGrid1.TabIndex = 0;
+            this.tabControlArt.Controls.Add(this.tabPageArtLayout);
+            this.tabControlArt.Controls.Add(this.tabPageArtTiles);
+            this.tabControlArt.Controls.Add(this.tabPageArtPalette);
+            this.tabControlArt.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControlArt.Location = new System.Drawing.Point(0, 0);
+            this.tabControlArt.Name = "tabControlArt";
+            this.tabControlArt.SelectedIndex = 0;
+            this.tabControlArt.Size = new System.Drawing.Size(1052, 531);
+            this.tabControlArt.TabIndex = 1;
             // 
-            // pictureBox1
+            // tabPageArtTiles
             // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pictureBox1.Location = new System.Drawing.Point(618, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(256, 531);
-            this.pictureBox1.TabIndex = 1;
-            this.pictureBox1.TabStop = false;
+            this.tabPageArtTiles.Controls.Add(this.otherArtTileSetViewer);
+            this.tabPageArtTiles.Location = new System.Drawing.Point(4, 22);
+            this.tabPageArtTiles.Name = "tabPageArtTiles";
+            this.tabPageArtTiles.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageArtTiles.Size = new System.Drawing.Size(1044, 505);
+            this.tabPageArtTiles.TabIndex = 0;
+            this.tabPageArtTiles.Text = "Tiles";
+            this.tabPageArtTiles.UseVisualStyleBackColor = true;
+            // 
+            // otherArtTileSetViewer
+            // 
+            this.otherArtTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.otherArtTileSetViewer.Location = new System.Drawing.Point(3, 3);
+            this.otherArtTileSetViewer.Name = "otherArtTileSetViewer";
+            this.otherArtTileSetViewer.Size = new System.Drawing.Size(1038, 499);
+            this.otherArtTileSetViewer.TabIndex = 0;
+            this.otherArtTileSetViewer.TilesPerRow = 4;
+            // 
+            // tabPageArtPalette
+            // 
+            this.tabPageArtPalette.Location = new System.Drawing.Point(4, 22);
+            this.tabPageArtPalette.Name = "tabPageArtPalette";
+            this.tabPageArtPalette.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageArtPalette.Size = new System.Drawing.Size(1044, 505);
+            this.tabPageArtPalette.TabIndex = 1;
+            this.tabPageArtPalette.Text = "Palette";
+            this.tabPageArtPalette.UseVisualStyleBackColor = true;
             // 
             // statusStrip1
             // 
@@ -869,24 +899,24 @@ namespace sth1edwv
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
             // 
-            // tabPage1
+            // tabPageArtLayout
             // 
-            this.tabPage1.Controls.Add(this.ringTileSetViewer);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1323, 537);
-            this.tabPage1.TabIndex = 9;
-            this.tabPage1.Text = "Rings";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabPageArtLayout.Controls.Add(this.pictureBoxArtLayout);
+            this.tabPageArtLayout.Location = new System.Drawing.Point(4, 22);
+            this.tabPageArtLayout.Name = "tabPageArtLayout";
+            this.tabPageArtLayout.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageArtLayout.Size = new System.Drawing.Size(1044, 505);
+            this.tabPageArtLayout.TabIndex = 2;
+            this.tabPageArtLayout.Text = "Layout";
+            this.tabPageArtLayout.UseVisualStyleBackColor = true;
             // 
-            // ringTileSetViewer
+            // pictureBoxArtLayout
             // 
-            this.ringTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ringTileSetViewer.Location = new System.Drawing.Point(3, 3);
-            this.ringTileSetViewer.Name = "ringTileSetViewer";
-            this.ringTileSetViewer.Size = new System.Drawing.Size(1317, 531);
-            this.ringTileSetViewer.TabIndex = 0;
+            this.pictureBoxArtLayout.Location = new System.Drawing.Point(6, 6);
+            this.pictureBoxArtLayout.Name = "pictureBoxArtLayout";
+            this.pictureBoxArtLayout.Size = new System.Drawing.Size(317, 194);
+            this.pictureBoxArtLayout.TabIndex = 0;
+            this.pictureBoxArtLayout.TabStop = false;
             // 
             // Form1
             // 
@@ -938,15 +968,17 @@ namespace sth1edwv
             this.toolStripLayout.PerformLayout();
             this.tabPage9.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
-            this.tabPageScreens.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.tabPage1.ResumeLayout(false);
+            this.splitContainer3.Panel1.ResumeLayout(false);
+            this.splitContainer3.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
+            this.splitContainer3.ResumeLayout(false);
+            this.tabControlArt.ResumeLayout(false);
+            this.tabPageArtTiles.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.tabPage1.ResumeLayout(false);
+            this.tabPageArtLayout.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -996,11 +1028,6 @@ namespace sth1edwv
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel floorStatus;
         private ToolStripStatusLabel tileSetStatus;
-        private TabPage tabPageScreens;
-        private SplitContainer splitContainer1;
-        private ListBox listBoxScreens;
-        private PropertyGrid propertyGrid1;
-        private PictureBox pictureBox1;
         private SplitContainer splitContainer7;
         private ItemPicker layoutBlockChooser;
         private ToolStripLabel toolStripLabel1;
@@ -1022,7 +1049,14 @@ namespace sth1edwv
         private ToolStripMenuItem selectBlockToolStripMenuItem;
         private ToolStripMenuItem editObjectToolStripMenuItem;
         private TabPage tabPage1;
-        private TileSetViewer ringTileSetViewer;
+        private TileSetViewer otherArtTileSetViewer;
+        private SplitContainer splitContainer3;
+        private ListBox listBoxArt;
+        private TabControl tabControlArt;
+        private TabPage tabPageArtTiles;
+        private TabPage tabPageArtPalette;
+        private TabPage tabPageArtLayout;
+        private PictureBox pictureBoxArtLayout;
     }
 }
 

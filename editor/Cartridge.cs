@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using sth1edwv.GameObjects;
@@ -184,29 +185,152 @@ namespace sth1edwv
         };
 
         public Memory Memory { get; }
-        public IList<Level> Levels { get; } = new List<Level>();
-        public IList<GameText> GameText { get; } = new List<GameText>();
-        public IList<Screen> Screens { get; } = new List<Screen>();
-        public TileSet Rings { get; set; }
+        public List<Level> Levels { get; } = new();
+        public List<GameText> GameText { get; } = new();
+        public List<Screen> Screens { get; } = new();
+        public List<ArtItem> Art { get; } = new();
 
         private readonly Dictionary<int, TileSet> _tileSets = new();
         private readonly Dictionary<int, Floor> _floors = new();
         private readonly Dictionary<int, BlockMapping> _blockMappings = new();
         private readonly Dictionary<int, Palette> _palettes = new();
+        private TileSet _rings;
 
         public Cartridge(string path)
         {
             Memory = new Memory(File.ReadAllBytes(path));
-            ReadRings();
-            ReadLevels();
+            ReadLevels(); // TODO want _rings before this else they don't show up
             ReadGameText();
             ReadScreens();
+            ReadExtraArt();
         }
 
-        private void ReadRings()
+        private void ReadExtraArt()
         {
-            // Rings are at 0x2Fcf0
-            Rings = new TileSet(this, 0x2Fcf0, 24*32);
+            TileSet titleAndCreditTileSet;
+            Art.AddRange(new[]
+            {
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x15180, 0x400, 4, TileSet.Groupings.Monitor),
+                    Name = "Monitor art",
+                    Palette = Levels[0].SpritePalette,
+                    Width = 8,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x20000, 12 * 24 * 42, 3, TileSet.Groupings.Sonic),
+                    Name = "Sonic (right)",
+                    Palette = Levels[0].SpritePalette,
+                    Width = 8,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x23000, 12 * 24 * 42, 3, TileSet.Groupings.Sonic),
+                    Name = "Sonic (left)",
+                    Palette = Levels[0].SpritePalette,
+                    Width = 8,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x28294, null, TileSet.Groupings.Sprite),
+                    Name = "End sign",
+                    Palette = GetPalette(0x626C, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = titleAndCreditTileSet = new TileSet(Memory, 0x28B0A, null, TileSet.Groupings.Sprite),
+                    Name = "Title Screen Sprites",
+                    Palette = GetPalette(0x13f1, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = titleAndCreditTileSet,
+                    Name = "Credits Screen Sprites",
+                    Palette = GetPalette(0x2ae6, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x2926B, null, TileSet.Groupings.Sprite),
+                    Name = "Map Screen Sprites 1",
+                    Palette = GetPalette(0x0f1e, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x29942, null, TileSet.Groupings.Sprite),
+                    Name = "Map Screen Sprites 2",
+                    Palette = GetPalette(0x0f3e, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x2EEB1, null, TileSet.Groupings.Sprite),
+                    Name = "Boss Sprites",
+                    Palette = GetPalette(0x731C, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x2F92E, null, TileSet.Groupings.Sprite),
+                    Name = "HUD Sprites",
+                    Palette = Levels[0].SpritePalette,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = _rings = new TileSet(Memory, 0x2Fcf0, 24 * 32, 4, TileSet.Groupings.Ring),
+                    Name = "Rings",
+                    Palette = Levels[0].TilePalette,
+                    Width = 6
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x3da28, null, TileSet.Groupings.Sprite),
+                    Name = "Capsule and animals",
+                    Palette = GetPalette(0x731C, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x3e508, null, TileSet.Groupings.Sprite),
+                    Name = "Underwater boss",
+                    Palette = GetPalette(0x027b, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                },
+                new ArtItem
+                {
+                    TileSet = new TileSet(Memory, 0x3ef3f, null, TileSet.Groupings.Sprite),
+                    Name = "Running Robotnik",
+                    Palette = GetPalette(0x731C, 1),
+                    PaletteEditable = true,
+                    Width = 16,
+                    IsSprites = true
+                }
+            });
         }
 
         private void ReadScreens()
@@ -238,9 +362,9 @@ namespace sth1edwv
             }
         }
 
-        public TileSet GetTileSet(int offset, bool addRings, bool isSprites)
+        public TileSet GetTileSet(int offset, bool addRings, List<Point> grouping)
         {
-            return GetItem(_tileSets, offset, () => new TileSet(this, offset, addRings ? Rings : null, isSprites));
+            return GetItem(_tileSets, offset, () => new TileSet(Memory, offset, addRings ? _rings : null, grouping));
         }
 
         public Floor GetFloor(int offset, int compressedSize, int width)
@@ -248,9 +372,9 @@ namespace sth1edwv
             return GetItem(_floors, offset, () => new Floor(this, offset, compressedSize, width));
         }
 
-        public BlockMapping GetBlockMapping(int offset, int solidityIndex, TileSet tileSet)
+        public BlockMapping GetBlockMapping(int offset, int blockCount, int solidityIndex, TileSet tileSet)
         {
-            return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, solidityIndex, tileSet));
+            return GetItem(_blockMappings, offset, () => new BlockMapping(this, offset, blockCount, solidityIndex, tileSet));
         }
 
         public Palette GetPalette(int offset, int count)
@@ -302,19 +426,75 @@ namespace sth1edwv
             // We clone the memory to a memory stream
             var memory = Memory.GetStream(0, Memory.Count).ToArray();
 
+            // Data we read/write and what we can repack...
+            // Start    End     Description                         Repacking?
+            // -----------------------------------------------------------------------------
+            // 0027b    28a     Underwater boss palette             TODO
+            //
+            // 00f0e    00f1d   Map screen 1 art palette            TODO
+            // 00f1e    00f2d   Map screen 1 sprites palette        TODO
+            //
+            // 00f3e    00f4d   Map screen 2 sprites palette        TODO
+            //
+            // 0122d    01286   Level titles text                   Original offset/size
+            //
+            // 013e1    013f0   Title screen art palette            TODO
+            //
+            // 014fc    0150b   "Game over" art palette             TODO
+            //
+            // 0197e    019ad   Ending text                         Original offset/size
+            //
+            // 01b8d    01b9c   "Sonic has passed" art palette      TODO
+            //
+            // 02ae6    02af5   Credits sprite palette              TODO
+            //
+            // 0626c    0627b   Sign palette                        TODO
+            // 0629e    065ed   Level palettes                      Original offset/size, Sky Base extra palettes not editable
+            //
+            // 0731c    0732b   Boss/capsule palette                TODO
+            //
+            // 15180    1557f   Monitor screens                     Original offset/size (uncompressed) TODO change?
+            // 15580    155c9   Level header pointers               Untouched
+            // 155ca    15ab3   Level headers                       Yes, Original offset/size 
+            // 15ab4    15fff   Object layouts (+ unused)           Original offsets/sizes TODO change?
+            // 16000    16de9	Tilemaps                            (compressed, need to figure them all out) TODO
+            // 16dea    1ffff   Floors (+unused)                    Yes, level header pointers are rewritten. Can be in range 14000..23fff
+            // 20000    22fff   Sonic sprites (left) (+ unused)     Original offset/size (uncompressed) TODO change?
+            // 23000    25fff   Sonic sprites (right) (+ unused)    Original offset/size (uncompressed) TODO change?
+            // 26000    2751e   Title screen art                    (compressed) TODO
+            // 2751f    28293   "Sonic has passed", "game over" art (compressed) TODO
+            // 28294    28b09   Sign sprites                        (compressed) TODO
+            // 28b0a    2926a   Title screen/credits sprites        (compressed) TODO
+            // 2926b    29941   Map screen sprites 1                (compressed) TODO
+            // 29942    2a129   Map screen sprites 2                (compressed) TODO
+            // 2a12a    2f92d   Level sprites                       Yes, level header pointers are rewritten. Can be in range 24000..33fff TODO: boss sprites are in here but with a bad palette. Could exclude?
+            // 2f92e    2fcef   HUD sprites                         (compressed) TODO
+            // 2fcf0    2ffff   Rings (+ unused)                    Original offset/size (uncompressed) TODO change?
+            // 30000    31800   Map screen 1/ending art             TODO
+            // 31801    32fe5   Map screen 2 art                    TODO
+            // 32fe6    3da27   Level backgrounds                   Yes, level header pointers are rewritten. Can be in range 30000..3ffff
+            // 3da28    3e507   Capsule art                         (compressed) TODO
+            // 3e508    3ef3e   Underwater boss art                 (compressed) TODO
+            // 3ef3f    3ff21?  Running Robotnik art                (compressed) TODO
+
             // We work through the data types...
             // - Game text (at original offsets)
+            // 122d..1286 inclusive
+            // 197e..19ad inclusive
             foreach (var gameText in GameText)
             {
                 gameText.GetData().CopyTo(memory, gameText.Offset);
             }
-            // - Palettes (at original offsets)
-            foreach (var palette in Levels.Select(x => x.Palette))
+            // - Level palettes (at original offsets)
+            // 629e..65ed inclusive, with Sky Base lightning not covered
+            foreach (var palette in Levels.SelectMany(x => new[]{x.Palette, x.CyclingPalette}))
             {
                 palette.GetData().CopyTo(memory, palette.Offset);
             }
             // - Floors (filling space)
+            // 16dea..1ffff inclusive
             // TODO: 16000-18de9 is tilemaps, I should repack them and then append (when I add an editor?)
+            // TODO: tilemaps are more freely placeable?
             var offset = 0x16dea;
             foreach (var floor in Levels.Select(l => l.Floor).Distinct())
             {
@@ -329,10 +509,11 @@ namespace sth1edwv
                 throw new Exception("Floor layouts out of space");
             }
 
-            // - Tile sets (filling space)
+            // - Sprite tile sets (filling space)
             // TODO: various art from 26000
             // TODO: map art from 30000 - can be more flexible for the bank, levels can't
-            // Level sprite art is from 0x2a12a to 0x2f92e (ending sequence includes boss sprites)
+            // 2a12a..2f92d inclusive
+            // Game engine expects data in the range 24000..33fff
             offset = 0x2a12a;
             foreach (var tileSet in Levels.Select(l => l.SpriteTileSet).Distinct())
             {
@@ -347,8 +528,9 @@ namespace sth1edwv
                 throw new Exception("Sprite tile sets out of space");
             }
 
-            // Level background art is from 0x32fe6 to $3da28, where some more assets are placed in the way... repack them too?
-            // "Contains sprite art and/or sprite mappings"
+            // - Lavel background art (filling space)
+            // 32fe6..3da27
+            // Game engine expects data in the range 30000..3ffff
             offset = 0x32fe6;
             foreach (var tileSet in Levels.Select(l => l.TileSet).Distinct())
             {
@@ -363,8 +545,12 @@ namespace sth1edwv
                 throw new Exception("Level tile sets out of space");
             }
 
-            // Rings art (at original offset)
-            Rings.GetData().CopyTo(memory, Rings.Offset);
+            // Uncompressed art at its original offsets
+            foreach (var tileSet in Art.Select(x => x.TileSet).Where(x => !x.Compressed))
+            {
+                tileSet.GetData().CopyTo(memory, tileSet.Offset);
+            }
+            // TODO other art...
 
             // - Block mappings (at original offsets)
             // TODO make these flexible if I make it possible to change sizes

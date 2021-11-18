@@ -61,10 +61,10 @@ namespace sth1edwv
             listBoxLevels.Items.AddRange(_cartridge.Levels.ToArray<object>());
             listBoxGameText.Items.Clear();
             listBoxGameText.Items.AddRange(_cartridge.GameText.ToArray<object>());
-            listBoxScreens.Items.Clear();
-            listBoxScreens.Items.AddRange(_cartridge.Screens.ToArray<object>());
-
-            ringTileSetViewer.SetData(_cartridge.Rings, _cartridge.Levels[0].TilePalette, null);
+            listBoxArt.Items.Clear();
+            listBoxArt.Items.AddRange(_cartridge.Art.ToArray<object>());
+            listBoxArt.Items.AddRange(_cartridge.Screens.ToArray<object>());
+            listBoxArt.Sorted = true;
 
             // Add or replace filename in title bar
             Text = $"{Regex.Replace(Text, " \\[.+\\]$", "")} [{Path.GetFileName(filename)}]";
@@ -84,7 +84,7 @@ namespace sth1edwv
             LevelRenderModeChanged(null, EventArgs.Empty);
 
             tileSetViewer.SetData(level?.TileSet, level?.TilePalette, GetTileUsedInBlocks);
-            spriteTileSetViewer.SetData(level?.SpriteTileSet, level?.SpritePalette, null);
+            spriteTileSetViewer.SetData(level?.SpriteTileSet, level?.SpritePalette);
 
             LoadLevelData();
 
@@ -123,7 +123,7 @@ namespace sth1edwv
             if (listBoxLevels.SelectedItem is Level selectedLevel)
             {
                 tileSetViewer.SetData(selectedLevel.TileSet, selectedLevel.TilePalette, GetTileUsedInBlocks);
-                spriteTileSetViewer.SetData(selectedLevel.SpriteTileSet, selectedLevel.SpritePalette, null);
+                spriteTileSetViewer.SetData(selectedLevel.SpriteTileSet, selectedLevel.SpritePalette);
             }
         }
 
@@ -148,7 +148,6 @@ namespace sth1edwv
             }
             var t = new TreeNode($"{level}");
             t.Nodes.Add(level.ToNode());
-            t.Nodes.Add(level.TileSet.ToNode());
             t.Expand();
             treeViewLevelData.Nodes.Add(t);
         }
@@ -461,12 +460,6 @@ namespace sth1edwv
             floorStatus.Text = $"Floor space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
         }
 
-        private void listBoxScreens_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            propertyGrid1.SelectedObject = listBoxScreens.SelectedItem;
-            pictureBox1.Image = (listBoxScreens.SelectedItem as Screen)?.Image;
-        }
-
         private void DrawingButtonCheckedChanged(object sender, EventArgs e)
         {
             foreach (var button in new[]{buttonDraw, buttonSelect, buttonFloodFill})
@@ -608,6 +601,79 @@ namespace sth1edwv
                     }
                 }
             }
+        }
+
+        private void listBoxArt_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            foreach (Control control in tabPageArtPalette.Controls)
+            {
+                control.Dispose();
+            }
+            tabPageArtPalette.Controls.Clear();
+            otherArtTileSetViewer.SetData(null, null);
+
+            switch (listBoxArt.SelectedItem)
+            {
+                case ArtItem artItem:
+                    Show(artItem);
+                    return;
+                case Screen screen:
+                    Show(screen);
+                    break;
+            }
+        }
+
+        private void Show(Screen screen)
+        {
+            otherArtTileSetViewer.TilesPerRow = 16;
+            otherArtTileSetViewer.SetData(screen.TileSet, screen.Palette);
+
+            var paletteEditor = new PaletteEditor(screen.Palette, "Palette", _ =>
+            {
+                foreach (var tile in screen.TileSet.Tiles)
+                {
+                    tile.ResetImages();
+                }
+                otherArtTileSetViewer.Invalidate();
+            });
+            tabPageArtPalette.Controls.Add(paletteEditor);
+            paletteEditor.Dock = DockStyle.Fill;
+
+            pictureBoxArtLayout.Image = screen.Image;
+            if (!tabControlArt.TabPages.Contains(tabPageArtLayout))
+            {
+                tabControlArt.TabPages.Insert(0, tabPageArtLayout);
+            }
+        }
+
+        private void Show(ArtItem artItem)
+        {
+            otherArtTileSetViewer.TilesPerRow = artItem.Width;
+            otherArtTileSetViewer.SetData(artItem.TileSet, artItem.Palette, null, artItem.IsSprites);
+
+            if (artItem.PaletteEditable)
+            {
+                var paletteEditor = new PaletteEditor(artItem.Palette, "Palette", _ =>
+                {
+                    foreach (var tile in artItem.TileSet.Tiles)
+                    {
+                        tile.ResetImages();
+                    }
+                    otherArtTileSetViewer.Invalidate();
+                });
+                tabPageArtPalette.Controls.Add(paletteEditor);
+                paletteEditor.Dock = DockStyle.Fill;
+                if (!tabControlArt.TabPages.Contains(tabPageArtPalette))
+                {
+                    tabControlArt.TabPages.Add(tabPageArtPalette);
+                }
+            }
+            else
+            {
+                tabControlArt.TabPages.Remove(tabPageArtPalette);
+            }
+            // No layouts for these
+            tabControlArt.TabPages.Remove(tabPageArtLayout);
         }
     }
 }

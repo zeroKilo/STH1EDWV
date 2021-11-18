@@ -53,6 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArtItem.cs" />
+    <Compile Include="GameObjects\IDrawableBlock.cs" />
     <Compile Include="Controls\PaletteEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -68,6 +70,7 @@
     <Compile Include="GameObjects\Block.cs" />
     <Compile Include="GameObjects\BlockMapping.cs" />
     <Compile Include="Cartridge.cs" />
+    <Compile Include="GameObjects\EnumerableMemoryStream.cs" />
     <Compile Include="GameObjects\Floor.cs" />
     <Compile Include="Controls\FloorEditor.cs">
       <SubType>Component</SubType>

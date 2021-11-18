@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using sth1edwv.Controls;
+using sth1edwv.GameObjects;
 
 namespace sth1edwv.Forms
 {

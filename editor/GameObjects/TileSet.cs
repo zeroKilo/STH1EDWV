@@ -5,55 +5,115 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace sth1edwv.GameObjects
 {
     public class TileSet: IDataItem, IDisposable
     {
-        private readonly ushort _magic;
-        private readonly ushort _dupRows;
-        private readonly ushort _artData;
-        private readonly ushort _rowCount;
-        private readonly double _compression;
-        private readonly int _tileHeight;
-        private readonly bool _compressed;
-        public List<Tile> Tiles { get; } = new();
+        private readonly int _bitPlanes;
+        public bool Compressed { get; }
+        public List<Tile> Tiles { get; }
 
-        public TileSet(Cartridge cartridge, int offset, int length)
+        public static class Groupings
+        {
+            /// <summary>
+            /// A single tile
+            /// </summary>
+            public static readonly List<Point> Single = new() { new Point(0, 0) };
+
+            /// <summary>
+            /// A sprite tile in 8x16 mode
+            /// </summary>
+            public static readonly List<Point> Sprite = new() { new Point(0, 0), new Point(0, 8) };
+
+            /// <summary>
+            /// Rings are ordered
+            /// <code>
+            /// AB
+            /// CD
+            /// </code>
+            /// </summary>
+            public static readonly List<Point> Ring = new()
+            {
+                new Point(0, 0), new Point(8, 0),
+                new Point(0, 8), new Point(8, 8)
+            };
+
+
+            /// <summary>
+            /// Monitor screens are ordered
+            /// <code>
+            /// AC
+            /// BD
+            /// </code>
+            /// </summary>
+            public static readonly List<Point> Monitor = new()
+            {
+                new Point(0, 0), new Point(0, 8),
+                new Point(8, 0), new Point(8, 8)
+            };
+
+            /// <summary>
+            /// Sonic is built from six 8x16 sprites:
+            /// <code>
+            /// ACE
+            /// BDF
+            /// GIK
+            /// HJL
+            /// </code>
+            /// </summary>
+            public static readonly List<Point> Sonic = new()
+            {
+                new Point(0, 0), new Point(0, 8),
+                new Point(8, 0), new Point(8, 8),
+                new Point(16, 0), new Point(16, 8),
+                new Point(0, 16), new Point(0, 24),
+                new Point(8, 16), new Point(8, 24),
+                new Point(16, 16), new Point(16, 24)
+            };
+        }
+
+        /// <summary>
+        /// Uncompressed data version
+        /// </summary>
+        public TileSet(Memory memory, int offset, int length, int bitPlanes = 4, List<Point> grouping = null)
         {
             // Raw VRAM data
             Offset = offset;
-            _tileHeight = 8;
-            _compressed = false;
+            Compressed = false;
+            _bitPlanes = bitPlanes;
 
-            for (var i = 0; i < length; i += _tileHeight * 4)
-            {
-                var data = Compression.PlanarToChunky(cartridge.Memory, offset + i, 8).ToArray();
-                Tiles.Add(new Tile(data, 0, i / _tileHeight / 4, _tileHeight));
-            }
+            // Default grouping
+            grouping ??= Groupings.Single;
+
+            // Read the data and convert to tiles
+            Tiles = new EnumerableMemoryStream(memory.GetStream(offset, length))
+                .PlanarToChunky(bitPlanes)
+                .ToChunks(64 * grouping.Count)
+                .Select((x, index) => new Tile(x, grouping, index))
+                .ToList();
         }
 
-        public TileSet(Cartridge cartridge, int offset, TileSet rings, bool isSprites)
+        /// <summary>
+        /// Compressed data version
+        /// </summary>
+        public TileSet(Memory memory, int offset, TileSet rings, List<Point> grouping)
         {
             Offset = offset;
-            _compressed = true;
-            _magic = cartridge.Memory.Word(offset);
-            _dupRows = cartridge.Memory.Word(offset + 2);
-            _artData = cartridge.Memory.Word(offset + 4);
-            _rowCount = cartridge.Memory.Word(offset + 6);
-            var decompressed = Compression.DecompressArt(cartridge.Memory, offset, out var lengthConsumed);
-            _tileHeight = isSprites ? 16 : 8;
-            var tileSizeBytes = _tileHeight * 8;
-            for (var i = 0; i < decompressed.Length; i += tileSizeBytes)
-            {
-                Tiles.Add(new Tile(decompressed, i, i / tileSizeBytes, _tileHeight));
-            }
-            _compression = (double)(decompressed.Length - lengthConsumed) / decompressed.Length;
+            Compressed = true;
+
+            // Default grouping
+            grouping ??= Groupings.Single;
+
+            var decompressed = Compression.DecompressArt(memory, offset, out _);
+            Tiles = decompressed
+                .ToChunks(64 * grouping.Count)
+                .Select((x, index) => new Tile(x, grouping, index))
+                .ToList();
 
             if (rings != null)
             {
-                // We replace the last 4 tiles' images with the third frame
+                // We replace the last 4 tiles' images with ring tiles TODO: fix this
                 for (var i = 0; i < 4; ++i)
                 {
                     var index = 252 + i;
@@ -62,33 +122,11 @@ namespace sth1edwv.GameObjects
             }
         }
 
-        public TreeNode ToNode()
-        {
-            return new TreeNode($"Tile Set @ {Offset:X6}")
-            {
-                Nodes =
-                {
-                    new TreeNode("Header")
-                    {
-                        Nodes =
-                        {
-                            new TreeNode($"Magic           = 0x{_magic:X4}"),
-                            new TreeNode($"Duplicate Rows  = 0x{_dupRows:X4}"),
-                            new TreeNode($"Art Data Offset = 0x{_artData:X4}"),
-                            new TreeNode($"Row Count       = 0x{_rowCount:X4}")
-                        }
-                    },
-                    new TreeNode($"{Tiles.Count} tiles"),
-                    new TreeNode($"{_compression:P} compression")
-                }
-            };
-        }
-
         public int Offset { get; set; }
 
         public IList<byte> GetData()
         {
-            if (_compressed)
+            if (Compressed)
             {
                 using var ms = new MemoryStream();
                 // We gather our tiles back into a big buffer...
@@ -102,13 +140,16 @@ namespace sth1edwv.GameObjects
             }
             else
             {
-                // Uncompressed, we want to convert planar to chunky as we go. This is a bit ugly...
+                // Uncompressed, so we convert chunky to planar and then deal with bitplane removal.
+                // First we get all the sprites...
                 using var ms = new MemoryStream();
                 foreach (var tile in Tiles)
                 {
                     tile.WriteTo(ms);
                 }
-                return Compression.ChunkyToPlanar(ms.ToArray()).ToList();
+                // Then we convert to planar and return it
+                ms.Position = 0;
+                return new EnumerableMemoryStream(ms).ChunkyToPlanar(_bitPlanes).ToList();
             }
         }
 
@@ -121,43 +162,46 @@ namespace sth1edwv.GameObjects
             Tiles.Clear();
         }
 
-        public Bitmap ToImage(Palette palette)
+        public Bitmap ToImage(Palette palette, int tilesPerRow)
         {
             // We write the tileset to an image
             // Keeping it all in 8bpp is a pain!
-            var rows = Tiles.Count % 16 == 0
-                ? Tiles.Count / 16
-                : Tiles.Count / 16 + 1;
+            var blockWidth = Tiles[0].Width;
+            var blockHeight = Tiles[0].Height;
+            var columns = tilesPerRow;
+            var rows = Tiles.Count / columns + (Tiles.Count % columns == 0 ? 0 : 1);
             // Caller disposes
-            var image = new Bitmap(128, rows * _tileHeight, PixelFormat.Format8bppIndexed);
+            var image = new Bitmap(columns * blockWidth, rows * blockHeight, PixelFormat.Format8bppIndexed);
             image.Palette = palette.ImagePalette;
             var data = image.LockBits(
                 new Rectangle(0, 0, image.Width, image.Height),
                 ImageLockMode.WriteOnly,
                 PixelFormat.Format8bppIndexed);
+            var index = 0;
             foreach (var tile in Tiles)
             {
-                var x = tile.Index % 16 * 8;
-                var y = tile.Index / 16 * _tileHeight;
+                var x = index % columns * blockWidth;
+                var y = index / columns * blockHeight;
+                ++index;
                 // We copy the data from the source image one row at a time
-                var sourceImage = tile.GetImage(palette, false);
+                var sourceImage = tile.GetImage(palette);
                 var sourceData = sourceImage.LockBits(
-                    new Rectangle(0, 0, 8, _tileHeight),
+                    new Rectangle(0, 0, blockWidth, blockHeight),
                     ImageLockMode.ReadOnly,
                     PixelFormat.Format8bppIndexed);
-                var rowData = new byte[8];
-                for (var row = 0; row < _tileHeight; ++row)
+                var rowData = new byte[blockWidth];
+                for (var row = 0; row < blockHeight; ++row)
                 {
                     Marshal.Copy(
                         sourceData.Scan0 + row * sourceData.Stride,
                         rowData, 
                         0, 
-                        8);
+                        blockWidth);
                     Marshal.Copy(
                         rowData, 
                         0, 
                         data.Scan0 + (row + y) * data.Stride + x,
-                        8);
+                        blockWidth);
                 }
                 sourceImage.UnlockBits(sourceData);
             }
@@ -167,18 +211,22 @@ namespace sth1edwv.GameObjects
 
         public void FromImage(Bitmap image)
         {
+            var blocks = Tiles.ToList();
+            var blockWidth = blocks[0].Width;
+            var blockHeight = blocks[0].Height;
+
             if (image.PixelFormat != PixelFormat.Format8bppIndexed)
             {
                 throw new Exception("Image is not paletted!");
             }
 
-            if (image.Width % 8 != 0 || image.Height % _tileHeight != 0)
+            if (image.Width % blockWidth != 0 || image.Height % blockHeight != 0)
             {
-                throw new Exception($"Image is {image.Width}x{image.Height}, width must be a multiple of 8x{_tileHeight}");
+                throw new Exception($"Image is {image.Width}x{image.Height}, must be a multiple of {blockWidth}x{blockHeight}");
             }
 
-            var tilesPerRow = image.Width / 8;
-            var imageTileCount =  tilesPerRow * (image.Height / _tileHeight);
+            var columns = image.Width / blockWidth;
+            var imageTileCount =  columns * (image.Height / blockHeight);
             if (imageTileCount < Tiles.Count)
             {
                 throw new Exception($"Image defines {imageTileCount} tiles, we need {Tiles.Count}");
@@ -190,35 +238,35 @@ namespace sth1edwv.GameObjects
                 ImageLockMode.ReadOnly,
                 PixelFormat.Format8bppIndexed);
             // Make a buffer
-            var rowData = new byte[8];
+            var tileData = new byte[Tiles[0].Width * Tiles[0].Height];
+
             foreach (var tile in Tiles)
             {
                 // First get the tile's source coordinates
-                var tileX = tile.Index % tilesPerRow * 8;
-                var tileY = tile.Index / tilesPerRow * _tileHeight;
+                var tileX = tile.Index % columns * tile.Width;
+                var tileY = tile.Index / columns * tile.Height;
 
-                for (var row = 0; row < _tileHeight; ++row)
+                // Then we extract the data for each row of the tile
+                for (var row = 0; row < tile.Height; ++row)
                 {
                     // Copy source data into the buffer
                     Marshal.Copy(
                         data.Scan0 + (tileY + row) * data.Stride + tileX,
-                        rowData,
-                        0,
-                        8);
-
-                    // Then into the tile
-                    for (var x = 0; x < 8; ++x)
-                    {
-                        tile.SetData(x, row, rowData[x] & 0xf);
-                    }
+                        tileData,
+                        row * tile.Width,
+                        tile.Width);
                 }
+
+                // Finally we send it to the tile
+                tile.SetData(tileData);
             }
+
             image.UnlockBits(data);
         }
 
         public override string ToString()
         {
-            return $"{Tiles.Count} tiles @ {Offset:X}";
+            return $"{Tiles.Count} tiles @ {Offset:X}..{Offset+GetData().Count-1:X}";
         }
     }
 }
