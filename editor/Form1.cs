@@ -200,7 +200,7 @@ namespace sth1edwv
                     var tile = block.TileSet.Tiles[block.TileIndices[i]];
                     var x = i % 4 * _blockEditorTileSize - 1;
                     var y = i / 4 * _blockEditorTileSize - 1;
-                    g.DrawImage(tile.GetImage(level.TilePalette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
+                    g.DrawImage(tile.GetImageWithRings(level.TilePalette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
                 }
             }
 

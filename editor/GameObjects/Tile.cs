@@ -20,21 +20,23 @@ namespace sth1edwv.GameObjects
 
         // Images are per-palette
         private readonly Dictionary<Palette, Bitmap> _images = new();
+        private Tile _ringtile;
+        private Point _ringPosition;
 
-        private Tile _ringTile;
+        public Bitmap GetImageWithRings(Palette palette)
+        {
+            if (_ringtile != null)
+            {
+                // We crop to the right part
+                return _ringtile
+                    .GetImage(palette)
+                    .Clone(new Rectangle(_ringPosition, new Size(8, 8)), PixelFormat.Format8bppIndexed);
+            }
+            return GetImage(palette);
+        }
 
         public Bitmap GetImage(Palette palette)
         {
-            return GetImage(palette, true);
-        }
-
-        public Bitmap GetImage(Palette palette, bool withRings)
-        {
-            if (withRings && _ringTile != null)
-            {
-                return _ringTile.GetImage(palette);
-            }
-
             if (_images.TryGetValue(palette, out var image))
             {
                 return image;
@@ -92,11 +94,6 @@ namespace sth1edwv.GameObjects
             _images.Clear();
         }
 
-        public void SetRingVersion(Tile tile)
-        {
-            _ringTile = tile;
-        }
-
         public void SetData(byte[] data)
         {
             // The incoming data is a rectangle. We want to "wind" it back to the game data format.
@@ -121,6 +118,12 @@ namespace sth1edwv.GameObjects
         {
             Array.Clear(_data, 0, _data.Length);
             ResetImages();
+        }
+
+        public void SetRingTile(Tile ringTile, int x, int y)
+        {
+            _ringtile = ringTile;
+            _ringPosition = new Point(x, y);
         }
     }
 }

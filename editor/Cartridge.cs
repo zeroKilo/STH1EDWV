@@ -199,10 +199,16 @@ namespace sth1edwv
         public Cartridge(string path)
         {
             Memory = new Memory(File.ReadAllBytes(path));
-            ReadLevels(); // TODO want _rings before this else they don't show up
+            ReadLevels();
             ReadGameText();
             ReadScreens();
             ReadExtraArt();
+
+            // Apply rings to level tilesets
+            foreach (var tileSet in Levels.Select(x => x.TileSet).Distinct())
+            {
+                tileSet.SetRings(_rings.Tiles[0]);
+            }
         }
 
         private void ReadExtraArt()
@@ -236,7 +242,7 @@ namespace sth1edwv
                 },
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x28294, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x28294, TileSet.Groupings.Sprite),
                     Name = "End sign",
                     Palette = GetPalette(0x626C, 1),
                     PaletteEditable = true,
@@ -245,7 +251,7 @@ namespace sth1edwv
                 },
                 new ArtItem
                 {
-                    TileSet = titleAndCreditTileSet = new TileSet(Memory, 0x28B0A, null, TileSet.Groupings.Sprite),
+                    TileSet = titleAndCreditTileSet = new TileSet(Memory, 0x28B0A, TileSet.Groupings.Sprite),
                     Name = "Title Screen Sprites",
                     Palette = GetPalette(0x13f1, 1),
                     PaletteEditable = true,
@@ -263,7 +269,7 @@ namespace sth1edwv
                 },
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x2926B, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x2926B, TileSet.Groupings.Sprite),
                     Name = "Map Screen Sprites 1",
                     Palette = GetPalette(0x0f1e, 1),
                     PaletteEditable = true,
@@ -272,25 +278,27 @@ namespace sth1edwv
                 },
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x29942, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x29942, TileSet.Groupings.Sprite),
                     Name = "Map Screen Sprites 2",
                     Palette = GetPalette(0x0f3e, 1),
                     PaletteEditable = true,
                     Width = 16,
                     IsSprites = true
                 },
+                /* This is no longer at a fixed position as it gets relocated when saving levels
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x2EEB1, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x2EEB1, TileSet.Groupings.Sprite),
                     Name = "Boss Sprites",
                     Palette = GetPalette(0x731C, 1),
                     PaletteEditable = true,
                     Width = 16,
                     IsSprites = true
                 },
+                */
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x2F92E, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x2F92E, TileSet.Groupings.Sprite),
                     Name = "HUD Sprites",
                     Palette = Levels[0].SpritePalette,
                     Width = 16,
@@ -305,7 +313,7 @@ namespace sth1edwv
                 },
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x3da28, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x3da28, TileSet.Groupings.Sprite),
                     Name = "Capsule and animals",
                     Palette = GetPalette(0x731C, 1),
                     PaletteEditable = true,
@@ -314,7 +322,7 @@ namespace sth1edwv
                 },
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x3e508, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x3e508, TileSet.Groupings.Sprite),
                     Name = "Underwater boss",
                     Palette = GetPalette(0x027b, 1),
                     PaletteEditable = true,
@@ -323,7 +331,7 @@ namespace sth1edwv
                 },
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x3ef3f, null, TileSet.Groupings.Sprite),
+                    TileSet = new TileSet(Memory, 0x3ef3f, TileSet.Groupings.Sprite),
                     Name = "Running Robotnik",
                     Palette = GetPalette(0x731C, 1),
                     PaletteEditable = true,
@@ -362,9 +370,9 @@ namespace sth1edwv
             }
         }
 
-        public TileSet GetTileSet(int offset, bool addRings, List<Point> grouping)
+        public TileSet GetTileSet(int offset, List<Point> grouping)
         {
-            return GetItem(_tileSets, offset, () => new TileSet(Memory, offset, addRings ? _rings : null, grouping));
+            return GetItem(_tileSets, offset, () => new TileSet(Memory, offset, grouping));
         }
 
         public Floor GetFloor(int offset, int compressedSize, int width)

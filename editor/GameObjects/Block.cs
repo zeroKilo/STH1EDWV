@@ -63,7 +63,7 @@ namespace sth1edwv.GameObjects
                     var y = i / 4 * 8;
                     var tileIndex = TileIndices[i];
                     var tile = TileSet.Tiles[tileIndex];
-                    g.DrawImageUnscaled(tile.GetImage(palette), x, y);
+                    g.DrawImageUnscaled(tile.GetImageWithRings(palette), x, y);
                 }
             }
 

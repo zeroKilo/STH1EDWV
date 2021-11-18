@@ -276,9 +276,9 @@ namespace sth1edwv.GameObjects
             Palette = cartridge.GetPalette(cartridge.Memory.Word(0x627C + _initPalette*2), 2);
             CyclingPalette = cartridge.GetPalette(cartridge.Memory.Word(0x628C + _paletteCycleIndex*2), _paletteCycleCount);
 
-            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, true, null);
+            TileSet = cartridge.GetTileSet(_offsetArt + 0x30000, null);
 
-            SpriteTileSet = cartridge.GetTileSet(spriteArtAddress + spriteArtPage * 0x4000, false, TileSet.Groupings.Sprite);
+            SpriteTileSet = cartridge.GetTileSet(spriteArtAddress + spriteArtPage * 0x4000, TileSet.Groupings.Sprite);
 
             Floor = cartridge.GetFloor(
                 _floorAddress + 0x14000, 

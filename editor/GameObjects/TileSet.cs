@@ -97,7 +97,7 @@ namespace sth1edwv.GameObjects
         /// <summary>
         /// Compressed data version
         /// </summary>
-        public TileSet(Memory memory, int offset, TileSet rings, List<Point> grouping)
+        public TileSet(Memory memory, int offset, List<Point> grouping)
         {
             Offset = offset;
             Compressed = true;
@@ -110,16 +110,6 @@ namespace sth1edwv.GameObjects
                 .ToChunks(64 * grouping.Count)
                 .Select((x, index) => new Tile(x, grouping, index))
                 .ToList();
-
-            if (rings != null)
-            {
-                // We replace the last 4 tiles' images with ring tiles TODO: fix this
-                for (var i = 0; i < 4; ++i)
-                {
-                    var index = 252 + i;
-                    Tiles[index].SetRingVersion(rings.Tiles[i]);
-                }
-            }
         }
 
         public int Offset { get; set; }
@@ -267,6 +257,14 @@ namespace sth1edwv.GameObjects
         public override string ToString()
         {
             return $"{Tiles.Count} tiles @ {Offset:X}..{Offset+GetData().Count-1:X}";
+        }
+
+        public void SetRings(Tile ring)
+        {
+            Tiles[252].SetRingTile(ring, 0, 0);
+            Tiles[253].SetRingTile(ring, 8, 0);
+            Tiles[254].SetRingTile(ring, 0, 8);
+            Tiles[255].SetRingTile(ring, 8, 8);
         }
     }
 }
