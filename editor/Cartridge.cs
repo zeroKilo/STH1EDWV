@@ -285,17 +285,16 @@ namespace sth1edwv
                     Width = 16,
                     IsSprites = true
                 },
-                /* This is no longer at a fixed position as it gets relocated when saving levels
+                // This is no longer at a fixed position as it gets relocated when saving levels
                 new ArtItem
                 {
-                    TileSet = new TileSet(Memory, 0x2EEB1, TileSet.Groupings.Sprite),
+                    TileSet = Levels[18].SpriteTileSet,
                     Name = "Boss Sprites",
                     Palette = GetPalette(0x731C, 1),
                     PaletteEditable = true,
                     Width = 16,
                     IsSprites = true
                 },
-                */
                 new ArtItem
                 {
                     TileSet = new TileSet(Memory, 0x2F92E, TileSet.Groupings.Sprite),
