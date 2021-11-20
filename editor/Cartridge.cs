@@ -22,7 +22,7 @@ namespace sth1edwv
 
     public class Cartridge: IDisposable
     {
-        private class Game
+        public class Game
         {
             public class LevelInfo
             {
@@ -31,7 +31,7 @@ namespace sth1edwv
             }
             public List<LevelInfo> Levels { get; set; }
 
-            public class ScreenInfo
+            public class ArtInfo
             {
                 public string Name { get; set; }
                 public int TileSetBankOffset { get; set; }
@@ -43,44 +43,159 @@ namespace sth1edwv
                 public int SecondaryTileMapSizeOffset { get; set; }
                 public int PaletteReferenceOffset { get; set; }
             }
-            public List<ScreenInfo> Screens { get; set; }
+            public List<ArtInfo> Screens { get; set; }
+
+            public class Reference
+            {
+                public int Offset { get; set; }
+                public string To { get; set; } // This is a bit nasty... we look things up by name. I guess I need to check for clashes and unreferenced things?
+                public enum Types
+                {
+                    Absolute,
+                    Slot1Banked,
+                    Slot2Banked,
+                    PageNumber,
+                    Size
+                }
+                public Types Type { get; set; }
+                public int Delta { get; set; }
+            }
+            public Dictionary<string, List<Reference>> References { get; set; }
+
+            // The game has various "groups" of assets, with one or more of:
+            // - Tileset
+            // - Palette
+            // - Tilemap
+            // - Sprite tileset
+            // - Sprite palette (maybe linked to the other palette)
+            // - Secondary tilemap for tile priority
+            // Each of these items will then have one or more references in the ROM.
+            public class Asset
+            {
+                public int Offset { get; set; }
+                public enum Types { TileSet, Palette, TileMap,
+                    SpriteTileSet,
+                    ForegroundTileMap
+                }
+                public Types Type { get; set; }
+                public List<Reference> References { get; set; }
+            }
+
+            public class AssetGroup
+            {
+                public string Name { get; set; }
+                public List<Asset> Assets { get; set; }
+            }
+            public List<AssetGroup> Assets { get; set; }
         }
 
         private static readonly Game Sonic1MasterSystem = new()
         {
-            Screens = new List<Game.ScreenInfo>
+            Assets = new List<Game.AssetGroup>
             {
                 new()
                 {
-                    Name = "Map screen 1", 
-                    TileSetReferenceOffset = 0x0c8a, 
-                    TileSetBankOffset = 0x0c90, 
+                    Name = "Map screen 1",
+                    Assets = new List<Game.Asset>
+                    {
+                        new() // Tileset
+                        {
+                            Offset = 0x30000,
+                            Type = Game.Asset.Types.TileSet,
+                            References = new List<Game.Reference>
+                            {
+                                new() {Offset = 0x0c89+1, Type = Game.Reference.Types.Slot1Banked, Delta = -0x4000}, // ld     hl,$0000        ; 000C89 21 00 00 
+                                new() {Offset = 0x0c8f+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$0c           ; 000C8F 3E 0C 
+                            }
+                        },
+                        new() // Sprite tileset
+                        {
+                            Offset = 0x2926b,
+                            Type = Game.Asset.Types.SpriteTileSet,
+                            References = new List<Game.Reference>
+                            {
+                                new() {Offset = 0x0c94+1, Type = Game.Reference.Types.Slot1Banked, Delta = -0x4000}, // ld     hl,$526b        ; 000C94 21 6B 52 
+                                new() {Offset = 0x0c9a+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$09           ; 000C9A 3E 09 
+                            }
+                        },
+                        new() // HUD tileset
+                        {
+                            Offset = 0x2f92e,
+                            Type = Game.Asset.Types.SpriteTileSet,
+                            References = new List<Game.Reference>
+                            {
+                                new() {Offset = 0x0c9f+1, Type = Game.Reference.Types.Slot1Banked, Delta = -0x4000}, // ld     hl,$b92e        ; 000C9F 21 2E B9 
+                                new() {Offset = 0x0ca5+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$09           ; 000CA5 3E 09 
+                            }
+                        },
+                        new() // High priority tilemap, loaded first
+                        {
+                            Offset = 0x1627e,
+                            Type = Game.Asset.Types.ForegroundTileMap,
+                            References = new List<Game.Reference>
+                            {
+                                new() {Offset = 0x0caa+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$05           ; 000CAA 3E 05 
+                                new() {Offset = 0x0cb2+1, Type = Game.Reference.Types.Slot1Banked}, // ld     hl,$627e        ; 000CB2 21 7E 62 
+                                new() {Offset = 0x0cb5+1, Type = Game.Reference.Types.Size}, // ld     bc,$0178        ; 000CB5 01 78 01 
+                            }
+                        },
+                        new() // Low priority tilemap, loaded second with "transparency"
+                        {
+                            Offset = 0x1627e,
+                            Type = Game.Asset.Types.TileMap,
+                            References = new List<Game.Reference>
+                            {
+                                new() {Offset = 0x0caa+1, Type = Game.Reference.Types.PageNumber}, // TODO shared reference with the above means they need to be linked somehow
+                                new() {Offset = 0x0cc3+1, Type = Game.Reference.Types.Slot1Banked}, // ld     hl,$63f6        ; 000CC3 21 F6 63 
+                                new() {Offset = 0x0cc6+1, Type = Game.Reference.Types.Size}, // ld     bc,$0145        ; 000CC6 01 45 01 
+                            }
+                        },
+                        new() // Palette
+                        {
+                            Offset = 0x0f0e,
+                            Type = Game.Asset.Types.Palette,
+                            References = new List<Game.Reference>
+                            {
+                                new() {Offset = 0x0cd4+1, Type = Game.Reference.Types.Absolute}, // ld     hl,$0f0e        ; 000CD4 21 0E 0F 
+                            }
+                        }
+                    }
+                }
+            },
+
+            Screens = new List<Game.ArtInfo>
+            {
+                new()
+                {
+                    Name = "Map screen 1",
+                    TileSetReferenceOffset = 0x0c8a,
+                    TileSetBankOffset = 0x0c90,
                     TileMapBankOffset = 0x0cab,
-                    TileMapReferenceOffset = 0x0cb3, 
+                    TileMapReferenceOffset = 0x0cb3,
                     TileMapSizeOffset = 0x0cb6,
-                    SecondaryTileMapReferenceOffset = 0x0cc4, 
+                    SecondaryTileMapReferenceOffset = 0x0cc4,
                     SecondaryTileMapSizeOffset = 0x0cc7,
                     PaletteReferenceOffset = 0x0cd5
                 },
                 new()
                 {
-                    Name = "Map screen 2", 
-                    TileSetReferenceOffset = 0x0cec, 
-                    TileSetBankOffset = 0x0cf2, 
-                    PaletteReferenceOffset = 0x0d37, 
-                    TileMapReferenceOffset = 0x0d15, 
+                    Name = "Map screen 2",
+                    TileSetReferenceOffset = 0x0cec,
+                    TileSetBankOffset = 0x0cf2,
+                    PaletteReferenceOffset = 0x0d37,
+                    TileMapReferenceOffset = 0x0d15,
                     TileMapSizeOffset = 0x0d18,
                     TileMapBankOffset = 0x0d0d,
-                    SecondaryTileMapReferenceOffset = 0x0d26, 
+                    SecondaryTileMapReferenceOffset = 0x0d26,
                     SecondaryTileMapSizeOffset = 0x0d29
                 },
                 new()
                 {
-                    Name = "Title screen", 
-                    TileSetReferenceOffset = 0x1297, 
-                    TileSetBankOffset = 0x129d, 
+                    Name = "Title screen",
+                    TileSetReferenceOffset = 0x1297,
+                    TileSetBankOffset = 0x129d,
                     TileMapBankOffset = 0x12ad,
-                    TileMapReferenceOffset = 0x12b5, 
+                    TileMapReferenceOffset = 0x12b5,
                     TileMapSizeOffset = 0x12bb,
                     PaletteReferenceOffset = 0x12cd
                 },
@@ -127,7 +242,7 @@ namespace sth1edwv
                 new()
                 {
                     Name = "Ending Map 2",
-                    // Uses the tileset from Ending Map...
+                    // Same tileset and palette as above
                     PaletteReferenceOffset = 0x25a2,
                     TileSetReferenceOffset = 0x25aa,
                     TileSetBankOffset = 0x25b0,
@@ -143,7 +258,7 @@ namespace sth1edwv
                     TileMapBankOffset = 0x26c2,
                     TileMapReferenceOffset = 0x26ca,
                     TileMapSizeOffset = 0x26cd,
-                    PaletteReferenceOffset = 0x2703 // TODO: same tileset, different palette... how to resolve this?
+                    PaletteReferenceOffset = 0x2703
                 }
             },
             Levels = new List<Game.LevelInfo>
@@ -181,6 +296,40 @@ namespace sth1edwv
                 new() { Name = "Special Stage 6", Offset = 0x15580 + 0x4c5 },
                 new() { Name = "Special Stage 7", Offset = 0x15580 + 0x4ea },
                 new() { Name = "Special Stage 8", Offset = 0x15580 + 0x50f }
+            },
+            References = new Dictionary<string, List<Game.Reference>>
+            {
+                { 
+                    "Monitor Art", // 0x15180
+                    new() {
+                        new Game.Reference { Offset = 0x5b32, Type = Game.Reference.Types.Slot1Banked }, // 005B31 21 80 51 
+                        new Game.Reference { Offset = 0x350a, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5400 - 0x5180 }, // 005F09 21 00 54 
+                        new Game.Reference { Offset = 0xbf51, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5400 - 0x5180 }, // 00BF50 21 00 54 
+                        new Game.Reference { Offset = 0x5c00, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5200 - 0x5200 }, // 005BFF 21 00 52
+                        new Game.Reference { Offset = 0x5cde, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5280 - 0x5200 }, // 005C6D 21 80 52
+                        new Game.Reference { Offset = 0x5ca8, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5180 - 0x5200 }, // 005CA7 21 80 51 
+                        new Game.Reference { Offset = 0x5cb3, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5280 - 0x5200 }, // 005CB2 21 80 52
+                        new Game.Reference { Offset = 0x5cfa, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5300 - 0x5200 }, // 005CF9 21 00 53
+                        new Game.Reference { Offset = 0x5d2a, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5380 - 0x5200 }, // 005D29 21 80 53
+                        new Game.Reference { Offset = 0x5d7b, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5480 - 0x5200 }, // 005D7A 21 80 54
+                        new Game.Reference { Offset = 0x5da3, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5500 - 0x5200 }, // 005DA2 21 00 55
+                        new Game.Reference { Offset = 0x0c1f, Type = Game.Reference.Types.PageNumber } // 000C1E 3E 05 
+                    }
+                }, {
+                    "Sonic (right)", // 0x20000 
+                    new() {
+                        new Game.Reference { Offset = 0x4c85, Type = Game.Reference.Types.Slot1Banked }, // 004C84 01 00 40 
+                        new Game.Reference { Offset = 0x012e, Type = Game.Reference.Types.PageNumber }, // 00012D 3E 08 
+                        new Game.Reference { Offset = 0x0156, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // 000135 3E 09
+                    }
+                }, {
+                    "Sonic (left)", // 0x23000 TODO this has to be in the same 32KB window as the above, how to express this?
+                    new() {
+                        new Game.Reference { Offset = 0x4c8e, Type = Game.Reference.Types.Slot1Banked }, // 004C8D 01 00 70
+                        new Game.Reference { Offset = 0x012e, Type = Game.Reference.Types.PageNumber }, // 00012D 3E 08 
+                        new Game.Reference { Offset = 0x0156, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // 000135 3E 09
+                    }
+                }
             }
         };
 
@@ -219,7 +368,7 @@ namespace sth1edwv
                 new ArtItem
                 {
                     TileSet = new TileSet(Memory, 0x15180, 0x400, 4, TileSet.Groupings.Monitor),
-                    Name = "Monitor art",
+                    Name = "Monitor Art",
                     Palette = Levels[0].SpritePalette,
                     Width = 8,
                     IsSprites = true
@@ -344,17 +493,7 @@ namespace sth1edwv
         {
             foreach (var screenInfo in Sonic1MasterSystem.Screens)
             {
-                Screens.Add(new Screen(
-                    this, 
-                    screenInfo.Name, 
-                    screenInfo.TileSetReferenceOffset, 
-                    screenInfo.TileSetBankOffset, 
-                    screenInfo.PaletteReferenceOffset, 
-                    screenInfo.TileMapReferenceOffset, 
-                    screenInfo.TileMapSizeOffset,
-                    screenInfo.TileMapBankOffset,
-                    screenInfo.SecondaryTileMapReferenceOffset,
-                    screenInfo.SecondaryTileMapSizeOffset));
+                Screens.Add(new Screen(this, screenInfo));
             }
         }
 
@@ -462,9 +601,20 @@ namespace sth1edwv
             //
             // 15180    1557f   Monitor screens                     Original offset/size (uncompressed) TODO change?
             // 15580    155c9   Level header pointers               Untouched
-            // 155ca    15ab3   Level headers                       Yes, Original offset/size 
+            // 155ca    15ab3   Level headers                       Yes, original offset/size 
             // 15ab4    15fff   Object layouts (+ unused)           Original offsets/sizes TODO change?
-            // 16000    16de9	Tilemaps                            (compressed, need to figure them all out) TODO
+            // 16000    1612D   Title screen tilemap
+            // 1612E    161E8   "Sonic Has Passed" tilemap
+            // 161E9    1627D   Special Stage complete tilemap
+            // 1627E    163F5   Map screen 1 high-priority tilemap
+            // 163F6    1653A   Map screen 1 low-priority tilemap
+            // 1653B    166AA   Map screen 2 high-priority tilemap
+            // 166AB    167FD   Map screen 3 low-priority tilemap
+            // 167FE    1682F   Game Over tilemap
+            // 16830    169A8   End screen polluted tilemap
+            // 169A9    16AED   End screen clean tilemap
+            // 16AED    16c60   Unused credits screen tilemap       Can be removed for some free space
+            // 16C61    16DE9   Credits screen tilemap
             // 16dea    1ffff   Floors (+unused)                    Yes, level header pointers are rewritten. Can be in range 14000..23fff
             // 20000    22fff   Sonic sprites (left) (+ unused)     Original offset/size (uncompressed) TODO change?
             // 23000    25fff   Sonic sprites (right) (+ unused)    Original offset/size (uncompressed) TODO change?
@@ -498,11 +648,22 @@ namespace sth1edwv
             {
                 palette.GetData().CopyTo(memory, palette.Offset);
             }
+
+            // Static screen tilemaps
+            // 16000..16de9 inclusive, so we combine with Floors below
+            // TODO these could be placed anywhere... so we could place them later
+            var offset = 0x16000;
+            foreach (var screen in Screens)
+            {
+                var data = screen.TileMap.GetData();
+                data.CopyTo(memory, offset);
+                screen.TileMap.Offset = offset;
+                screen.FixPointers(memory);
+                offset += data.Count;
+            }
+
             // - Floors (filling space)
             // 16dea..1ffff inclusive
-            // TODO: 16000-18de9 is tilemaps, I should repack them and then append (when I add an editor?)
-            // TODO: tilemaps are more freely placeable?
-            var offset = 0x16dea;
             foreach (var floor in Levels.Select(l => l.Floor).Distinct())
             {
                 var data = floor.GetData();
@@ -594,8 +755,9 @@ namespace sth1edwv
         public Space GetFloorSpace() =>
             new()
             {
-                Total = 0x20000 - 0x16dea,
-                Used = Levels.Select(x => x.Floor).Distinct().Sum(x => x.GetData().Count)
+                Total = 0x20000 - 0x16000,
+                Used = Levels.Select(x => x.Floor).Distinct().Sum(x => x.GetData().Count) +
+                       Screens.Sum(x => x.TileMap.GetData().Count) // screens don't share tilemaps
             };
         public Space GetFloorTileSetSpace() =>
             new()

@@ -104,14 +104,15 @@ namespace sth1edwv
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.listBoxArt = new System.Windows.Forms.ListBox();
             this.tabControlArt = new System.Windows.Forms.TabControl();
+            this.tabPageArtLayout = new System.Windows.Forms.TabPage();
+            this.pictureBoxArtLayout = new System.Windows.Forms.PictureBox();
             this.tabPageArtTiles = new System.Windows.Forms.TabPage();
             this.otherArtTileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.tabPageArtPalette = new System.Windows.Forms.TabPage();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.tabPageArtLayout = new System.Windows.Forms.TabPage();
-            this.pictureBoxArtLayout = new System.Windows.Forms.PictureBox();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -150,10 +151,10 @@ namespace sth1edwv
             this.splitContainer3.Panel2.SuspendLayout();
             this.splitContainer3.SuspendLayout();
             this.tabControlArt.SuspendLayout();
-            this.tabPageArtTiles.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
             this.tabPageArtLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).BeginInit();
+            this.tabPageArtTiles.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -846,6 +847,26 @@ namespace sth1edwv
             this.tabControlArt.Size = new System.Drawing.Size(1052, 531);
             this.tabControlArt.TabIndex = 1;
             // 
+            // tabPageArtLayout
+            // 
+            this.tabPageArtLayout.Controls.Add(this.propertyGrid1);
+            this.tabPageArtLayout.Controls.Add(this.pictureBoxArtLayout);
+            this.tabPageArtLayout.Location = new System.Drawing.Point(4, 22);
+            this.tabPageArtLayout.Name = "tabPageArtLayout";
+            this.tabPageArtLayout.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageArtLayout.Size = new System.Drawing.Size(1044, 505);
+            this.tabPageArtLayout.TabIndex = 2;
+            this.tabPageArtLayout.Text = "Layout";
+            this.tabPageArtLayout.UseVisualStyleBackColor = true;
+            // 
+            // pictureBoxArtLayout
+            // 
+            this.pictureBoxArtLayout.Location = new System.Drawing.Point(6, 6);
+            this.pictureBoxArtLayout.Name = "pictureBoxArtLayout";
+            this.pictureBoxArtLayout.Size = new System.Drawing.Size(317, 194);
+            this.pictureBoxArtLayout.TabIndex = 0;
+            this.pictureBoxArtLayout.TabStop = false;
+            // 
             // tabPageArtTiles
             // 
             this.tabPageArtTiles.Controls.Add(this.otherArtTileSetViewer);
@@ -899,24 +920,13 @@ namespace sth1edwv
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
             // 
-            // tabPageArtLayout
+            // propertyGrid1
             // 
-            this.tabPageArtLayout.Controls.Add(this.pictureBoxArtLayout);
-            this.tabPageArtLayout.Location = new System.Drawing.Point(4, 22);
-            this.tabPageArtLayout.Name = "tabPageArtLayout";
-            this.tabPageArtLayout.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageArtLayout.Size = new System.Drawing.Size(1044, 505);
-            this.tabPageArtLayout.TabIndex = 2;
-            this.tabPageArtLayout.Text = "Layout";
-            this.tabPageArtLayout.UseVisualStyleBackColor = true;
-            // 
-            // pictureBoxArtLayout
-            // 
-            this.pictureBoxArtLayout.Location = new System.Drawing.Point(6, 6);
-            this.pictureBoxArtLayout.Name = "pictureBoxArtLayout";
-            this.pictureBoxArtLayout.Size = new System.Drawing.Size(317, 194);
-            this.pictureBoxArtLayout.TabIndex = 0;
-            this.pictureBoxArtLayout.TabStop = false;
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.propertyGrid1.Location = new System.Drawing.Point(737, 3);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(304, 499);
+            this.propertyGrid1.TabIndex = 1;
             // 
             // Form1
             // 
@@ -974,11 +984,11 @@ namespace sth1edwv
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
             this.splitContainer3.ResumeLayout(false);
             this.tabControlArt.ResumeLayout(false);
+            this.tabPageArtLayout.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).EndInit();
             this.tabPageArtTiles.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.tabPageArtLayout.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1057,6 +1067,7 @@ namespace sth1edwv
         private TabPage tabPageArtPalette;
         private TabPage tabPageArtLayout;
         private PictureBox pictureBoxArtLayout;
+        private PropertyGrid propertyGrid1;
     }
 }
 

@@ -457,7 +457,7 @@ namespace sth1edwv
         private void UpdateFloorSpace()
         {
             var used = _cartridge.GetFloorSpace();
-            floorStatus.Text = $"Floor space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
+            floorStatus.Text = $"Floor/screen map space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
         }
 
         private void DrawingButtonCheckedChanged(object sender, EventArgs e)
@@ -612,6 +612,8 @@ namespace sth1edwv
             tabPageArtPalette.Controls.Clear();
             otherArtTileSetViewer.SetData(null, null);
 
+            propertyGrid1.SelectedObject = listBoxArt.SelectedItem;
+
             switch (listBoxArt.SelectedItem)
             {
                 case ArtItem artItem:
@@ -639,7 +641,7 @@ namespace sth1edwv
             tabPageArtPalette.Controls.Add(paletteEditor);
             paletteEditor.Dock = DockStyle.Fill;
 
-            pictureBoxArtLayout.Image = screen.Image;
+            pictureBoxArtLayout.Image = screen.TileMap.GetImage(screen.TileSet, screen.Palette);
             if (!tabControlArt.TabPages.Contains(tabPageArtLayout))
             {
                 tabControlArt.TabPages.Insert(0, tabPageArtLayout);

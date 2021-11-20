@@ -10,7 +10,7 @@ namespace sth1edwv.GameObjects
         public Floor(Cartridge cartridge, int offset, int compressedSize, int width)
         {
             Offset = offset;
-            BlockIndices = Compression.DecompressRle(cartridge, offset, compressedSize);
+            BlockIndices = Compression.DecompressRle(cartridge.Memory, offset, compressedSize);
             Width = width;
         }
 

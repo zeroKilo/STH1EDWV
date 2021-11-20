@@ -8,10 +8,10 @@ namespace sth1edwv
 {
     public static class Compression
     {
-        public static byte[] DecompressRle(Cartridge cartridge, int address, int size)
+        public static byte[] DecompressRle(Memory memory, int address, int size)
         {
             // Decompress into a new stream
-            using var m = cartridge.Memory.GetStream(address, size);
+            using var m = memory.GetStream(address, size);
             using var result = new MemoryStream();
             while (m.Position < m.Length)
             {

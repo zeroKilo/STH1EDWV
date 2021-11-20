@@ -94,6 +94,7 @@
     <Compile Include="GameObjects\Level.cs" />
     <Compile Include="GameObjects\LevelObject.cs" />
     <Compile Include="GameObjects\LevelObjectSet.cs" />
+    <Compile Include="GameObjects\TileMap.cs" />
     <Compile Include="Memory.cs" />
     <Compile Include="Forms\ObjectEditor.cs">
       <SubType>Form</SubType>

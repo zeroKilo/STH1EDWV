@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 
 namespace sth1edwv.GameObjects
 {
     public class Screen
     {
-        private Bitmap _image;
+        private readonly Cartridge.Game.ArtInfo _screenInfo;
 
         // ReSharper disable MemberCanBePrivate.Global
         public string Name { get; }
@@ -16,78 +15,65 @@ namespace sth1edwv.GameObjects
 
         public Palette Palette { get; }
 
-        public List<ushort> TileMap { get; }
+        public TileMap TileMap { get; }
         // ReSharper restore MemberCanBePrivate.Global
 
-        public Screen(Cartridge cartridge, string name, int tileSetReferenceOffset,
-            int tileSetBankOffset, int paletteReferenceOffset, int tileMapReferenceOffset, int tileMapSizeOffset,
-            int tileMapBankOffset, int secondaryTileMapReferenceOffset, int secondaryTileMapSizeOffset)
+        public Screen(Cartridge cartridge, Cartridge.Game.ArtInfo screenInfo)
         {
-            Name = name;
-            var paletteOffset = cartridge.Memory.Word(paletteReferenceOffset);
+            _screenInfo = screenInfo;
+            Name = screenInfo.Name;
+            var paletteOffset = cartridge.Memory.Word(screenInfo.PaletteReferenceOffset);
             Palette = cartridge.GetPalette(paletteOffset, 1);
             // Tile set reference is relative to the start of its bank
-            var tileSetOffset = cartridge.Memory.Word(tileSetReferenceOffset) + cartridge.Memory[tileSetBankOffset] * 0x4000;
+            var tileSetOffset = cartridge.Memory.Word(screenInfo.TileSetReferenceOffset) + cartridge.Memory[screenInfo.TileSetBankOffset] * 0x4000;
             TileSet = cartridge.GetTileSet(tileSetOffset, null);
-            // Tile map offset is as pages in slot 1 (TODO always?)
-            var tileMapOffset = cartridge.Memory.Word(tileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
-            var tileMapSize = cartridge.Memory.Word(tileMapSizeOffset);
-            TileMap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize)
-                .Select(b => (ushort)b)
-                .ToList();
-            if (secondaryTileMapReferenceOffset != 0)
+            // Tile map offset is as pages in slot 1
+            var tileMapOffset = cartridge.Memory.Word(screenInfo.TileMapReferenceOffset) + cartridge.Memory[screenInfo.TileMapBankOffset] * 0x4000 - 0x4000;
+            var tileMapSize = cartridge.Memory.Word(screenInfo.TileMapSizeOffset);
+            TileMap = new TileMap(cartridge.Memory, tileMapOffset, tileMapSize);
+            TileMapOffset = $"{tileMapOffset:X}-{tileMapOffset + tileMapSize - 1:X}";
+            if (screenInfo.SecondaryTileMapReferenceOffset != 0)
             {
-                tileMapOffset = cartridge.Memory.Word(secondaryTileMapReferenceOffset) + cartridge.Memory[tileMapBankOffset] * 0x4000 - 0x4000;
-                tileMapSize = cartridge.Memory.Word(secondaryTileMapSizeOffset);
-                var secondaryTileMap = Compression.DecompressRle(cartridge, tileMapOffset, tileMapSize);
-
-                // Apply to the tile map
-                for (var i = 0; i < secondaryTileMap.Length; i++)
-                {
-                    var index = secondaryTileMap[i];
-                    if (index == 0xff)
-                    {
-                        //  Assume the primary one is therefore foreground
-                        TileMap[i] |= 0x1000;
-                    }
-                    else
-                    {
-                        TileMap[i] = secondaryTileMap[i];
-                    }
-                }
+                TileMap.SetAllForeground();
+                tileMapOffset = cartridge.Memory.Word(screenInfo.SecondaryTileMapReferenceOffset) + cartridge.Memory[screenInfo.TileMapBankOffset] * 0x4000 - 0x4000;
+                tileMapSize = cartridge.Memory.Word(screenInfo.SecondaryTileMapSizeOffset);
+                var background = new TileMap(cartridge.Memory, tileMapOffset, tileMapSize);
+                TileMap.Overlay(background);
+                SecondaryTileMapOffset = $"{tileMapOffset:X}-{tileMapOffset + tileMapSize - 1:X}";
             }
         }
+
+        // These are for display only
+        // ReSharper disable MemberCanBePrivate.Global
+        // ReSharper disable UnusedAutoPropertyAccessor.Global
+        public string TileMapOffset { get; }
+        public string SecondaryTileMapOffset { get; }
+        // ReSharper restore UnusedAutoPropertyAccessor.Global
+        // ReSharper restore MemberCanBePrivate.Global
 
         public override string ToString()
         {
             return Name;
         }
 
-        public Bitmap Image
+        public void FixPointers(byte[] memory)
         {
-            get
+            var value = 0x4000 + TileMap.Offset % 0x4000;
+            var bank = TileMap.Offset / 0x4000;
+            var length = TileMap.TileMap1Size;
+            memory[_screenInfo.TileMapReferenceOffset + 0] = (byte)(value & 0xff);
+            memory[_screenInfo.TileMapReferenceOffset + 1] = (byte)(value >> 8);
+            memory[_screenInfo.TileMapBankOffset] = (byte)bank;
+            memory[_screenInfo.TileMapSizeOffset + 0] = (byte)(length & 0xff);
+            memory[_screenInfo.TileMapSizeOffset + 1] = (byte)(length >> 8);
+            if (TileMap.TileMap2Size > 0)
             {
-                if (_image != null)
-                {
-                    return _image;
-                }
-                _image = new Bitmap(256, 192);
-                using var g = Graphics.FromImage(_image);
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                for (var i = 0; i < TileMap.Count; ++i)
-                {
-                    var x = i % 32 * 8;
-                    var y = i / 32 * 8;
-                    var index = TileMap[i];
-                    if (index != 0xff)
-                    {
-                        // Mask off high bits
-                        index &= 0xff;
-                        g.DrawImageUnscaled(TileSet.Tiles[index].GetImage(Palette), x, y);
-                    }
-                }
-
-                return _image;
+                value = 0x4000 + (TileMap.Offset + TileMap.TileMap1Size) % 0x4000;
+                length = TileMap.TileMap2Size;
+                memory[_screenInfo.SecondaryTileMapReferenceOffset + 0] = (byte)(value & 0xff);
+                memory[_screenInfo.SecondaryTileMapReferenceOffset + 1] = (byte)(value >> 8);
+                memory[_screenInfo.SecondaryTileMapSizeOffset + 0] = (byte)(length & 0xff);
+                memory[_screenInfo.SecondaryTileMapSizeOffset + 1] = (byte)(length >> 8);
             }
         }
     }
