@@ -57,7 +57,7 @@ namespace sth1edwv
 
         private void LoadFile(string filename)
         {
-            _cartridge = new Cartridge(filename);
+            _cartridge = new Cartridge(filename, Log);
             listBoxLevels.Items.Clear();
             listBoxLevels.Items.AddRange(_cartridge.Levels.ToArray<object>());
             listBoxGameText.Items.Clear();
@@ -739,6 +739,15 @@ namespace sth1edwv
                     }
                 }
             }
+        }
+
+        private void Log(string text)
+        {
+            logTextBox.BeginInvoke(new Action(() =>
+            {
+                logTextBox.AppendText(text);
+                logTextBox.AppendText("\r\n");
+            }));
         }
     }
 }

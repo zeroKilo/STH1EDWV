@@ -37,9 +37,9 @@ namespace sth1edwv
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -114,6 +114,8 @@ namespace sth1edwv
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.spriteTileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.logTextBox = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -156,6 +158,7 @@ namespace sth1edwv
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).BeginInit();
             this.tabPageArtTiles.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -434,8 +437,8 @@ namespace sth1edwv
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle4.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -457,8 +460,8 @@ namespace sth1edwv
             // Used
             // 
             this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
             this.Used.HeaderText = "Used";
             this.Used.Name = "Used";
             this.Used.ReadOnly = true;
@@ -466,8 +469,8 @@ namespace sth1edwv
             // UsedGlobal
             // 
             this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
             this.UsedGlobal.HeaderText = "Total used";
             this.UsedGlobal.Name = "UsedGlobal";
             this.UsedGlobal.ReadOnly = true;
@@ -791,6 +794,7 @@ namespace sth1edwv
             this.tabControl1.Controls.Add(this.tabPage5);
             this.tabControl1.Controls.Add(this.tabPage9);
             this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 24);
             this.tabControl1.Name = "tabControl1";
@@ -936,6 +940,28 @@ namespace sth1edwv
             this.spriteTileSetStatus.Size = new System.Drawing.Size(107, 17);
             this.spriteTileSetStatus.Text = "Sprite tileset space:";
             // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.logTextBox);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1323, 537);
+            this.tabPage2.TabIndex = 10;
+            this.tabPage2.Text = "Log";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // logTextBox
+            // 
+            this.logTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.logTextBox.Location = new System.Drawing.Point(3, 3);
+            this.logTextBox.Multiline = true;
+            this.logTextBox.Name = "logTextBox";
+            this.logTextBox.ReadOnly = true;
+            this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.logTextBox.Size = new System.Drawing.Size(1317, 531);
+            this.logTextBox.TabIndex = 0;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -998,6 +1024,8 @@ namespace sth1edwv
             this.tabPageArtTiles.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1078,6 +1106,8 @@ namespace sth1edwv
         private PictureBox pictureBoxArtLayout;
         private PropertyGrid propertyGrid1;
         private ToolStripStatusLabel spriteTileSetStatus;
+        private TabPage tabPage2;
+        private TextBox logTextBox;
     }
 }
 

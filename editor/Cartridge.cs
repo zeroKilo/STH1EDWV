@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,8 @@ namespace sth1edwv
 
     public class Cartridge: IDisposable
     {
+        private readonly Action<string> _logger;
+
         public class Game
         {
             public class LevelInfo
@@ -345,8 +348,11 @@ namespace sth1edwv
         private readonly Dictionary<int, Palette> _palettes = new();
         private TileSet _rings;
 
-        public Cartridge(string path)
+        public Cartridge(string path, Action<string> logger)
         {
+            _logger = logger;
+            logger($"Loading {path}...");
+            var sw = Stopwatch.StartNew();
             Memory = new Memory(File.ReadAllBytes(path));
             ReadLevels();
             ReadGameText();
@@ -358,10 +364,13 @@ namespace sth1edwv
             {
                 tileSet.SetRings(_rings.Tiles[0]);
             }
+
+            _logger($"Load complete in {sw.Elapsed}");
         }
 
         private void ReadExtraArt()
         {
+            _logger("Loading art...");
             TileSet titleAndCreditTileSet;
             Art.AddRange(new[]
             {
@@ -491,19 +500,23 @@ namespace sth1edwv
 
         private void ReadScreens()
         {
+            _logger("Loading screens...");
             foreach (var screenInfo in Sonic1MasterSystem.Screens)
             {
+                _logger($"- Loading screen {screenInfo.Name}...");
                 Screens.Add(new Screen(this, screenInfo));
             }
         }
 
         private void ReadLevels()
         {
+            _logger("Loading levels...");
             DisposeAll(_blockMappings);
             DisposeAll(_tileSets);
             Levels.Clear();
             foreach (var level in Sonic1MasterSystem.Levels)
             {
+                _logger($"- Loading level {level.Name} at offset ${level.Offset:X}...");
                 Levels.Add(new Level(this, level.Offset, level.Name));
             }
         }
@@ -541,6 +554,7 @@ namespace sth1edwv
 
         private void ReadGameText()
         {
+            _logger("Loading game text...");
             GameText.Clear();
             for (var i = 0; i < 6; i++)
             {
@@ -569,6 +583,8 @@ namespace sth1edwv
 
         public byte[] MakeRom()
         {
+            _logger("Building ROM...");
+            var sw = Stopwatch.StartNew();
             // We clone the memory to a memory stream
             var memory = Memory.GetStream(0, Memory.Count).ToArray();
 
@@ -640,35 +656,43 @@ namespace sth1edwv
             // 197e..19ad inclusive
             foreach (var gameText in GameText)
             {
-                gameText.GetData().CopyTo(memory, gameText.Offset);
+                var data = gameText.GetData();
+                data.CopyTo(memory, gameText.Offset);
+                _logger($"- Wrote game text \"{gameText.Text}\" at offset ${gameText.Offset:X}, length {data.Count} bytes");
             }
             // - Level palettes (at original offsets)
             // 629e..65ed inclusive, with Sky Base lightning not covered
-            foreach (var palette in Levels.SelectMany(x => new[]{x.Palette, x.CyclingPalette}))
+            foreach (var palette in Levels.SelectMany(x => new[]{x.Palette, x.CyclingPalette}).Distinct())
             {
-                palette.GetData().CopyTo(memory, palette.Offset);
+                var data = palette.GetData();
+                data.CopyTo(memory, palette.Offset);
+                _logger($"- Wrote palette at offset ${palette.Offset:X}, length {data.Count} bytes");
             }
 
             // Static screen tilemaps
             // 16000..16de9 inclusive, so we combine with Floors below
             // TODO these could be placed anywhere... so we could place them later
             var offset = 0x16000;
-            foreach (var tileMap in Screens.Select(x => x.TileMap).Distinct())
+            foreach (var group in Screens.GroupBy(x => x.TileMap))
             {
+                var tileMap = group.Key;
                 var data = tileMap.GetData();
                 data.CopyTo(memory, offset);
                 tileMap.Offset = offset;
                 offset += data.Count;
+                _logger($"- Wrote tilemap for screen(s) {string.Join(", ", group)} at offset ${tileMap.Offset:X}, length {data.Count} bytes");
             }
 
             // - Floors (filling space)
             // 16dea..1ffff inclusive
-            foreach (var floor in Levels.Select(l => l.Floor).Distinct())
+            foreach (var group in Levels.GroupBy(l => l.Floor))
             {
+                var floor = group.Key;
                 var data = floor.GetData();
                 data.CopyTo(memory, offset);
                 floor.Offset = offset;
                 offset += data.Count;
+                _logger($"- Wrote floor for level(s) {string.Join(", ", group)} at offset ${floor.Offset:X}, length {data.Count} bytes");
             }
 
             if (offset > 0x20000)
@@ -682,8 +706,9 @@ namespace sth1edwv
             // 2a12a..2EEB0 inclusive
             // Game engine expects data in the range 24000..33fff
             offset = 0x2a12a;
-            foreach (var tileSet in Levels.Select(l => l.SpriteTileSet).Distinct())
+            foreach (var group in Levels.GroupBy(l => l.SpriteTileSet))
             {
+                var tileSet = group.Key;
                 if (tileSet.Offset == 0x2EEB1)
                 {
                      // Skip boss tiles TODO fix this
@@ -693,6 +718,7 @@ namespace sth1edwv
                 data.CopyTo(memory, offset);
                 tileSet.Offset = offset;
                 offset += data.Count;
+                _logger($"- Wrote sprite tileset for level(s) {string.Join(", ", group)} at offset ${tileSet.Offset:X}, length {data.Count} bytes");
             }
 
             if (offset > 0x2EEB1)
@@ -704,12 +730,14 @@ namespace sth1edwv
             // 32fe6..3da27
             // Game engine expects data in the range 30000..3ffff
             offset = 0x32fe6;
-            foreach (var tileSet in Levels.Select(l => l.TileSet).Distinct())
+            foreach (var group in Levels.GroupBy(l => l.TileSet))
             {
+                var tileSet = group.Key;
                 var data = tileSet.GetData();
                 data.CopyTo(memory, offset);
                 tileSet.Offset = offset;
                 offset += data.Count;
+                _logger($"- Wrote background tileset for level(s) {string.Join(", ", group)} at offset ${tileSet.Offset:X}, length {data.Count} bytes");
             }
 
             if (offset > 0x3da28)
@@ -718,39 +746,51 @@ namespace sth1edwv
             }
 
             // Uncompressed art at its original offsets
-            foreach (var tileSet in Art.Select(x => x.TileSet).Where(x => !x.Compressed))
+            foreach (var group in Art.GroupBy(x => x.TileSet).Where(x => !x.Key.Compressed))
             {
-                tileSet.GetData().CopyTo(memory, tileSet.Offset);
+                var tileSet = group.Key;
+                var data = tileSet.GetData();
+                data.CopyTo(memory, tileSet.Offset);
+                _logger($"- Wrote uncompressed art for {string.Join(", ", group.Select(x => x.Name))} at offset ${tileSet.Offset:X}, length {data.Count} bytes");
             }
             // TODO other art...
 
             // - Block mappings (at original offsets)
             // TODO make these flexible if I make it possible to change sizes
-            foreach (var blockMapping in Levels.Select(l => l.BlockMapping).Distinct())
+            foreach (var group in Levels.GroupBy(l => l.BlockMapping))
             {
                 // We need to place both the block data and solidity data
-                foreach (var block in blockMapping.Blocks)
+                foreach (var block in group.Key.Blocks)
                 {
                     block.GetData().CopyTo(memory, block.Offset);
 
                     memory[block.SolidityOffset] = block.Data;
                 }
+
+                _logger($"- Wrote block mapping for level(s) {string.Join(", ", group)} at offset ${group.Key.Blocks[0].Offset:X}");
             }
             // - Level objects (at original offsets)
-            foreach (var obj in Levels.Select(l => l.Objects).Distinct().SelectMany(x => x))
+            foreach (var group in Levels.GroupBy(l => l.Objects))
             {
-                obj.GetData().CopyTo(memory, obj.Offset);
+                foreach (var obj in group.Key)
+                {
+                    obj.GetData().CopyTo(memory, obj.Offset);
+                }
+                _logger($"- Wrote {group.Key.Count()} level objects for level(s) {string.Join(", ", group)} at offset ${group.Key.First().Offset:X}");
             }
             // - Level headers (at original offsets). We do these last so they pick up info from the contained objects.
             foreach (var level in Levels)
             {
                 level.GetData().CopyTo(memory, level.Offset);
+                _logger($"- Wrote level header for {level} at offset ${level.Offset:X}");
             }
             // Fix up screen pointers - this also waits for all the offsets to be sorted
             foreach (var screen in Screens)
             {
                 screen.FixPointers(memory);
             }
+
+            _logger($"Built ROM image in {sw.Elapsed}");
 
             return memory;
         }
