@@ -23,6 +23,7 @@ namespace sth1edwv
         private Cartridge _cartridge;
         private readonly ImageList _solidityImages;
         private int _blockEditorTileSize;
+        private byte[] _lastSaved;
 
         public Form1()
         {
@@ -74,6 +75,9 @@ namespace sth1edwv
 
             UpdateFloorSpace();
             UpdateTileSetSpace();
+
+            // Take an image at the point of loading
+            _lastSaved = _cartridge.MakeRom();
         }
 
         private void SelectedLevelChanged(object sender, EventArgs e)
@@ -249,7 +253,16 @@ namespace sth1edwv
             using var dialog = new SaveFileDialog { Filter = "*.sms|*.sms" };
             if (dialog.ShowDialog(this) == DialogResult.OK)
             {
-                _cartridge.SaveTo(dialog.FileName);
+                try
+                {
+                    var data = _cartridge.MakeRom();
+                    File.WriteAllBytes(dialog.FileName, data);
+                    _lastSaved = data;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"There was an error while saving:\n\n{ex.Message}");
+                }
             }
         }
 
@@ -409,9 +422,16 @@ namespace sth1edwv
 
         private void quickTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var filename = Path.Combine(Path.GetTempPath(), "test.sms");
-            _cartridge.SaveTo(filename);
-            Process.Start(filename);
+            try
+            {
+                var filename = Path.Combine(Path.GetTempPath(), "test.sms");
+                File.WriteAllBytes(filename, _cartridge.MakeRom());
+                Process.Start(filename);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"There was an error while saving:\n\n{ex.Message}");
+            }
         }
 
         private void buttonCopyFloor_Click(object sender, EventArgs e)
@@ -676,6 +696,43 @@ namespace sth1edwv
             }
             // No layouts for these
             tabControlArt.TabPages.Remove(tabPageArtLayout);
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing && _lastSaved != null)
+            {
+                try
+                {
+                    var current = _cartridge.MakeRom();
+                    if (!current.SequenceEqual(_lastSaved))
+                    {
+                        if (MessageBox.Show(
+                                this, 
+                                "You have unsaved changes. Do you want to discard them?",
+                                "Unsaved changes", 
+                                MessageBoxButtons.YesNo, 
+                                MessageBoxIcon.Warning,
+                                MessageBoxDefaultButton.Button2) == DialogResult.No)
+                        {
+                            e.Cancel = true;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (MessageBox.Show(
+                            this,
+                            $"There may be unsaved changes, however there is currently an error:\n\n{ex.Message}",
+                            "Unsaved changes", 
+                            MessageBoxButtons.YesNo, 
+                            MessageBoxIcon.Warning,
+                            MessageBoxDefaultButton.Button2) == DialogResult.No)
+                    {
+                        e.Cancel = true;
+                    }
+                }
+            }
         }
     }
 }

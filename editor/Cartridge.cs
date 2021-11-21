@@ -567,7 +567,7 @@ namespace sth1edwv
             collection.Clear();
         }
 
-        public void SaveTo(string filename)
+        public byte[] MakeRom()
         {
             // We clone the memory to a memory stream
             var memory = Memory.GetStream(0, Memory.Count).ToArray();
@@ -653,12 +653,11 @@ namespace sth1edwv
             // 16000..16de9 inclusive, so we combine with Floors below
             // TODO these could be placed anywhere... so we could place them later
             var offset = 0x16000;
-            foreach (var screen in Screens)
+            foreach (var tileMap in Screens.Select(x => x.TileMap).Distinct())
             {
-                var data = screen.TileMap.GetData();
+                var data = tileMap.GetData();
                 data.CopyTo(memory, offset);
-                screen.TileMap.Offset = offset;
-                screen.FixPointers(memory);
+                tileMap.Offset = offset;
                 offset += data.Count;
             }
 
@@ -680,18 +679,23 @@ namespace sth1edwv
             // - Sprite tile sets (filling space)
             // TODO: various art from 26000
             // TODO: map art from 30000 - can be more flexible for the bank, levels can't
-            // 2a12a..2f92d inclusive
+            // 2a12a..2EEB0 inclusive
             // Game engine expects data in the range 24000..33fff
             offset = 0x2a12a;
             foreach (var tileSet in Levels.Select(l => l.SpriteTileSet).Distinct())
             {
+                if (tileSet.Offset == 0x2EEB1)
+                {
+                     // Skip boss tiles TODO fix this
+                    continue;
+                }
                 var data = tileSet.GetData();
                 data.CopyTo(memory, offset);
                 tileSet.Offset = offset;
                 offset += data.Count;
             }
 
-            if (offset > 0x2f92e)
+            if (offset > 0x2EEB1)
             {
                 throw new Exception("Sprite tile sets out of space");
             }
@@ -742,7 +746,13 @@ namespace sth1edwv
             {
                 level.GetData().CopyTo(memory, level.Offset);
             }
-            File.WriteAllBytes(filename, memory);
+            // Fix up screen pointers - this also waits for all the offsets to be sorted
+            foreach (var screen in Screens)
+            {
+                screen.FixPointers(memory);
+            }
+
+            return memory;
         }
 
         public class Space
@@ -751,13 +761,13 @@ namespace sth1edwv
             public int Used { get; set; }
         }
 
-        // All the numbers in these need to match what's in SaveTo
+        // All the numbers in these need to match what's in MakeRom
         public Space GetFloorSpace() =>
             new()
             {
                 Total = 0x20000 - 0x16000,
                 Used = Levels.Select(x => x.Floor).Distinct().Sum(x => x.GetData().Count) +
-                       Screens.Sum(x => x.TileMap.GetData().Count) // screens don't share tilemaps
+                       Screens.Select(x => x.TileMap).Distinct().Sum(x => x.GetData().Count)
             };
         public Space GetFloorTileSetSpace() =>
             new()
@@ -768,8 +778,8 @@ namespace sth1edwv
         public Space GetSpriteTileSetSpace() =>
             new()
             {
-                Total = 0x2f92e - 0x2a12a,
-                Used = Levels.Select(x => x.SpriteTileSet).Distinct().Sum(x => x.GetData().Count)
+                Total = 0x2EEB1 - 0x2a12a,
+                Used = Levels.Select(x => x.SpriteTileSet).Distinct().Where(x => x.Offset != 0x2EEB1).Sum(x => x.GetData().Count)
             };
     }
 }

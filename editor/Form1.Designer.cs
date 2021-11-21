@@ -105,6 +105,7 @@ namespace sth1edwv
             this.listBoxArt = new System.Windows.Forms.ListBox();
             this.tabControlArt = new System.Windows.Forms.TabControl();
             this.tabPageArtLayout = new System.Windows.Forms.TabPage();
+            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.pictureBoxArtLayout = new System.Windows.Forms.PictureBox();
             this.tabPageArtTiles = new System.Windows.Forms.TabPage();
             this.otherArtTileSetViewer = new sth1edwv.Controls.TileSetViewer();
@@ -112,7 +113,6 @@ namespace sth1edwv
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -859,6 +859,14 @@ namespace sth1edwv
             this.tabPageArtLayout.Text = "Layout";
             this.tabPageArtLayout.UseVisualStyleBackColor = true;
             // 
+            // propertyGrid1
+            // 
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.propertyGrid1.Location = new System.Drawing.Point(737, 3);
+            this.propertyGrid1.Name = "propertyGrid1";
+            this.propertyGrid1.Size = new System.Drawing.Size(304, 499);
+            this.propertyGrid1.TabIndex = 1;
+            // 
             // pictureBoxArtLayout
             // 
             this.pictureBoxArtLayout.Location = new System.Drawing.Point(6, 6);
@@ -920,14 +928,6 @@ namespace sth1edwv
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
             // 
-            // propertyGrid1
-            // 
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.propertyGrid1.Location = new System.Drawing.Point(737, 3);
-            this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(304, 499);
-            this.propertyGrid1.TabIndex = 1;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -940,6 +940,7 @@ namespace sth1edwv
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "STH1 Editor by WV :: extended by Maxim";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
