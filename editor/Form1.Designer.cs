@@ -37,9 +37,9 @@ namespace sth1edwv
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -113,6 +113,7 @@ namespace sth1edwv
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.floorStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.spriteTileSetStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -433,8 +434,8 @@ namespace sth1edwv
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle1.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -456,8 +457,8 @@ namespace sth1edwv
             // Used
             // 
             this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle5;
             this.Used.HeaderText = "Used";
             this.Used.Name = "Used";
             this.Used.ReadOnly = true;
@@ -465,8 +466,8 @@ namespace sth1edwv
             // UsedGlobal
             // 
             this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle6;
             this.UsedGlobal.HeaderText = "Total used";
             this.UsedGlobal.Name = "UsedGlobal";
             this.UsedGlobal.ReadOnly = true;
@@ -909,7 +910,8 @@ namespace sth1edwv
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.floorStatus,
-            this.tileSetStatus});
+            this.tileSetStatus,
+            this.spriteTileSetStatus});
             this.statusStrip1.Location = new System.Drawing.Point(0, 587);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1331, 22);
@@ -927,6 +929,12 @@ namespace sth1edwv
             this.tileSetStatus.Name = "tileSetStatus";
             this.tileSetStatus.Size = new System.Drawing.Size(76, 17);
             this.tileSetStatus.Text = "Tileset space:";
+            // 
+            // spriteTileSetStatus
+            // 
+            this.spriteTileSetStatus.Name = "spriteTileSetStatus";
+            this.spriteTileSetStatus.Size = new System.Drawing.Size(107, 17);
+            this.spriteTileSetStatus.Text = "Sprite tileset space:";
             // 
             // Form1
             // 
@@ -1069,6 +1077,7 @@ namespace sth1edwv
         private TabPage tabPageArtLayout;
         private PictureBox pictureBoxArtLayout;
         private PropertyGrid propertyGrid1;
+        private ToolStripStatusLabel spriteTileSetStatus;
     }
 }
 

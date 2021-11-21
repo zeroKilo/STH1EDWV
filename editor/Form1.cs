@@ -476,8 +476,7 @@ namespace sth1edwv
 
         private void UpdateFloorSpace()
         {
-            var used = _cartridge.GetFloorSpace();
-            floorStatus.Text = $"Floor/screen map space: {used.Used}/{used.Total} ({(double)used.Used/used.Total:P})";
+            UpdateSpace(floorStatus, "Floor/screen tile map", _cartridge.GetFloorSpace());
         }
 
         private void DrawingButtonCheckedChanged(object sender, EventArgs e)
@@ -499,10 +498,17 @@ namespace sth1edwv
 
         private void UpdateTileSetSpace()
         {
-            var backgrounds = _cartridge.GetFloorTileSetSpace();
-            var sprites = _cartridge.GetSpriteTileSetSpace();
-            tileSetStatus.Text = $"Tile set space: backgrounds {backgrounds.Used}/{backgrounds.Total} ({(double)backgrounds.Used/backgrounds.Total:P}), sprites {sprites.Used}/{sprites.Total} ({(double)sprites.Used/sprites.Total:P})";
+            UpdateSpace(tileSetStatus, "Tile set", _cartridge.GetFloorTileSetSpace());
+            UpdateSpace(spriteTileSetStatus, "Sprite tile set", _cartridge.GetSpriteTileSetSpace());
         }
+
+        private void UpdateSpace(ToolStripStatusLabel label, string prefix, Cartridge.Space space)
+        {
+            label.Text = $"{prefix} space: {space.Used}/{space.Total} ({(double)space.Used/space.Total:P})";
+            label.ForeColor = space.Used > space.Total ? Color.White: SystemColors.ControlText;
+            label.BackColor = space.Used > space.Total ? Color.DarkRed : SystemColors.Control;
+        }
+
 
         private void spriteTileSetViewer_Changed(TileSet tileSet)
         {
