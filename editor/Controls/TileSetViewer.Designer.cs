@@ -123,6 +123,7 @@ namespace sth1edwv.Controls
             this.tilePicker.Name = "tilePicker";
             this.tilePicker.Scaling = 1;
             this.tilePicker.SelectedIndex = -1;
+            this.tilePicker.ShowTransparency = false;
             this.tilePicker.Size = new System.Drawing.Size(331, 387);
             this.tilePicker.TabIndex = 0;
             this.tilePicker.SelectionChanged += new System.EventHandler<sth1edwv.GameObjects.IDrawableBlock>(this.tilePicker_SelectionChanged);

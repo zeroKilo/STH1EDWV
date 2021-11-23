@@ -106,7 +106,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Compression.cs" />
-    <Compile Include="GameObjects\Screen.cs" />
     <Compile Include="GameObjects\Tile.cs" />
     <Compile Include="Forms\TileChooser.cs">
       <SubType>Form</SubType>

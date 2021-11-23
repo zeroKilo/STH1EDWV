@@ -141,7 +141,7 @@ namespace sth1edwv.Controls
         // Returns the bounding rect for the given metatile, in screen coordinates.
         private Rectangle ScreenRectFromIndex(int index)
         {
-            if (_items == null || index < 0 || index >= _items.Count)
+            if (_items == null || index < 0 || index >= _items.Count || ItemsPerRow <= 0)
             {
                 return new Rectangle();
             }

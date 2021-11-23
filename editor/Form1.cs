@@ -14,7 +14,6 @@ using sth1edwv.Controls;
 using sth1edwv.Forms;
 using sth1edwv.GameObjects;
 using sth1edwv.Properties;
-using Screen = sth1edwv.GameObjects.Screen;
 
 namespace sth1edwv
 {
@@ -64,7 +63,6 @@ namespace sth1edwv
             listBoxGameText.Items.AddRange(_cartridge.GameText.ToArray<object>());
             listBoxArt.Items.Clear();
             listBoxArt.Items.AddRange(_cartridge.Art.ToArray<object>());
-            listBoxArt.Items.AddRange(_cartridge.Screens.ToArray<object>());
             listBoxArt.Sorted = true;
 
             // Add or replace filename in title bar
@@ -640,44 +638,48 @@ namespace sth1edwv
 
             propertyGrid1.SelectedObject = listBoxArt.SelectedItem;
 
-            switch (listBoxArt.SelectedItem)
+            if (listBoxArt.SelectedItem is ArtItem artItem)
             {
-                case ArtItem artItem:
-                    Show(artItem);
-                    return;
-                case Screen screen:
-                    Show(screen);
-                    break;
-            }
-        }
-
-        private void Show(Screen screen)
-        {
-            otherArtTileSetViewer.TilesPerRow = 16;
-            otherArtTileSetViewer.SetData(screen.TileSet, screen.Palette);
-
-            var paletteEditor = new PaletteEditor(screen.Palette, "Palette", _ =>
-            {
-                foreach (var tile in screen.TileSet.Tiles)
-                {
-                    tile.ResetImages();
-                }
-                otherArtTileSetViewer.Invalidate();
-            });
-            tabPageArtPalette.Controls.Add(paletteEditor);
-            paletteEditor.Dock = DockStyle.Fill;
-
-            pictureBoxArtLayout.Image = screen.TileMap.GetImage(screen.TileSet, screen.Palette);
-            if (!tabControlArt.TabPages.Contains(tabPageArtLayout))
-            {
-                tabControlArt.TabPages.Insert(0, tabPageArtLayout);
+                Show(artItem);
             }
         }
 
         private void Show(ArtItem artItem)
         {
-            otherArtTileSetViewer.TilesPerRow = artItem.Width;
-            otherArtTileSetViewer.SetData(artItem.TileSet, artItem.Palette, null, artItem.IsSprites);
+            // We want to hide irrelevant tabs. This is a bit of a pain because we can't just hide them, so we remove them all and re-add...
+            // Sprite pages are created dynamically so we also dispose any of those
+            foreach (var tabPage in tabControlArt.TabPages.Cast<TabPage>().Where(x => x.Tag is TileSet))
+            {
+                tabPage.Dispose();
+            }
+            tabControlArt.TabPages.Clear();
+
+            if (artItem.TileMap != null)
+            {
+                pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
+                tabControlArt.TabPages.Add(tabPageArtLayout);
+            }
+
+            if (artItem.TileSet != null)
+            {
+                otherArtTileSetViewer.TilesPerRow = artItem.TileSet.TilesPerRow;
+                otherArtTileSetViewer.SetData(artItem.TileSet, artItem.Palette);
+                tabControlArt.TabPages.Add(tabPageArtTiles);
+            }
+
+            foreach (var tileSet in artItem.SpriteTileSets)
+            {
+                var page = new TabPage("Sprites") { Tag = tileSet };
+                var viewer = new TileSetViewer();
+                page.Controls.Add(viewer);
+                viewer.Dock = DockStyle.Fill;
+                viewer.TilesPerRow = tileSet.TilesPerRow;
+                var palette = artItem.Palette.GetData().Count >= 32
+                    ? artItem.Palette.GetSubPalette(16, 16)
+                    : artItem.Palette;
+                viewer.SetData(tileSet, palette, null, true);
+                tabControlArt.TabPages.Add(page);
+            }
 
             if (artItem.PaletteEditable)
             {
@@ -689,19 +691,15 @@ namespace sth1edwv
                     }
                     otherArtTileSetViewer.Invalidate();
                 });
+                foreach (Control control in tabPageArtPalette.Controls)
+                {
+                    control.Dispose();
+                    tabPageArtPalette.Controls.Clear();
+                }
                 tabPageArtPalette.Controls.Add(paletteEditor);
                 paletteEditor.Dock = DockStyle.Fill;
-                if (!tabControlArt.TabPages.Contains(tabPageArtPalette))
-                {
-                    tabControlArt.TabPages.Add(tabPageArtPalette);
-                }
+                tabControlArt.TabPages.Add(tabPageArtPalette);
             }
-            else
-            {
-                tabControlArt.TabPages.Remove(tabPageArtPalette);
-            }
-            // No layouts for these
-            tabControlArt.TabPages.Remove(tabPageArtLayout);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

@@ -26,7 +26,7 @@ namespace sth1edwv.GameObjects
             }
         }
 
-        public void Overlay(TileMap other)
+        public void OverlayWith(TileMap other)
         {
             for (var i = 0; i < _data.Count; i++)
             {
@@ -82,6 +82,11 @@ namespace sth1edwv.GameObjects
             TileMap1Size = tileMap1.Length;
             TileMap2Size = tileMap2.Length;
             return tileMap1.Concat(tileMap2).ToList();
+        }
+
+        public bool IsOverlay()
+        {
+            return _data.Any(x => (x & 0xff) == 0xff);
         }
     }
 }

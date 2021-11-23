@@ -1,17 +1,17 @@
-﻿using sth1edwv.GameObjects;
+﻿using System.Collections.Generic;
+using sth1edwv.GameObjects;
 
 namespace sth1edwv
 {
     public class ArtItem
     {
-        // TODO: maybe add screens in here too?
-        // Add info on reference locations?
         public TileSet TileSet { get; set; }
         public Palette Palette { get; set; }
         public bool PaletteEditable { get; set; }
         public string Name { get; set; }
-        public int Width { get; set; }
         public bool IsSprites { get; set; }
+        public TileMap TileMap { get; set; }
+        public List<TileSet> SpriteTileSets { get; } = new();
 
         public override string ToString()
         {

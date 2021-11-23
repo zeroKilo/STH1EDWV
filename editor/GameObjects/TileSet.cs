@@ -76,10 +76,11 @@ namespace sth1edwv.GameObjects
         /// <summary>
         /// Uncompressed data version
         /// </summary>
-        public TileSet(Memory memory, int offset, int length, int bitPlanes = 4, List<Point> grouping = null)
+        public TileSet(Memory memory, int offset, int length, int bitPlanes = 4, List<Point> grouping = null, int tilesPerRow = 16)
         {
             // Raw VRAM data
             Offset = offset;
+            TilesPerRow = tilesPerRow;
             Compressed = false;
             _bitPlanes = bitPlanes;
 
@@ -97,9 +98,10 @@ namespace sth1edwv.GameObjects
         /// <summary>
         /// Compressed data version
         /// </summary>
-        public TileSet(Memory memory, int offset, List<Point> grouping)
+        public TileSet(Memory memory, int offset, List<Point> grouping, int tilesPerRow = 16)
         {
             Offset = offset;
+            TilesPerRow = tilesPerRow;
             Compressed = true;
 
             // Default grouping
@@ -113,6 +115,7 @@ namespace sth1edwv.GameObjects
         }
 
         public int Offset { get; set; }
+        public int TilesPerRow { get; }
 
         public IList<byte> GetData()
         {

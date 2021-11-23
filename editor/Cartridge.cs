@@ -27,12 +27,12 @@ namespace sth1edwv
 
         public class Game
         {
-            public class LevelInfo
+            public class LevelHeader
             {
                 public string Name { get; set; }
                 public int Offset { get; set; }
             }
-            public List<LevelInfo> Levels { get; set; }
+            public List<LevelHeader> Levels { get; set; }
 
             public class ArtInfo
             {
@@ -51,220 +51,654 @@ namespace sth1edwv
             public class Reference
             {
                 public int Offset { get; set; }
-                public string To { get; set; } // This is a bit nasty... we look things up by name. I guess I need to check for clashes and unreferenced things?
                 public enum Types
                 {
                     Absolute,
-                    Slot1Banked,
-                    Slot2Banked,
+                    Slot1,
+                    Slot2,
                     PageNumber,
                     Size
                 }
                 public Types Type { get; set; }
                 public int Delta { get; set; }
+                public override string ToString()
+                {
+                    return $"{Type}@{Offset:X} ({Delta:X})";
+                }
             }
-            public Dictionary<string, List<Reference>> References { get; set; }
 
-            // The game has various "groups" of assets, with one or more of:
-            // - Tileset
-            // - Palette
-            // - Tilemap
-            // - Sprite tileset
-            // - Sprite palette (maybe linked to the other palette)
-            // - Secondary tilemap for tile priority
-            // Each of these items will then have one or more references in the ROM.
             public class Asset
             {
-                public int Offset { get; set; }
-                public enum Types { TileSet, Palette, TileMap,
-                    SpriteTileSet,
-                    ForegroundTileMap
-                }
+                //public int Offset { get; set; }
+                public enum Types { TileSet, Palette, TileMap, SpriteTileSet, ForegroundTileMap }
                 public Types Type { get; set; }
                 public List<Reference> References { get; set; }
+                public int FixedSize { get; set; }
+                public int BitPlanes { get; set; }
+                public List<Point> TileGrouping { get; set; }
+                public int TilesPerRow { get; set; } = 16; // 16 is often the best default
+
+                public int GetOffset(Memory memory)
+                {
+                    // The offset is implied by the references
+                    // First see if there is an absolute one
+                    var absoluteReference = References.FirstOrDefault(x => x.Type == Reference.Types.Absolute);
+                    if (absoluteReference != null)
+                    {
+                        return memory.Word(absoluteReference.Offset) - absoluteReference.Delta;
+                    }
+                    // Next try for a paged one
+                    var pageNumberReference = References.FirstOrDefault(x => x.Type == Reference.Types.PageNumber);
+                    if (pageNumberReference == null)
+                    {
+                        throw new Exception("Unable to compute offset");
+                    }
+                    var pagedReference = References.FirstOrDefault(x => x.Type is Reference.Types.Slot1 or Reference.Types.Slot2);
+                    if (pagedReference == null)
+                    {
+                        throw new Exception("Unable to compute offset");
+                    }
+
+                    var offset = memory.Word(pagedReference.Offset) - pagedReference.Delta;
+                    var page = memory[pageNumberReference.Offset] - pageNumberReference.Delta;
+                    switch (pagedReference.Type)
+                    {
+                        case Reference.Types.Slot1:
+                            page -= 1;
+                            break;
+                        case Reference.Types.Slot2:
+                            page -= 2;
+                            break;
+                    }
+                    return page * 0x4000 + offset;
+                }
+
+                public int GetLength(Memory memory)
+                {
+                    if (FixedSize > 0)
+                    {
+                        return FixedSize;
+                    }
+                    // We must have a reference to our length
+                    var reference = References.FirstOrDefault(x => x.Type == Reference.Types.Size);
+                    if (reference == null)
+                    {
+                        throw new Exception("No length reference");
+                    }
+
+                    return memory.Word(reference.Offset) - reference.Delta;
+                }
             }
 
-            public class AssetGroup
-            {
-                public string Name { get; set; }
-                public List<Asset> Assets { get; set; }
-            }
-            public List<AssetGroup> Assets { get; set; }
+            public Dictionary<string, Asset> Assets { get; set; }
+
+            public Dictionary<string, IEnumerable<string>> AssetGroups { get; set; }
         }
 
         private static readonly Game Sonic1MasterSystem = new()
         {
-            Assets = new List<Game.AssetGroup>
-            {
-                new()
+            Assets = new Dictionary<string, Game.Asset> {
                 {
-                    Name = "Map screen 1",
-                    Assets = new List<Game.Asset>
+                    "Monitor Art", new Game.Asset { 
+                        // Offset = 0x15180, 
+                        Type = Game.Asset.Types.SpriteTileSet, 
+                        FixedSize = 0x400,
+                        BitPlanes = 4,
+                        TileGrouping = TileSet.Groupings.Monitor,
+                        TilesPerRow = 8,
+                        References = new List<Game.Reference> 
+                        {
+                            new() { Offset = 0x5b32, Type = Game.Reference.Types.Slot1 }, // ld hl, $5180 ; 005B31 21 80 51 
+                            new() { Offset = 0x350a, Type = Game.Reference.Types.Slot1, Delta = 0x5400 - 0x5180 }, // ld hl, $5400 ; 005F09 21 00 54 
+                            new() { Offset = 0xbf51, Type = Game.Reference.Types.Slot1, Delta = 0x5400 - 0x5180 }, // ld hl, $5400 ; 00BF50 21 00 54 
+                            new() { Offset = 0x5c00, Type = Game.Reference.Types.Slot1, Delta = 0x5200 - 0x5200 }, // ld hl, $5200 ; 005BFF 21 00 52
+                            new() { Offset = 0x5cde, Type = Game.Reference.Types.Slot1, Delta = 0x5280 - 0x5200 }, // ld hl, $5280 ; 005C6D 21 80 52
+                            new() { Offset = 0x5ca8, Type = Game.Reference.Types.Slot1, Delta = 0x5180 - 0x5200 }, // ld hl, $5100 ; 005CA7 21 80 51 
+                            new() { Offset = 0x5cb3, Type = Game.Reference.Types.Slot1, Delta = 0x5280 - 0x5200 }, // ld hl, $5200 ; 005CB2 21 80 52
+                            new() { Offset = 0x5cfa, Type = Game.Reference.Types.Slot1, Delta = 0x5300 - 0x5200 }, // ld hl, $5300 ; 005CF9 21 00 53
+                            new() { Offset = 0x5d2a, Type = Game.Reference.Types.Slot1, Delta = 0x5380 - 0x5200 }, // ld hl, $5380 ; 005D29 21 80 53
+                            new() { Offset = 0x5d7b, Type = Game.Reference.Types.Slot1, Delta = 0x5480 - 0x5200 }, // ld hl, $5480 ; 005D7A 21 80 54
+                            new() { Offset = 0x5da3, Type = Game.Reference.Types.Slot1, Delta = 0x5500 - 0x5200 }, // ld hl, $5500 ; 005DA2 21 00 55
+                            new() { Offset = 0x0c1f, Type = Game.Reference.Types.PageNumber } // ld a,$05 ; 000C1E 3E 05 
+                        }
+                    }
+                }, {
+                    "Sonic (right)", new Game.Asset 
+                    { 
+                        // Offset = 0x20000,
+                        Type = Game.Asset.Types.SpriteTileSet, 
+                        BitPlanes = 3,
+                        TileGrouping = TileSet.Groupings.Sonic,
+                        FixedSize = 42 * 24 * 32 * 3/8, // 42 frames, each 24x32, each pixel is 3 bits
+                        TilesPerRow = 4,
+                        References = new List<Game.Reference> 
+                        {
+                            new() { Offset = 0x4c84 + 1, Type = Game.Reference.Types.Slot1 }, // ld bc,$4000 ; 004C84 01 00 40 
+                            new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
+                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
+                        }
+                    }
+                }, {
+                    "Sonic (left)", new Game.Asset 
+                    { 
+                        // Offset = 0x23000,
+                        Type = Game.Asset.Types.SpriteTileSet, 
+                        BitPlanes = 3,
+                        TileGrouping = TileSet.Groupings.Sonic,
+                        FixedSize = 42 * 24 * 32 * 3/8, // 42 frames, each 24x32, each pixel is 3 bits
+                        TilesPerRow = 4,
+                        References = new List<Game.Reference> 
+                        {
+                            // TODO this has to be in the same 32KB window as the above, how to express this?
+                            new() { Offset = 0x4c8e, Type = Game.Reference.Types.Slot1 }, // ld bc,$7000 ; 004C8D 01 00 70
+                            new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
+                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
+                        }
+                    }
+                }, {
+                    "Map screen 1 tileset", new Game.Asset 
+                    { 
+                        // Offset = 0x30000,
+                        Type = Game.Asset.Types.TileSet, 
+                        References = new List<Game.Reference> 
+                        {
+                            // Map screen
+                            // ld hl,$0000 ; 000C89 21 00 00
+                            // ld a,$0c    ; 000C8F 3E 0C 
+                            new() {Offset = 0x0c89+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
+                            new() {Offset = 0x0c8f+1, Type = Game.Reference.Types.PageNumber}, 
+                            // Ending screens
+                            // ld hl,$0000 ; 0025A9 21 00 00
+                            // ld a,$0c    ; 0025AF 3E 0C 
+                            new() {Offset = 0x25a9+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
+                            new() {Offset = 0x25af+1, Type = Game.Reference.Types.PageNumber}, 
+                        }
+                    }
+                }, {
+                    "Map screen 1 tilemap 1", new Game.Asset 
+                    { 
+                        // Offset = 0x1627E,
+                        Type = Game.Asset.Types.ForegroundTileMap, 
+                        References = new List<Game.Reference>
+                        {
+                            // Map screen
+                            // ld a,$05    ; 000CAA 3E 05 
+                            // ld hl,$627e ; 000CB2 21 7E 62 
+                            // ld bc,$0178 ; 000CB5 01 78 01 
+                            new() {Offset = 0x0caa + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x0cb2 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x0cb5 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Map screen 1 tilemap 2", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileMap, 
+                        References = new List<Game.Reference>
+                        {
+                            // Shares page with the above
+                            // ld hl,$63f6 ; 000CC3 21 F6 63 
+                            // ld bc,$0145 ; 000CC6 01 45 01 
+                            new() {Offset = 0x0caa + 1, Type = Game.Reference.Types.PageNumber}, // TODO can this duplication act to make us know to tie them together?
+                            new() {Offset = 0x0cc3 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x0cc6 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Map screen 1 palette", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference>
+                        {
+                            new() {Offset = 0x0cd4 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$0f0e ; 000CD4 21 0E 0F 
+                        }
+                    }
+                }, {
+                    "Map screen 1 sprite tiles", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$526b ; 000C94 21 6B 52 
+                            // ld a,$09    ; 000C9A 3E 09 
+                            new() {Offset = 0x0c94 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x0c9a + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Map screen 2 tileset", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileSet, 
+                        References = new List<Game.Reference> 
+                        {
+                            // Map screen
+                            // ld hl,$1801 ; 000CEB 21 01 18 
+                            // ld a,$0c    ; 000CF1 3E 0C 
+                            new() {Offset = 0x0ceb+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
+                            new() {Offset = 0x0cf1+1, Type = Game.Reference.Types.PageNumber}, 
+                            // Credits
+                            // ld hl,$1801 ; 0026AB 21 01 18
+                            // ld a,$0c    ; 0026B1 3E 0C 
+                            new() {Offset = 0x26ab+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
+                            new() {Offset = 0x26b1+1, Type = Game.Reference.Types.PageNumber}, 
+                        }
+                    }
+                }, {
+                    "Map screen 2 tilemap 1", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.ForegroundTileMap, 
+                        References = new List<Game.Reference>
+                        {
+                            // Map screen
+                            // ld a,$05     ; 000D0C 3E 05 
+                            // ld hl,$653b  ; 000D14 21 3B 65 
+                            // ld bc,$0170  ; 000D17 01 70 01 
+                            new() {Offset = 0x0d0c + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x0d14 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x0d17 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Map screen 2 tilemap 2", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileMap, 
+                        References = new List<Game.Reference>
+                        {
+                            // Shares page with the above
+                            // ld hl,$66ab ; 000D25 21 AB 66 
+                            // ld bc,$0153 ; 000D28 01 53 01 
+                            new() {Offset = 0x0d0c + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x0d25 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x0d28 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Map screen 2 palette", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference>
+                        {
+                            new() {Offset = 0x0d36 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$0f2e ; 000D36 21 2E 0F 
+                        }
+                    }
+                }, {
+                    "Map screen 2 sprite tiles", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$5942 ; 000CF6 21 42 59 
+                            // ld a,$09    ; 000CFC 3E 09 
+                            new() {Offset = 0x0cf6 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x0cfc + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "HUD sprite tiles", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$b92e ; 000C9F 21 2E B9 
+                            // ld a,$09    ; 000CA5 3E 09 
+                            new() {Offset = 0x0c9f + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x0ca5 + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Title screen tiles", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileSet,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$2000 ; 001296 21 00 20 
+                            // ld a,$09    ; 00129C 3E 09 
+                            new() {Offset = 0x1296 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x129c + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Title screen sprites", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$4b0a ; 0012A1 21 0A 4B 
+                            // ld a,$09    ; 0012A7 3E 09 
+                            new() {Offset = 0x12a1 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x12a7 + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Title screen tilemap", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileMap,
+                        References = new List<Game.Reference>
+                        {
+                            // ld a,$05    ; 0012AC 3E 05 
+                            // ld hl,$6000 ; 0012B4 21 00 60 
+                            // ld bc,$012e ; 0012BA 01 2E 01 
+                            new() {Offset = 0x12ac + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x12b4 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x12ba + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Title screen palette", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$13e1 ; 0012CC 21 E1 13 
+                            new() {Offset = 0x12cc + 1, Type = Game.Reference.Types.Absolute},
+                        }
+                    }
+                }, {
+                    "Act Complete tiles", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileSet,
+                        References = new List<Game.Reference>
+                        {
+                            // Game Over
+                            // ld hl,$351f ; 001411 21 1F 35 
+                            // ld a,$09    ; 001417 3E 09 
+                            new() {Offset = 0x1411 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x1417 + 1, Type = Game.Reference.Types.PageNumber},
+                            // Act Complete
+                            // ld hl,$351f ; 001580 21 1F 35 
+                            // ld a,$09    ; 001586 3E 09 
+                            new() {Offset = 0x1580 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x1586 + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Game Over tilemap", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileMap,
+                        References = new List<Game.Reference>
+                        {
+                            // ld a,$05    ; 00141C 3E 05 
+                            // ld hl,$67fe ; 001424 21 FE 67 
+                            // ld bc,$0032 ; 001427 01 32 00 
+                            new() {Offset = 0x141c + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x1424 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x1427 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Game Over palette", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$14fc ; 00143C 21 FC 14 
+                            new() {Offset = 0x143c + 1, Type = Game.Reference.Types.Absolute},
+                        }
+                    }
+                }, {
+                    "Act Complete tilemap", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileMap,
+                        References = new List<Game.Reference>
+                        {
+                            // ld a,$05    ; 00158B 3E 05 
+                            // ld hl,$612e ; 001593 21 2E 61 
+                            // ld bc,$00bb ; 001596 01 BB 00 
+                            new() {Offset = 0x1588 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x1593 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x1596 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Special Stage Complete tilemap", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.TileMap,
+                        References = new List<Game.Reference>
+                        {
+                            // ld a,$05    ; 00158B 3E 05 // Shared with Act Complete tilemap
+                            // ld hl,$61e9 ; 0015A3 21 E9 61 
+                            // ld bc,$0095 ; 0015A6 01 95 00 
+                            new() {Offset = 0x1588 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x15A3 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x15A6 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Act Complete palette", new Game.Asset 
+                    { 
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32, 
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$1b8d ; 001604 21 8D 1B 
+                            new() {Offset = 0x1604 + 1, Type = Game.Reference.Types.Absolute},
+                        }
+                    }
+                }, {
+                    "Ending palette", new Game.Asset
                     {
-                        new() // Tileset
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference>
                         {
-                            Offset = 0x30000,
-                            Type = Game.Asset.Types.TileSet,
-                            References = new List<Game.Reference>
-                            {
-                                new() {Offset = 0x0c89+1, Type = Game.Reference.Types.Slot1Banked, Delta = -0x4000}, // ld     hl,$0000        ; 000C89 21 00 00 
-                                new() {Offset = 0x0c8f+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$0c           ; 000C8F 3E 0C 
-                            }
-                        },
-                        new() // Sprite tileset
+                            // ld hl,$2828 ; 0025A1 21 28 28 
+                            new() { Offset = 0x25a1 + 1, Type = Game.Reference.Types.Absolute},
+                            // ld hl,$2828 ; 00268D 21 28 28 
+                            new() { Offset = 0x268d + 1, Type = Game.Reference.Types.Absolute},
+                        }
+                    }
+                }, {
+                    "Ending 1 tilemap", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.TileMap,
+                        References = new List<Game.Reference>
                         {
-                            Offset = 0x2926b,
-                            Type = Game.Asset.Types.SpriteTileSet,
-                            References = new List<Game.Reference>
-                            {
-                                new() {Offset = 0x0c94+1, Type = Game.Reference.Types.Slot1Banked, Delta = -0x4000}, // ld     hl,$526b        ; 000C94 21 6B 52 
-                                new() {Offset = 0x0c9a+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$09           ; 000C9A 3E 09 
-                            }
-                        },
-                        new() // HUD tileset
+                            // ld a,$05    ; 0025B4 3E 05 
+                            // ld hl,$6830 ; 0025BC 21 30 68 
+                            // ld bc,$0179 ; 0025BF 01 79 01 
+                            new() {Offset = 0x25B4 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x25BC + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x25BF + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Ending 2 tilemap", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.TileMap,
+                        References = new List<Game.Reference>
                         {
-                            Offset = 0x2f92e,
-                            Type = Game.Asset.Types.SpriteTileSet,
-                            References = new List<Game.Reference>
-                            {
-                                new() {Offset = 0x0c9f+1, Type = Game.Reference.Types.Slot1Banked, Delta = -0x4000}, // ld     hl,$b92e        ; 000C9F 21 2E B9 
-                                new() {Offset = 0x0ca5+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$09           ; 000CA5 3E 09 
-                            }
-                        },
-                        new() // High priority tilemap, loaded first
+                            // ld a,$05    ; 002675 3E 05 
+                            // ld hl,$69a9 ; 00267D 21 A9 69 
+                            // ld bc,$0145 ; 002680 01 45 01 
+                            new() {Offset = 0x2675 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x267D + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x2680 + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Credits tilemap", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.TileMap,
+                        References = new List<Game.Reference>
                         {
-                            Offset = 0x1627e,
-                            Type = Game.Asset.Types.ForegroundTileMap,
-                            References = new List<Game.Reference>
-                            {
-                                new() {Offset = 0x0caa+1, Type = Game.Reference.Types.PageNumber}, // ld     a,$05           ; 000CAA 3E 05 
-                                new() {Offset = 0x0cb2+1, Type = Game.Reference.Types.Slot1Banked}, // ld     hl,$627e        ; 000CB2 21 7E 62 
-                                new() {Offset = 0x0cb5+1, Type = Game.Reference.Types.Size}, // ld     bc,$0178        ; 000CB5 01 78 01 
-                            }
-                        },
-                        new() // Low priority tilemap, loaded second with "transparency"
+                            // ld a,$05    ; 0026C1 3E 05 
+                            // ld hl,$6c61 ; 0026C9 21 61 6C 
+                            // ld bc,$0189 ; 0026CC 01 89 01 
+                            new() {Offset = 0x26C1 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x26C9 + 1, Type = Game.Reference.Types.Slot1},
+                            new() {Offset = 0x26CC + 1, Type = Game.Reference.Types.Size},
+                        }
+                    }
+                }, {
+                    "Credits palette", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference>
                         {
-                            Offset = 0x1627e,
-                            Type = Game.Asset.Types.TileMap,
-                            References = new List<Game.Reference>
-                            {
-                                new() {Offset = 0x0caa+1, Type = Game.Reference.Types.PageNumber}, // TODO shared reference with the above means they need to be linked somehow
-                                new() {Offset = 0x0cc3+1, Type = Game.Reference.Types.Slot1Banked}, // ld     hl,$63f6        ; 000CC3 21 F6 63 
-                                new() {Offset = 0x0cc6+1, Type = Game.Reference.Types.Size}, // ld     bc,$0145        ; 000CC6 01 45 01 
-                            }
-                        },
-                        new() // Palette
+                            // ld hl,$2ad6 ; 002702 21 D6 2A 
+                            new() {Offset = 0x2702 + 1, Type = Game.Reference.Types.Absolute}
+                        }
+                    }
+                }, {
+                    "End sign tileset", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
                         {
-                            Offset = 0x0f0e,
-                            Type = Game.Asset.Types.Palette,
-                            References = new List<Game.Reference>
-                            {
-                                new() {Offset = 0x0cd4+1, Type = Game.Reference.Types.Absolute}, // ld     hl,$0f0e        ; 000CD4 21 0E 0F 
-                            }
+                            // ld hl,$4294 ; 005F2D 21 94 42 // This is actually into page 10
+                            // ld a,$09    ; 005F33 3E 09 
+                            new() {Offset = 0x5f2d + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x5f33 + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "End sign palette", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 16, // Sprite palette only
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$626c ; 005F38 21 6C 62 
+                            new() {Offset = 0x5F38 + 1, Type = Game.Reference.Types.Absolute}
+                        }
+                    }
+                }, {
+                    "Rings", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.TileSet,
+                        TileGrouping = TileSet.Groupings.Ring,
+                        TilesPerRow = 6,
+                        BitPlanes = 4,
+                        FixedSize = 6 * 16 * 16 * 4/8, // 6 16x16 frames at 4bpp
+                        References = new List<Game.Reference>
+                        {
+                            // ld de,$7cf0 ; 0023AD 11 F0 7C 
+                            new() {Offset = 0x23AD + 1, Type = Game.Reference.Types.Slot1},
+                            // ld a,$0b ; 001D55 3E 0B 
+                            new() {Offset = 0x1D55 + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld a,$0b ; 001DB5 3E 0B 
+                            new() {Offset = 0x1DB5 + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld a,$0b ; 001eb1 3E 0B 
+                            new() {Offset = 0x1eb1 + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Boss sprites palette", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 16,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$731c ; 00703C 21 1C 73 
+                            // ld hl,$731c ; 00807F 21 1C 73 
+                            // ld hl,$731c ; 0084C7 21 1C 73 
+                            // ld hl,$731c ; 00929C 21 1C 73 
+                            // ld hl,$731c ; 00A821 21 1C 73 
+                            // ld hl,$731c ; 00BE07 21 1C 73 
+                            new() {Offset = 0x703C + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0x807F + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0x84C7 + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0x929C + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0xA821 + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0xBE07 + 1, Type = Game.Reference.Types.Absolute},
+                        }
+                    }
+                }, {
+                    "Boss sprites 1", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$aeb1 ; 007031 21 B1 AE 
+                            // ld a,$09    ; 007037 3E 09 
+                            new() {Offset = 0x7031 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x7037 + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld hl,$aeb1 ; 008074 21 B1 AE 
+                            // ld a,$09    ; 00807A 3E 09 
+                            new() {Offset = 0x8074 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x807A + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Boss sprites 2", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$e508 ; 0084BC 21 08 E5 
+                            // ld a,$0c    ; 0084C2 3E 0C 
+                            new() {Offset = 0x84BC + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x84C2 + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld hl,$e508 ; 009291 21 08 E5 
+                            // ld a,$0c    ; 009297 3E 0C 
+                            new() {Offset = 0x9291 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x9297 + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Boss sprites 3", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$ef3f ; 00A816 21 3F EF 
+                            // ld a,$0c    ; 00A81C 3E 0C 
+                            new() {Offset = 0xA816 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0xA81C + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld hl,$ef3f ; 00BB94 21 3F EF 
+                            // ld a,$0c    ; 00BB9A 3E 0C 
+                            new() {Offset = 0xBB94 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0xBB9A + 1, Type = Game.Reference.Types.PageNumber},
+                        }
+                    }
+                }, {
+                    "Capsule sprites", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.SpriteTileSet,
+                        TileGrouping = TileSet.Groupings.Sprite,
+                        References = new List<Game.Reference>
+                        {
+                            // ld hl,$da28 ; 007916 21 28 DA 
+                            // ld a,$0c    ; 00791C 3E 0C 
+                            new() {Offset = 0x7916 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x791C + 1, Type = Game.Reference.Types.PageNumber},
                         }
                     }
                 }
             },
 
-            Screens = new List<Game.ArtInfo>
+            AssetGroups = new Dictionary<string, IEnumerable<string>>
             {
-                new()
-                {
-                    Name = "Map screen 1",
-                    TileSetReferenceOffset = 0x0c8a,
-                    TileSetBankOffset = 0x0c90,
-                    TileMapBankOffset = 0x0cab,
-                    TileMapReferenceOffset = 0x0cb3,
-                    TileMapSizeOffset = 0x0cb6,
-                    SecondaryTileMapReferenceOffset = 0x0cc4,
-                    SecondaryTileMapSizeOffset = 0x0cc7,
-                    PaletteReferenceOffset = 0x0cd5
-                },
-                new()
-                {
-                    Name = "Map screen 2",
-                    TileSetReferenceOffset = 0x0cec,
-                    TileSetBankOffset = 0x0cf2,
-                    PaletteReferenceOffset = 0x0d37,
-                    TileMapReferenceOffset = 0x0d15,
-                    TileMapSizeOffset = 0x0d18,
-                    TileMapBankOffset = 0x0d0d,
-                    SecondaryTileMapReferenceOffset = 0x0d26,
-                    SecondaryTileMapSizeOffset = 0x0d29
-                },
-                new()
-                {
-                    Name = "Title screen",
-                    TileSetReferenceOffset = 0x1297,
-                    TileSetBankOffset = 0x129d,
-                    TileMapBankOffset = 0x12ad,
-                    TileMapReferenceOffset = 0x12b5,
-                    TileMapSizeOffset = 0x12bb,
-                    PaletteReferenceOffset = 0x12cd
-                },
-                new()
-                {
-                    Name = "Game Over",
-                    TileSetReferenceOffset = 0x1412,
-                    TileSetBankOffset = 0x1418,
-                    TileMapBankOffset = 0x141d,
-                    TileMapReferenceOffset = 0x1425,
-                    TileMapSizeOffset = 0x1428,
-                    PaletteReferenceOffset = 0x143d
-                },
-                new()
-                {
-                    Name = "Act Complete",
-                    TileSetReferenceOffset = 0x1581,
-                    TileSetBankOffset = 0x1587,
-                    TileMapBankOffset = 0x158c,
-                    TileMapReferenceOffset = 0x1594,
-                    TileMapSizeOffset = 0x1597,
-                    PaletteReferenceOffset = 0x1605
-                },
-                new()
-                {
-                    Name = "Special Stage Complete",
-                    TileSetReferenceOffset = 0x1581,
-                    TileSetBankOffset = 0x1587,
-                    TileMapBankOffset = 0x158c,
-                    TileMapReferenceOffset = 0x15a4,
-                    TileMapSizeOffset = 0x15a7,
-                    PaletteReferenceOffset = 0x1605
-                },
-                new()
-                {
-                    Name = "Ending Map",
-                    PaletteReferenceOffset = 0x25a2,
-                    TileSetReferenceOffset = 0x25aa,
-                    TileSetBankOffset = 0x25b0,
-                    TileMapBankOffset = 0x25b5,
-                    TileMapReferenceOffset = 0x25bd,
-                    TileMapSizeOffset = 0x25c0
-                },
-                new()
-                {
-                    Name = "Ending Map 2",
-                    // Same tileset and palette as above
-                    PaletteReferenceOffset = 0x25a2,
-                    TileSetReferenceOffset = 0x25aa,
-                    TileSetBankOffset = 0x25b0,
-                    TileMapBankOffset = 0x26c2,
-                    TileMapReferenceOffset = 0x267e,
-                    TileMapSizeOffset = 0x2681
-                },
-                new()
-                {
-                    Name = "Credits",
-                    TileSetReferenceOffset = 0x26ac,
-                    TileSetBankOffset = 0x26b2,
-                    TileMapBankOffset = 0x26c2,
-                    TileMapReferenceOffset = 0x26ca,
-                    TileMapSizeOffset = 0x26cd,
-                    PaletteReferenceOffset = 0x2703
-                }
+                { "Map screen 1", new [] { "Map screen 1 tileset", "Map screen 1 tilemap 1", "Map screen 1 tilemap 2", "Map screen 1 palette", "Map screen 1 sprite tiles", "HUD sprite tiles" } }, // HUD sprites only used for life counter
+                { "Map screen 2", new [] { "Map screen 2 tileset", "Map screen 2 tilemap 1", "Map screen 2 tilemap 2", "Map screen 2 palette", "Map screen 2 sprite tiles", "HUD sprite tiles" } },
+                { "Sonic sprites", new[] { "Sonic (right)", "Sonic (left)", "HUD sprite tiles", "Map screen 1 palette" } }, // Palette is good for Sonic here. HUD sprites contain the spring jump toes, the ones in the art seem unused...
+                { "Monitors", new [] { "Monitor Art", "HUD sprite tiles", "Map screen 1 palette"  } }, // Monitor bases are in the HUD sprites
+                { "Title screen", new [] { "Title screen tiles", "Title screen sprites", "Title screen palette", "Title screen tilemap" } },
+                { "Game Over", new [] { "Act Complete tiles", "Game Over palette", "Game Over tilemap" } },
+                { "Act Complete", new [] { "Act Complete tiles", "Act Complete palette", "Act Complete tilemap", "HUD sprite tiles" } },
+                { "Special Stage Complete", new [] { "Act Complete tiles", "Act Complete palette", "Special Stage Complete tilemap", "HUD sprite tiles" } },
+                { "Ending 1", new [] { "Map screen 1 tileset", "Ending palette", "Ending 1 tilemap" } },
+                { "Ending 2", new [] { "Map screen 1 tileset", "Ending palette", "Ending 2 tilemap" } },
+                { "Credits", new [] { "Map screen 2 tileset", "Title screen sprites", "Credits tilemap", "Credits palette" } },
+                { "End sign", new [] { "End sign tileset", "End sign palette" } },
+                { "Rings", new [] { "Rings", "Map screen 2 palette" } }, // TODO a better palette than this? Also hide the palette
+                { "Dr. Robotnik", new [] { "Boss sprites 1", "Boss sprites 2", "Boss sprites 3", "Boss sprites palette", } },
+                { "Capsule", new [] { "Capsule sprites", "Boss sprites palette", } },
             },
-            Levels = new List<Game.LevelInfo>
+            Levels = new List<Game.LevelHeader>
             {
                 new() { Name = "Green Hill Act 1", Offset = 0x15580 + 0x4a },
                 new() { Name = "Green Hill Act 2", Offset = 0x15580 + 0x6f },
@@ -300,46 +734,11 @@ namespace sth1edwv
                 new() { Name = "Special Stage 7", Offset = 0x15580 + 0x4ea },
                 new() { Name = "Special Stage 8", Offset = 0x15580 + 0x50f }
             },
-            References = new Dictionary<string, List<Game.Reference>>
-            {
-                { 
-                    "Monitor Art", // 0x15180
-                    new() {
-                        new Game.Reference { Offset = 0x5b32, Type = Game.Reference.Types.Slot1Banked }, // 005B31 21 80 51 
-                        new Game.Reference { Offset = 0x350a, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5400 - 0x5180 }, // 005F09 21 00 54 
-                        new Game.Reference { Offset = 0xbf51, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5400 - 0x5180 }, // 00BF50 21 00 54 
-                        new Game.Reference { Offset = 0x5c00, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5200 - 0x5200 }, // 005BFF 21 00 52
-                        new Game.Reference { Offset = 0x5cde, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5280 - 0x5200 }, // 005C6D 21 80 52
-                        new Game.Reference { Offset = 0x5ca8, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5180 - 0x5200 }, // 005CA7 21 80 51 
-                        new Game.Reference { Offset = 0x5cb3, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5280 - 0x5200 }, // 005CB2 21 80 52
-                        new Game.Reference { Offset = 0x5cfa, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5300 - 0x5200 }, // 005CF9 21 00 53
-                        new Game.Reference { Offset = 0x5d2a, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5380 - 0x5200 }, // 005D29 21 80 53
-                        new Game.Reference { Offset = 0x5d7b, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5480 - 0x5200 }, // 005D7A 21 80 54
-                        new Game.Reference { Offset = 0x5da3, Type = Game.Reference.Types.Slot1Banked, Delta = 0x5500 - 0x5200 }, // 005DA2 21 00 55
-                        new Game.Reference { Offset = 0x0c1f, Type = Game.Reference.Types.PageNumber } // 000C1E 3E 05 
-                    }
-                }, {
-                    "Sonic (right)", // 0x20000 
-                    new() {
-                        new Game.Reference { Offset = 0x4c85, Type = Game.Reference.Types.Slot1Banked }, // 004C84 01 00 40 
-                        new Game.Reference { Offset = 0x012e, Type = Game.Reference.Types.PageNumber }, // 00012D 3E 08 
-                        new Game.Reference { Offset = 0x0156, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // 000135 3E 09
-                    }
-                }, {
-                    "Sonic (left)", // 0x23000 TODO this has to be in the same 32KB window as the above, how to express this?
-                    new() {
-                        new Game.Reference { Offset = 0x4c8e, Type = Game.Reference.Types.Slot1Banked }, // 004C8D 01 00 70
-                        new Game.Reference { Offset = 0x012e, Type = Game.Reference.Types.PageNumber }, // 00012D 3E 08 
-                        new Game.Reference { Offset = 0x0156, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // 000135 3E 09
-                    }
-                }
-            }
         };
 
         public Memory Memory { get; }
         public List<Level> Levels { get; } = new();
         public List<GameText> GameText { get; } = new();
-        public List<Screen> Screens { get; } = new();
         public List<ArtItem> Art { get; } = new();
 
         private readonly Dictionary<int, TileSet> _tileSets = new();
@@ -356,7 +755,6 @@ namespace sth1edwv
             Memory = new Memory(File.ReadAllBytes(path));
             ReadLevels();
             ReadGameText();
-            ReadScreens();
             ReadExtraArt();
 
             // Apply rings to level tilesets
@@ -370,141 +768,56 @@ namespace sth1edwv
 
         private void ReadExtraArt()
         {
+            _rings = new TileSet(Memory, 0x2Fcf0, 24 * 32, 4, TileSet.Groupings.Ring, 8); // TODO this
+            
             _logger("Loading art...");
-            TileSet titleAndCreditTileSet;
-            Art.AddRange(new[]
-            {
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x15180, 0x400, 4, TileSet.Groupings.Monitor),
-                    Name = "Monitor Art",
-                    Palette = Levels[0].SpritePalette,
-                    Width = 8,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x20000, 12 * 24 * 42, 3, TileSet.Groupings.Sonic),
-                    Name = "Sonic (right)",
-                    Palette = Levels[0].SpritePalette,
-                    Width = 8,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x23000, 12 * 24 * 42, 3, TileSet.Groupings.Sonic),
-                    Name = "Sonic (left)",
-                    Palette = Levels[0].SpritePalette,
-                    Width = 8,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x28294, TileSet.Groupings.Sprite),
-                    Name = "End sign",
-                    Palette = GetPalette(0x626C, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = titleAndCreditTileSet = new TileSet(Memory, 0x28B0A, TileSet.Groupings.Sprite),
-                    Name = "Title Screen Sprites",
-                    Palette = GetPalette(0x13f1, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = titleAndCreditTileSet,
-                    Name = "Credits Screen Sprites",
-                    Palette = GetPalette(0x2ae6, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x2926B, TileSet.Groupings.Sprite),
-                    Name = "Map Screen Sprites 1",
-                    Palette = GetPalette(0x0f1e, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x29942, TileSet.Groupings.Sprite),
-                    Name = "Map Screen Sprites 2",
-                    Palette = GetPalette(0x0f3e, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                // This is no longer at a fixed position as it gets relocated when saving levels
-                new ArtItem
-                {
-                    TileSet = Levels[18].SpriteTileSet,
-                    Name = "Boss Sprites",
-                    Palette = GetPalette(0x731C, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x2F92E, TileSet.Groupings.Sprite),
-                    Name = "HUD Sprites",
-                    Palette = Levels[0].SpritePalette,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = _rings = new TileSet(Memory, 0x2Fcf0, 24 * 32, 4, TileSet.Groupings.Ring),
-                    Name = "Rings",
-                    Palette = Levels[0].TilePalette,
-                    Width = 6
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x3da28, TileSet.Groupings.Sprite),
-                    Name = "Capsule and animals",
-                    Palette = GetPalette(0x731C, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x3e508, TileSet.Groupings.Sprite),
-                    Name = "Underwater boss",
-                    Palette = GetPalette(0x027b, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                },
-                new ArtItem
-                {
-                    TileSet = new TileSet(Memory, 0x3ef3f, TileSet.Groupings.Sprite),
-                    Name = "Running Robotnik",
-                    Palette = GetPalette(0x731C, 1),
-                    PaletteEditable = true,
-                    Width = 16,
-                    IsSprites = true
-                }
-            });
-        }
 
-        private void ReadScreens()
-        {
-            _logger("Loading screens...");
-            foreach (var screenInfo in Sonic1MasterSystem.Screens)
+            foreach (var kvp in Sonic1MasterSystem.AssetGroups)
             {
-                _logger($"- Loading screen {screenInfo.Name}...");
-                Screens.Add(new Screen(this, screenInfo));
+                var item = new ArtItem{Name = kvp.Key, PaletteEditable = true};
+                foreach (var asset in kvp.Value.Select(x => Sonic1MasterSystem.Assets[x]))
+                {
+                    var offset = asset.GetOffset(Memory);
+
+                    switch (asset.Type)
+                    {
+                        case Game.Asset.Types.TileSet:
+                            item.TileSet = asset.BitPlanes > 0 
+                                ? GetTileSet(offset, asset.GetLength(Memory), asset.BitPlanes, asset.TileGrouping, asset.TilesPerRow) 
+                                : GetTileSet(offset, asset.TileGrouping, asset.TilesPerRow);
+                            break;
+                        case Game.Asset.Types.Palette:
+                            item.Palette = GetPalette(offset, asset.FixedSize / 16);
+                            break;
+                        case Game.Asset.Types.ForegroundTileMap:
+                            // We assume these are set first
+                            item.TileMap = new TileMap(Memory, offset, asset.GetLength(Memory));
+                            item.TileMap.SetAllForeground();
+                            break;
+                        case Game.Asset.Types.TileMap:
+                        {
+                            // We assume these are set second so we have to check if it's a set or overlay
+                            var tileMap = new TileMap(Memory, offset, asset.GetLength(Memory));
+                            if (tileMap.IsOverlay())
+                            {
+                                item.TileMap.OverlayWith(tileMap);
+                            }
+                            else
+                            {
+                                item.TileMap = tileMap;
+                            }
+                            break;
+                        }
+                        case Game.Asset.Types.SpriteTileSet:
+                            item.SpriteTileSets.Add(asset.BitPlanes > 0 
+                                ? GetTileSet(offset, asset.GetLength(Memory), asset.BitPlanes, asset.TileGrouping, asset.TilesPerRow) 
+                                : GetTileSet(offset, asset.TileGrouping, asset.TilesPerRow));
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+                Art.Add(item);
             }
         }
 
@@ -521,10 +834,16 @@ namespace sth1edwv
             }
         }
 
-        public TileSet GetTileSet(int offset, List<Point> grouping)
+        public TileSet GetTileSet(int offset, List<Point> grouping, int tilesPerRow)
         {
-            return GetItem(_tileSets, offset, () => new TileSet(Memory, offset, grouping));
+            return GetItem(_tileSets, offset, () => new TileSet(Memory, offset, grouping, tilesPerRow));
         }
+
+        private TileSet GetTileSet(int offset, int length, int bitPlanes, List<Point> tileGrouping, int tilesPerRow)
+        {
+            return GetItem(_tileSets, offset, () => new TileSet(Memory, offset, length, bitPlanes, tileGrouping, tilesPerRow));
+        }
+
 
         public Floor GetFloor(int offset, int compressedSize, int width)
         {
@@ -669,22 +988,9 @@ namespace sth1edwv
                 _logger($"- Wrote palette at offset ${palette.Offset:X}, length {data.Count} bytes");
             }
 
-            // Static screen tilemaps
-            // 16000..16de9 inclusive, so we combine with Floors below
-            // TODO these could be placed anywhere... so we could place them later
-            var offset = 0x16000;
-            foreach (var group in Screens.GroupBy(x => x.TileMap))
-            {
-                var tileMap = group.Key;
-                var data = tileMap.GetData();
-                data.CopyTo(memory, offset);
-                tileMap.Offset = offset;
-                offset += data.Count;
-                _logger($"- Wrote tilemap for screen(s) {string.Join(", ", group)} at offset ${tileMap.Offset:X}, length {data.Count} bytes");
-            }
-
             // - Floors (filling space)
             // 16dea..1ffff inclusive
+            var offset = 0x16dea;
             foreach (var group in Levels.GroupBy(l => l.Floor))
             {
                 var floor = group.Key;
@@ -746,7 +1052,7 @@ namespace sth1edwv
             }
 
             // Uncompressed art at its original offsets
-            foreach (var group in Art.GroupBy(x => x.TileSet).Where(x => !x.Key.Compressed))
+            foreach (var group in Art.GroupBy(x => x.TileSet).Where(x => x.Key is { Compressed: false }))
             {
                 var tileSet = group.Key;
                 var data = tileSet.GetData();
@@ -784,11 +1090,6 @@ namespace sth1edwv
                 level.GetData().CopyTo(memory, level.Offset);
                 _logger($"- Wrote level header for {level} at offset ${level.Offset:X}");
             }
-            // Fix up screen pointers - this also waits for all the offsets to be sorted
-            foreach (var screen in Screens)
-            {
-                screen.FixPointers(memory);
-            }
 
             _logger($"Built ROM image in {sw.Elapsed}");
 
@@ -805,9 +1106,8 @@ namespace sth1edwv
         public Space GetFloorSpace() =>
             new()
             {
-                Total = 0x20000 - 0x16000,
-                Used = Levels.Select(x => x.Floor).Distinct().Sum(x => x.GetData().Count) +
-                       Screens.Select(x => x.TileMap).Distinct().Sum(x => x.GetData().Count)
+                Total = 0x20000 - 0x16dea,
+                Used = Levels.Select(x => x.Floor).Distinct().Sum(x => x.GetData().Count)
             };
         public Space GetFloorTileSetSpace() =>
             new()
