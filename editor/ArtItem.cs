@@ -9,9 +9,9 @@ namespace sth1edwv
         public Palette Palette { get; set; }
         public bool PaletteEditable { get; set; }
         public string Name { get; set; }
-        public bool IsSprites { get; set; }
         public TileMap TileMap { get; set; }
         public List<TileSet> SpriteTileSets { get; } = new();
+        public List<Cartridge.Game.Asset> Assets { get; } = new();
 
         public override string ToString()
         {

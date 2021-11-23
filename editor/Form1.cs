@@ -86,7 +86,7 @@ namespace sth1edwv
             LevelRenderModeChanged(null, EventArgs.Empty);
 
             tileSetViewer.SetData(level?.TileSet, level?.TilePalette, GetTileUsedInBlocks);
-            spriteTileSetViewer.SetData(level?.SpriteTileSet, level?.SpritePalette);
+            spriteTileSetViewer.SetData(level?.SpriteTileSet, level?.SpritePalette, null, true);
 
             LoadLevelData();
 
@@ -629,29 +629,20 @@ namespace sth1edwv
 
         private void listBoxArt_SelectedIndexChanged(object sender, EventArgs e)
         {
-            foreach (Control control in tabPageArtPalette.Controls)
-            {
-                control.Dispose();
-            }
-            tabPageArtPalette.Controls.Clear();
-            otherArtTileSetViewer.SetData(null, null);
-
             propertyGrid1.SelectedObject = listBoxArt.SelectedItem;
 
-            if (listBoxArt.SelectedItem is ArtItem artItem)
+            if (listBoxArt.SelectedItem is not ArtItem artItem)
             {
-                Show(artItem);
+                return;
             }
-        }
 
-        private void Show(ArtItem artItem)
-        {
             // We want to hide irrelevant tabs. This is a bit of a pain because we can't just hide them, so we remove them all and re-add...
             // Sprite pages are created dynamically so we also dispose any of those
             foreach (var tabPage in tabControlArt.TabPages.Cast<TabPage>().Where(x => x.Tag is TileSet))
             {
                 tabPage.Dispose();
             }
+
             tabControlArt.TabPages.Clear();
 
             if (artItem.TileMap != null)
@@ -669,11 +660,9 @@ namespace sth1edwv
 
             foreach (var tileSet in artItem.SpriteTileSets)
             {
-                var page = new TabPage("Sprites") { Tag = tileSet };
-                var viewer = new TileSetViewer();
+                var page = new TabPage("Sprites") { Tag = tileSet, Padding = new Padding(3), UseVisualStyleBackColor = true};
+                var viewer = new TileSetViewer { Dock = DockStyle.Fill, TilesPerRow = tileSet.TilesPerRow };
                 page.Controls.Add(viewer);
-                viewer.Dock = DockStyle.Fill;
-                viewer.TilesPerRow = tileSet.TilesPerRow;
                 var palette = artItem.Palette.GetData().Count >= 32
                     ? artItem.Palette.GetSubPalette(16, 16)
                     : artItem.Palette;
@@ -689,6 +678,7 @@ namespace sth1edwv
                     {
                         tile.ResetImages();
                     }
+
                     otherArtTileSetViewer.Invalidate();
                 });
                 foreach (Control control in tabPageArtPalette.Controls)
@@ -696,10 +686,14 @@ namespace sth1edwv
                     control.Dispose();
                     tabPageArtPalette.Controls.Clear();
                 }
+
                 tabPageArtPalette.Controls.Add(paletteEditor);
                 paletteEditor.Dock = DockStyle.Fill;
                 tabControlArt.TabPages.Add(tabPageArtPalette);
             }
+
+            // The tab control steals focus, we give it back
+            listBoxArt.Focus();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

@@ -109,8 +109,6 @@ namespace sth1edwv
             this.pictureBoxArtLayout = new System.Windows.Forms.PictureBox();
             this.tabPageArtTiles = new System.Windows.Forms.TabPage();
             this.otherArtTileSetViewer = new sth1edwv.Controls.TileSetViewer();
-            this.tabPageArtSprites = new System.Windows.Forms.TabPage();
-            this.otherArtSpriteTileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.tabPageArtPalette = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.logTextBox = new System.Windows.Forms.TextBox();
@@ -159,7 +157,6 @@ namespace sth1edwv
             this.tabPageArtLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).BeginInit();
             this.tabPageArtTiles.SuspendLayout();
-            this.tabPageArtSprites.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -847,7 +844,6 @@ namespace sth1edwv
             // 
             this.tabControlArt.Controls.Add(this.tabPageArtLayout);
             this.tabControlArt.Controls.Add(this.tabPageArtTiles);
-            this.tabControlArt.Controls.Add(this.tabPageArtSprites);
             this.tabControlArt.Controls.Add(this.tabPageArtPalette);
             this.tabControlArt.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlArt.Location = new System.Drawing.Point(0, 0);
@@ -903,26 +899,6 @@ namespace sth1edwv
             this.otherArtTileSetViewer.Size = new System.Drawing.Size(1038, 499);
             this.otherArtTileSetViewer.TabIndex = 0;
             this.otherArtTileSetViewer.TilesPerRow = 4;
-            // 
-            // tabPageArtSprites
-            // 
-            this.tabPageArtSprites.Controls.Add(this.otherArtSpriteTileSetViewer);
-            this.tabPageArtSprites.Location = new System.Drawing.Point(4, 22);
-            this.tabPageArtSprites.Name = "tabPageArtSprites";
-            this.tabPageArtSprites.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageArtSprites.Size = new System.Drawing.Size(1044, 505);
-            this.tabPageArtSprites.TabIndex = 3;
-            this.tabPageArtSprites.Text = "Sprite tiles";
-            this.tabPageArtSprites.UseVisualStyleBackColor = true;
-            // 
-            // otherArtSpriteTileSetViewer
-            // 
-            this.otherArtSpriteTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.otherArtSpriteTileSetViewer.Location = new System.Drawing.Point(3, 3);
-            this.otherArtSpriteTileSetViewer.Name = "otherArtSpriteTileSetViewer";
-            this.otherArtSpriteTileSetViewer.Size = new System.Drawing.Size(1038, 499);
-            this.otherArtSpriteTileSetViewer.TabIndex = 1;
-            this.otherArtSpriteTileSetViewer.TilesPerRow = 4;
             // 
             // tabPageArtPalette
             // 
@@ -1046,7 +1022,6 @@ namespace sth1edwv
             this.tabPageArtLayout.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).EndInit();
             this.tabPageArtTiles.ResumeLayout(false);
-            this.tabPageArtSprites.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -1133,8 +1108,6 @@ namespace sth1edwv
         private ToolStripStatusLabel spriteTileSetStatus;
         private TabPage tabPage2;
         private TextBox logTextBox;
-        private TabPage tabPageArtSprites;
-        private TileSetViewer otherArtSpriteTileSetViewer;
     }
 }
 

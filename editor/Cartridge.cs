@@ -34,20 +34,6 @@ namespace sth1edwv
             }
             public List<LevelHeader> Levels { get; set; }
 
-            public class ArtInfo
-            {
-                public string Name { get; set; }
-                public int TileSetBankOffset { get; set; }
-                public int TileSetReferenceOffset { get; set; }
-                public int TileMapBankOffset { get; set; }
-                public int TileMapReferenceOffset { get; set; }
-                public int SecondaryTileMapReferenceOffset { get; set; }
-                public int TileMapSizeOffset { get; set; }
-                public int SecondaryTileMapSizeOffset { get; set; }
-                public int PaletteReferenceOffset { get; set; }
-            }
-            public List<ArtInfo> Screens { get; set; }
-
             public class Reference
             {
                 public int Offset { get; set; }
@@ -55,7 +41,6 @@ namespace sth1edwv
                 {
                     Absolute,
                     Slot1,
-                    Slot2,
                     PageNumber,
                     Size
                 }
@@ -77,6 +62,7 @@ namespace sth1edwv
                 public int BitPlanes { get; set; }
                 public List<Point> TileGrouping { get; set; }
                 public int TilesPerRow { get; set; } = 16; // 16 is often the best default
+                public bool Hidden { get; set; }
 
                 public int GetOffset(Memory memory)
                 {
@@ -93,7 +79,7 @@ namespace sth1edwv
                     {
                         throw new Exception("Unable to compute offset");
                     }
-                    var pagedReference = References.FirstOrDefault(x => x.Type is Reference.Types.Slot1 or Reference.Types.Slot2);
+                    var pagedReference = References.FirstOrDefault(x => x.Type == Reference.Types.Slot1);
                     if (pagedReference == null)
                     {
                         throw new Exception("Unable to compute offset");
@@ -105,9 +91,6 @@ namespace sth1edwv
                     {
                         case Reference.Types.Slot1:
                             page -= 1;
-                            break;
-                        case Reference.Types.Slot2:
-                            page -= 2;
                             break;
                     }
                     return page * 0x4000 + offset;
@@ -148,18 +131,18 @@ namespace sth1edwv
                         TilesPerRow = 8,
                         References = new List<Game.Reference> 
                         {
-                            new() { Offset = 0x5b32, Type = Game.Reference.Types.Slot1 }, // ld hl, $5180 ; 005B31 21 80 51 
-                            new() { Offset = 0x350a, Type = Game.Reference.Types.Slot1, Delta = 0x5400 - 0x5180 }, // ld hl, $5400 ; 005F09 21 00 54 
-                            new() { Offset = 0xbf51, Type = Game.Reference.Types.Slot1, Delta = 0x5400 - 0x5180 }, // ld hl, $5400 ; 00BF50 21 00 54 
-                            new() { Offset = 0x5c00, Type = Game.Reference.Types.Slot1, Delta = 0x5200 - 0x5200 }, // ld hl, $5200 ; 005BFF 21 00 52
-                            new() { Offset = 0x5cde, Type = Game.Reference.Types.Slot1, Delta = 0x5280 - 0x5200 }, // ld hl, $5280 ; 005C6D 21 80 52
-                            new() { Offset = 0x5ca8, Type = Game.Reference.Types.Slot1, Delta = 0x5180 - 0x5200 }, // ld hl, $5100 ; 005CA7 21 80 51 
-                            new() { Offset = 0x5cb3, Type = Game.Reference.Types.Slot1, Delta = 0x5280 - 0x5200 }, // ld hl, $5200 ; 005CB2 21 80 52
-                            new() { Offset = 0x5cfa, Type = Game.Reference.Types.Slot1, Delta = 0x5300 - 0x5200 }, // ld hl, $5300 ; 005CF9 21 00 53
-                            new() { Offset = 0x5d2a, Type = Game.Reference.Types.Slot1, Delta = 0x5380 - 0x5200 }, // ld hl, $5380 ; 005D29 21 80 53
-                            new() { Offset = 0x5d7b, Type = Game.Reference.Types.Slot1, Delta = 0x5480 - 0x5200 }, // ld hl, $5480 ; 005D7A 21 80 54
-                            new() { Offset = 0x5da3, Type = Game.Reference.Types.Slot1, Delta = 0x5500 - 0x5200 }, // ld hl, $5500 ; 005DA2 21 00 55
-                            new() { Offset = 0x0c1f, Type = Game.Reference.Types.PageNumber } // ld a,$05 ; 000C1E 3E 05 
+                            new() { Offset = 0x5B31 + 1, Type = Game.Reference.Types.Slot1 }, // ld hl, $5180 ; 005B31 21 80 51 
+                            new() { Offset = 0x5F09 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5400 - 0x5180 }, // ld hl, $5400 ; 005F09 21 00 54
+                            new() { Offset = 0xBF50 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5400 - 0x5180 }, // ld hl, $5400 ; 00BF50 21 00 54
+                            new() { Offset = 0x5BFF + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5200 - 0x5180 }, // ld hl, $5200 ; 005BFF 21 00 52
+                            new() { Offset = 0x5C6D + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5280 - 0x5180 }, // ld hl, $5280 ; 005C6D 21 80 52
+                            new() { Offset = 0x5CA7 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5180 - 0x5180 }, // ld hl, $5100 ; 005CA7 21 80 51
+                            new() { Offset = 0x5CB2 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5280 - 0x5180 }, // ld hl, $5200 ; 005CB2 21 80 52
+                            new() { Offset = 0x5CF9 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5300 - 0x5180 }, // ld hl, $5300 ; 005CF9 21 00 53
+                            new() { Offset = 0x5D29 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5380 - 0x5180 }, // ld hl, $5380 ; 005D29 21 80 53
+                            new() { Offset = 0x5D7A + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5480 - 0x5180 }, // ld hl, $5480 ; 005D7A 21 80 54
+                            new() { Offset = 0x5DA2 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5500 - 0x5180 }, // ld hl, $5500 ; 005DA2 21 00 55
+                            new() { Offset = 0x0c1e + 1, Type = Game.Reference.Types.PageNumber } // ld a,$05 ; 000C1E 3E 05 
                         }
                     }
                 }, {
@@ -170,12 +153,12 @@ namespace sth1edwv
                         BitPlanes = 3,
                         TileGrouping = TileSet.Groupings.Sonic,
                         FixedSize = 42 * 24 * 32 * 3/8, // 42 frames, each 24x32, each pixel is 3 bits
-                        TilesPerRow = 4,
+                        TilesPerRow = 8,
                         References = new List<Game.Reference> 
                         {
                             new() { Offset = 0x4c84 + 1, Type = Game.Reference.Types.Slot1 }, // ld bc,$4000 ; 004C84 01 00 40 
                             new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
-                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
+                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 } // ld a,$09 ; 000135 3E 09 
                         }
                     }
                 }, {
@@ -186,13 +169,13 @@ namespace sth1edwv
                         BitPlanes = 3,
                         TileGrouping = TileSet.Groupings.Sonic,
                         FixedSize = 42 * 24 * 32 * 3/8, // 42 frames, each 24x32, each pixel is 3 bits
-                        TilesPerRow = 4,
+                        TilesPerRow = 8,
                         References = new List<Game.Reference> 
                         {
                             // TODO this has to be in the same 32KB window as the above, how to express this?
                             new() { Offset = 0x4c8e, Type = Game.Reference.Types.Slot1 }, // ld bc,$7000 ; 004C8D 01 00 70
                             new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
-                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
+                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 } // ld a,$09 ; 000135 3E 09 
                         }
                     }
                 }, {
@@ -211,7 +194,7 @@ namespace sth1edwv
                             // ld hl,$0000 ; 0025A9 21 00 00
                             // ld a,$0c    ; 0025AF 3E 0C 
                             new() {Offset = 0x25a9+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
-                            new() {Offset = 0x25af+1, Type = Game.Reference.Types.PageNumber}, 
+                            new() {Offset = 0x25af+1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -227,7 +210,7 @@ namespace sth1edwv
                             // ld bc,$0178 ; 000CB5 01 78 01 
                             new() {Offset = 0x0caa + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x0cb2 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x0cb5 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x0cb5 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -241,7 +224,7 @@ namespace sth1edwv
                             // ld bc,$0145 ; 000CC6 01 45 01 
                             new() {Offset = 0x0caa + 1, Type = Game.Reference.Types.PageNumber}, // TODO can this duplication act to make us know to tie them together?
                             new() {Offset = 0x0cc3 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x0cc6 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x0cc6 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -251,7 +234,7 @@ namespace sth1edwv
                         FixedSize = 32,
                         References = new List<Game.Reference>
                         {
-                            new() {Offset = 0x0cd4 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$0f0e ; 000CD4 21 0E 0F 
+                            new() {Offset = 0x0cd4 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$0f0e ; 000CD4 21 0E 0F 
                         }
                     }
                 }, {
@@ -264,7 +247,7 @@ namespace sth1edwv
                             // ld hl,$526b ; 000C94 21 6B 52 
                             // ld a,$09    ; 000C9A 3E 09 
                             new() {Offset = 0x0c94 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x0c9a + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x0c9a + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -282,7 +265,7 @@ namespace sth1edwv
                             // ld hl,$1801 ; 0026AB 21 01 18
                             // ld a,$0c    ; 0026B1 3E 0C 
                             new() {Offset = 0x26ab+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
-                            new() {Offset = 0x26b1+1, Type = Game.Reference.Types.PageNumber}, 
+                            new() {Offset = 0x26b1+1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -297,7 +280,7 @@ namespace sth1edwv
                             // ld bc,$0170  ; 000D17 01 70 01 
                             new() {Offset = 0x0d0c + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x0d14 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x0d17 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x0d17 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -311,7 +294,7 @@ namespace sth1edwv
                             // ld bc,$0153 ; 000D28 01 53 01 
                             new() {Offset = 0x0d0c + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x0d25 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x0d28 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x0d28 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -321,7 +304,7 @@ namespace sth1edwv
                         FixedSize = 32,
                         References = new List<Game.Reference>
                         {
-                            new() {Offset = 0x0d36 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$0f2e ; 000D36 21 2E 0F 
+                            new() {Offset = 0x0d36 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$0f2e ; 000D36 21 2E 0F 
                         }
                     }
                 }, {
@@ -334,7 +317,7 @@ namespace sth1edwv
                             // ld hl,$5942 ; 000CF6 21 42 59 
                             // ld a,$09    ; 000CFC 3E 09 
                             new() {Offset = 0x0cf6 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x0cfc + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x0cfc + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -347,7 +330,7 @@ namespace sth1edwv
                             // ld hl,$b92e ; 000C9F 21 2E B9 
                             // ld a,$09    ; 000CA5 3E 09 
                             new() {Offset = 0x0c9f + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x0ca5 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x0ca5 + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -359,7 +342,7 @@ namespace sth1edwv
                             // ld hl,$2000 ; 001296 21 00 20 
                             // ld a,$09    ; 00129C 3E 09 
                             new() {Offset = 0x1296 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x129c + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x129c + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -372,7 +355,7 @@ namespace sth1edwv
                             // ld hl,$4b0a ; 0012A1 21 0A 4B 
                             // ld a,$09    ; 0012A7 3E 09 
                             new() {Offset = 0x12a1 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x12a7 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x12a7 + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -386,7 +369,7 @@ namespace sth1edwv
                             // ld bc,$012e ; 0012BA 01 2E 01 
                             new() {Offset = 0x12ac + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x12b4 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x12ba + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x12ba + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -397,7 +380,7 @@ namespace sth1edwv
                         References = new List<Game.Reference>
                         {
                             // ld hl,$13e1 ; 0012CC 21 E1 13 
-                            new() {Offset = 0x12cc + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0x12cc + 1, Type = Game.Reference.Types.Absolute}
                         }
                     }
                 }, {
@@ -415,7 +398,7 @@ namespace sth1edwv
                             // ld hl,$351f ; 001580 21 1F 35 
                             // ld a,$09    ; 001586 3E 09 
                             new() {Offset = 0x1580 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x1586 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x1586 + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -429,7 +412,7 @@ namespace sth1edwv
                             // ld bc,$0032 ; 001427 01 32 00 
                             new() {Offset = 0x141c + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x1424 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x1427 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x1427 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -440,7 +423,7 @@ namespace sth1edwv
                         References = new List<Game.Reference>
                         {
                             // ld hl,$14fc ; 00143C 21 FC 14 
-                            new() {Offset = 0x143c + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0x143c + 1, Type = Game.Reference.Types.Absolute}
                         }
                     }
                 }, {
@@ -454,7 +437,7 @@ namespace sth1edwv
                             // ld bc,$00bb ; 001596 01 BB 00 
                             new() {Offset = 0x1588 + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x1593 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x1596 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x1596 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -468,7 +451,7 @@ namespace sth1edwv
                             // ld bc,$0095 ; 0015A6 01 95 00 
                             new() {Offset = 0x1588 + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x15A3 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x15A6 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x15A6 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -479,7 +462,7 @@ namespace sth1edwv
                         References = new List<Game.Reference>
                         {
                             // ld hl,$1b8d ; 001604 21 8D 1B 
-                            new() {Offset = 0x1604 + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0x1604 + 1, Type = Game.Reference.Types.Absolute}
                         }
                     }
                 }, {
@@ -492,7 +475,7 @@ namespace sth1edwv
                             // ld hl,$2828 ; 0025A1 21 28 28 
                             new() { Offset = 0x25a1 + 1, Type = Game.Reference.Types.Absolute},
                             // ld hl,$2828 ; 00268D 21 28 28 
-                            new() { Offset = 0x268d + 1, Type = Game.Reference.Types.Absolute},
+                            new() { Offset = 0x268d + 1, Type = Game.Reference.Types.Absolute}
                         }
                     }
                 }, {
@@ -506,7 +489,7 @@ namespace sth1edwv
                             // ld bc,$0179 ; 0025BF 01 79 01 
                             new() {Offset = 0x25B4 + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x25BC + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x25BF + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x25BF + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -520,7 +503,7 @@ namespace sth1edwv
                             // ld bc,$0145 ; 002680 01 45 01 
                             new() {Offset = 0x2675 + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x267D + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x2680 + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x2680 + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -534,7 +517,7 @@ namespace sth1edwv
                             // ld bc,$0189 ; 0026CC 01 89 01 
                             new() {Offset = 0x26C1 + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x26C9 + 1, Type = Game.Reference.Types.Slot1},
-                            new() {Offset = 0x26CC + 1, Type = Game.Reference.Types.Size},
+                            new() {Offset = 0x26CC + 1, Type = Game.Reference.Types.Size}
                         }
                     }
                 }, {
@@ -558,7 +541,7 @@ namespace sth1edwv
                             // ld hl,$4294 ; 005F2D 21 94 42 // This is actually into page 10
                             // ld a,$09    ; 005F33 3E 09 
                             new() {Offset = 0x5f2d + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x5f33 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x5f33 + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -589,7 +572,7 @@ namespace sth1edwv
                             // ld a,$0b ; 001DB5 3E 0B 
                             new() {Offset = 0x1DB5 + 1, Type = Game.Reference.Types.PageNumber},
                             // ld a,$0b ; 001eb1 3E 0B 
-                            new() {Offset = 0x1eb1 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x1eb1 + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -610,7 +593,7 @@ namespace sth1edwv
                             new() {Offset = 0x84C7 + 1, Type = Game.Reference.Types.Absolute},
                             new() {Offset = 0x929C + 1, Type = Game.Reference.Types.Absolute},
                             new() {Offset = 0xA821 + 1, Type = Game.Reference.Types.Absolute},
-                            new() {Offset = 0xBE07 + 1, Type = Game.Reference.Types.Absolute},
+                            new() {Offset = 0xBE07 + 1, Type = Game.Reference.Types.Absolute}
                         }
                     }
                 }, {
@@ -627,7 +610,7 @@ namespace sth1edwv
                             // ld hl,$aeb1 ; 008074 21 B1 AE 
                             // ld a,$09    ; 00807A 3E 09 
                             new() {Offset = 0x8074 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x807A + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x807A + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -644,7 +627,7 @@ namespace sth1edwv
                             // ld hl,$e508 ; 009291 21 08 E5 
                             // ld a,$0c    ; 009297 3E 0C 
                             new() {Offset = 0x9291 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x9297 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x9297 + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -661,7 +644,7 @@ namespace sth1edwv
                             // ld hl,$ef3f ; 00BB94 21 3F EF 
                             // ld a,$0c    ; 00BB9A 3E 0C 
                             new() {Offset = 0xBB94 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0xBB9A + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0xBB9A + 1, Type = Game.Reference.Types.PageNumber}
                         }
                     }
                 }, {
@@ -674,18 +657,30 @@ namespace sth1edwv
                             // ld hl,$da28 ; 007916 21 28 DA 
                             // ld a,$0c    ; 00791C 3E 0C 
                             new() {Offset = 0x7916 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x791C + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x791C + 1, Type = Game.Reference.Types.PageNumber}
+                        }
+                    }
+                },
+                {
+                    "Green Hill palette", new Game.Asset // We add this just so we can use it below
+                    {
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        Hidden = true,
+                        References = new List<Game.Reference>
+                        {
+                            new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute}
                         }
                     }
                 }
             },
-
+            // These all need to match strings above. This is a bit nasty but I don't see a better way.
             AssetGroups = new Dictionary<string, IEnumerable<string>>
             {
                 { "Map screen 1", new [] { "Map screen 1 tileset", "Map screen 1 tilemap 1", "Map screen 1 tilemap 2", "Map screen 1 palette", "Map screen 1 sprite tiles", "HUD sprite tiles" } }, // HUD sprites only used for life counter
                 { "Map screen 2", new [] { "Map screen 2 tileset", "Map screen 2 tilemap 1", "Map screen 2 tilemap 2", "Map screen 2 palette", "Map screen 2 sprite tiles", "HUD sprite tiles" } },
-                { "Sonic sprites", new[] { "Sonic (right)", "Sonic (left)", "HUD sprite tiles", "Map screen 1 palette" } }, // Palette is good for Sonic here. HUD sprites contain the spring jump toes, the ones in the art seem unused...
-                { "Monitors", new [] { "Monitor Art", "HUD sprite tiles", "Map screen 1 palette"  } }, // Monitor bases are in the HUD sprites
+                { "Sonic", new[] { "Sonic (right)", "Sonic (left)", "HUD sprite tiles", "Green Hill palette" } }, // HUD sprites contain the spring jump toes, the ones in the art seem unused...
+                { "Monitors", new [] { "Monitor Art", "HUD sprite tiles", "Green Hill palette"  } }, // Monitor bases are in the HUD sprites
                 { "Title screen", new [] { "Title screen tiles", "Title screen sprites", "Title screen palette", "Title screen tilemap" } },
                 { "Game Over", new [] { "Act Complete tiles", "Game Over palette", "Game Over tilemap" } },
                 { "Act Complete", new [] { "Act Complete tiles", "Act Complete palette", "Act Complete tilemap", "HUD sprite tiles" } },
@@ -694,9 +689,9 @@ namespace sth1edwv
                 { "Ending 2", new [] { "Map screen 1 tileset", "Ending palette", "Ending 2 tilemap" } },
                 { "Credits", new [] { "Map screen 2 tileset", "Title screen sprites", "Credits tilemap", "Credits palette" } },
                 { "End sign", new [] { "End sign tileset", "End sign palette" } },
-                { "Rings", new [] { "Rings", "Map screen 2 palette" } }, // TODO a better palette than this? Also hide the palette
-                { "Dr. Robotnik", new [] { "Boss sprites 1", "Boss sprites 2", "Boss sprites 3", "Boss sprites palette", } },
-                { "Capsule", new [] { "Capsule sprites", "Boss sprites palette", } },
+                { "Rings", new [] { "Rings", "Green Hill palette" } },
+                { "Dr. Robotnik", new [] { "Boss sprites 1", "Boss sprites 2", "Boss sprites 3", "Boss sprites palette" } },
+                { "Capsule", new [] { "Capsule sprites", "Boss sprites palette" } }
             },
             Levels = new List<Game.LevelHeader>
             {
@@ -733,7 +728,7 @@ namespace sth1edwv
                 new() { Name = "Special Stage 6", Offset = 0x15580 + 0x4c5 },
                 new() { Name = "Special Stage 7", Offset = 0x15580 + 0x4ea },
                 new() { Name = "Special Stage 8", Offset = 0x15580 + 0x50f }
-            },
+            }
         };
 
         public Memory Memory { get; }
@@ -746,6 +741,7 @@ namespace sth1edwv
         private readonly Dictionary<int, BlockMapping> _blockMappings = new();
         private readonly Dictionary<int, Palette> _palettes = new();
         private TileSet _rings;
+        private readonly Dictionary<Game.Asset, IDataItem> _assetsLookup = new();
 
         public Cartridge(string path, Action<string> logger)
         {
@@ -755,7 +751,7 @@ namespace sth1edwv
             Memory = new Memory(File.ReadAllBytes(path));
             ReadLevels();
             ReadGameText();
-            ReadExtraArt();
+            ReadAssets();
 
             // Apply rings to level tilesets
             foreach (var tileSet in Levels.Select(x => x.TileSet).Distinct())
@@ -766,15 +762,16 @@ namespace sth1edwv
             _logger($"Load complete in {sw.Elapsed}");
         }
 
-        private void ReadExtraArt()
+        private void ReadAssets()
         {
             _rings = new TileSet(Memory, 0x2Fcf0, 24 * 32, 4, TileSet.Groupings.Ring, 8); // TODO this
-            
+            _assetsLookup.Clear();
+
             _logger("Loading art...");
 
             foreach (var kvp in Sonic1MasterSystem.AssetGroups)
             {
-                var item = new ArtItem{Name = kvp.Key, PaletteEditable = true};
+                var item = new ArtItem{Name = kvp.Key};
                 foreach (var asset in kvp.Value.Select(x => Sonic1MasterSystem.Assets[x]))
                 {
                     var offset = asset.GetOffset(Memory);
@@ -782,16 +779,17 @@ namespace sth1edwv
                     switch (asset.Type)
                     {
                         case Game.Asset.Types.TileSet:
-                            item.TileSet = asset.BitPlanes > 0 
+                            _assetsLookup[asset] = item.TileSet = asset.BitPlanes > 0 
                                 ? GetTileSet(offset, asset.GetLength(Memory), asset.BitPlanes, asset.TileGrouping, asset.TilesPerRow) 
                                 : GetTileSet(offset, asset.TileGrouping, asset.TilesPerRow);
                             break;
                         case Game.Asset.Types.Palette:
-                            item.Palette = GetPalette(offset, asset.FixedSize / 16);
+                            _assetsLookup[asset] = item.Palette = GetPalette(offset, asset.FixedSize / 16);
+                            item.PaletteEditable = !asset.Hidden; // Only applies to palettes...
                             break;
                         case Game.Asset.Types.ForegroundTileMap:
                             // We assume these are set first
-                            item.TileMap = new TileMap(Memory, offset, asset.GetLength(Memory));
+                            _assetsLookup[asset] = item.TileMap = new TileMap(Memory, offset, asset.GetLength(Memory));
                             item.TileMap.SetAllForeground();
                             break;
                         case Game.Asset.Types.TileMap:
@@ -801,17 +799,20 @@ namespace sth1edwv
                             if (tileMap.IsOverlay())
                             {
                                 item.TileMap.OverlayWith(tileMap);
+                                _assetsLookup[asset] = item.TileMap; // Point at the same object for both
                             }
                             else
                             {
-                                item.TileMap = tileMap;
+                                _assetsLookup[asset] = item.TileMap = tileMap;
                             }
                             break;
                         }
                         case Game.Asset.Types.SpriteTileSet:
-                            item.SpriteTileSets.Add(asset.BitPlanes > 0 
+                            var tileSet = asset.BitPlanes > 0 
                                 ? GetTileSet(offset, asset.GetLength(Memory), asset.BitPlanes, asset.TileGrouping, asset.TilesPerRow) 
-                                : GetTileSet(offset, asset.TileGrouping, asset.TilesPerRow));
+                                : GetTileSet(offset, asset.TileGrouping, asset.TilesPerRow);
+                            _assetsLookup[asset] = tileSet;
+                            item.SpriteTileSets.Add(tileSet);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -843,7 +844,6 @@ namespace sth1edwv
         {
             return GetItem(_tileSets, offset, () => new TileSet(Memory, offset, length, bitPlanes, tileGrouping, tilesPerRow));
         }
-
 
         public Floor GetFloor(int offset, int compressedSize, int width)
         {
@@ -910,8 +910,6 @@ namespace sth1edwv
             // Data we read/write and what we can repack...
             // Start    End     Description                         Repacking?
             // -----------------------------------------------------------------------------
-            // 0027b    28a     Underwater boss palette             TODO
-            //
             // 00f0e    00f1d   Map screen 1 art palette            TODO
             // 00f1e    00f2d   Map screen 1 sprites palette        TODO
             //
@@ -961,7 +959,7 @@ namespace sth1edwv
             // 29942    2a129   Map screen sprites 2                (compressed) TODO
             // 2a12a    2f92d   Level sprites                       Yes, level header pointers are rewritten. Can be in range 24000..33fff TODO: boss sprites are in here but with a bad palette. Could exclude?
             // 2f92e    2fcef   HUD sprites                         (compressed) TODO
-            // 2fcf0    2ffff   Rings (+ unused)                    Original offset/size (uncompressed) TODO change?
+            // 2fcf0    2ffff   Rings (+ unused)                    TODO
             // 30000    31800   Map screen 1/ending art             TODO
             // 31801    32fe5   Map screen 2 art                    TODO
             // 32fe6    3da27   Level backgrounds                   Yes, level header pointers are rewritten. Can be in range 30000..3ffff
@@ -1051,15 +1049,67 @@ namespace sth1edwv
                 throw new Exception("Level tile sets out of space");
             }
 
-            // Uncompressed art at its original offsets
-            foreach (var group in Art.GroupBy(x => x.TileSet).Where(x => x.Key is { Compressed: false }))
+            // Next we pack the other assets.
+            var assetsToPack = Sonic1MasterSystem.AssetGroups.Values
+                .SelectMany(x => x)
+                .Distinct()
+                .Select(x => new { Name = x, Asset = Sonic1MasterSystem.Assets[x]})
+                .ToList();
+            foreach (var item in assetsToPack)
             {
-                var tileSet = group.Key;
-                var data = tileSet.GetData();
-                data.CopyTo(memory, tileSet.Offset);
-                _logger($"- Wrote uncompressed art for {string.Join(", ", group.Select(x => x.Name))} at offset ${tileSet.Offset:X}, length {data.Count} bytes");
+                var dataItem = _assetsLookup[item.Asset];
+                var data = dataItem.GetData();
+                offset = dataItem.Offset;
+                if (item.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute))
+                {
+                    // First we do the ones with absolute positions. There's nothing to gain by relocating them, so we just copy the data 
+                    data.CopyTo(memory, offset);
+                    _logger($"- Wrote data for asset {item.Name} at its original location {offset:X}, length {data.Count} bytes");
+                }
+                else
+                {
+                    switch (item.Asset.Type)
+                    {
+                        case Game.Asset.Types.TileMap:
+                        case Game.Asset.Types.ForegroundTileMap:
+                            // Skip for now
+                            continue;
+                        case Game.Asset.Types.Palette:
+                        case Game.Asset.Types.TileSet:
+                        case Game.Asset.Types.SpriteTileSet:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    // For now, we write the rest at their original offsets. We don't check sizes.
+                    data.CopyTo(memory, offset);
+                    _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {data.Count} bytes");
+
+                    foreach (var reference in item.Asset.References)
+                    {
+                        switch (reference.Type)
+                        {
+                            case Game.Reference.Types.PageNumber:
+                                var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
+                                memory[reference.Offset] = pageNumber;
+                                _logger($" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                                break;
+                            case Game.Reference.Types.Size:
+                                var size = (uint)data.Count;
+                                memory[reference.Offset + 0] = (byte)(size & 0xff);
+                                memory[reference.Offset + 1] = (byte)(size >> 8);
+                                _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
+                                break;
+                            case Game.Reference.Types.Slot1:
+                                var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
+                                memory[reference.Offset + 0] = (byte)(value & 0xff);
+                                memory[reference.Offset + 1] = (byte)(value >> 8);
+                                _logger($" - Wrote slot 1 location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                                break;
+                        }
+                    }
+                }
             }
-            // TODO other art...
 
             // - Block mappings (at original offsets)
             // TODO make these flexible if I make it possible to change sizes
