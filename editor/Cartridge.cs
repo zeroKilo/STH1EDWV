@@ -785,7 +785,7 @@ namespace sth1edwv
                             break;
                         case Game.Asset.Types.Palette:
                             _assetsLookup[asset] = item.Palette = GetPalette(offset, asset.FixedSize / 16);
-                            item.PaletteEditable = !asset.Hidden; // Only applies to palettes...
+                            item.PaletteEditable = !asset.Hidden; // Hidden only applies to palettes for now...
                             break;
                         case Game.Asset.Types.ForegroundTileMap:
                             // We assume these are set first
@@ -1059,6 +1059,7 @@ namespace sth1edwv
             {
                 var dataItem = _assetsLookup[item.Asset];
                 var data = dataItem.GetData();
+                var size = data.Count;
                 offset = dataItem.Offset;
                 if (item.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute))
                 {
@@ -1068,22 +1069,24 @@ namespace sth1edwv
                 }
                 else
                 {
-                    switch (item.Asset.Type)
-                    {
-                        case Game.Asset.Types.TileMap:
-                        case Game.Asset.Types.ForegroundTileMap:
-                            // Skip for now
-                            continue;
-                        case Game.Asset.Types.Palette:
-                        case Game.Asset.Types.TileSet:
-                        case Game.Asset.Types.SpriteTileSet:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                    // For now, we write the rest at their original offsets. We don't check sizes.
                     data.CopyTo(memory, offset);
                     _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {data.Count} bytes");
+
+                    // Tilemaps may have two parts. If so, the foreground data comes first and the background tiles second.
+                    // We fix up the offsets and sizes we write if this is the case.
+                    if (dataItem is TileMap tileMap)
+                    {
+                        switch (item.Asset.Type)
+                        {
+                            case Game.Asset.Types.TileMap:
+                                offset += tileMap.ForegroundTileMapSize;
+                                size = tileMap.BackgroundTileMapSize;
+                                break;
+                            case Game.Asset.Types.ForegroundTileMap:
+                                size = tileMap.ForegroundTileMapSize;
+                                break;
+                        }
+                    }
 
                     foreach (var reference in item.Asset.References)
                     {
@@ -1095,7 +1098,6 @@ namespace sth1edwv
                                 _logger($" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
                                 break;
                             case Game.Reference.Types.Size:
-                                var size = (uint)data.Count;
                                 memory[reference.Offset + 0] = (byte)(size & 0xff);
                                 memory[reference.Offset + 1] = (byte)(size >> 8);
                                 _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");

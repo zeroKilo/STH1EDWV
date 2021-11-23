@@ -125,5 +125,10 @@ namespace sth1edwv.GameObjects
             _ringtile = ringTile;
             _ringPosition = new Point(x, y);
         }
+
+        public bool Matches(byte[] buffer)
+        {
+            return _data.SequenceEqual(buffer);
+        }
     }
 }

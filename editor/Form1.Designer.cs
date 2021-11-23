@@ -105,6 +105,9 @@ namespace sth1edwv
             this.listBoxArt = new System.Windows.Forms.ListBox();
             this.tabControlArt = new System.Windows.Forms.TabControl();
             this.tabPageArtLayout = new System.Windows.Forms.TabPage();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.buttonSaveScreen = new System.Windows.Forms.ToolStripButton();
+            this.buttonLoadTileset = new System.Windows.Forms.ToolStripButton();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.pictureBoxArtLayout = new System.Windows.Forms.PictureBox();
             this.tabPageArtTiles = new System.Windows.Forms.TabPage();
@@ -155,6 +158,7 @@ namespace sth1edwv
             this.splitContainer3.SuspendLayout();
             this.tabControlArt.SuspendLayout();
             this.tabPageArtLayout.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).BeginInit();
             this.tabPageArtTiles.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -854,6 +858,7 @@ namespace sth1edwv
             // 
             // tabPageArtLayout
             // 
+            this.tabPageArtLayout.Controls.Add(this.toolStrip2);
             this.tabPageArtLayout.Controls.Add(this.propertyGrid1);
             this.tabPageArtLayout.Controls.Add(this.pictureBoxArtLayout);
             this.tabPageArtLayout.Location = new System.Drawing.Point(4, 22);
@@ -863,6 +868,35 @@ namespace sth1edwv
             this.tabPageArtLayout.TabIndex = 2;
             this.tabPageArtLayout.Text = "Layout";
             this.tabPageArtLayout.UseVisualStyleBackColor = true;
+            // 
+            // toolStrip2
+            // 
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buttonSaveScreen,
+            this.buttonLoadTileset});
+            this.toolStrip2.Location = new System.Drawing.Point(3, 3);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(734, 25);
+            this.toolStrip2.TabIndex = 5;
+            this.toolStrip2.Text = "toolStrip2";
+            // 
+            // buttonSaveScreen
+            // 
+            this.buttonSaveScreen.Image = ((System.Drawing.Image)(resources.GetObject("buttonSaveScreen.Image")));
+            this.buttonSaveScreen.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonSaveScreen.Name = "buttonSaveScreen";
+            this.buttonSaveScreen.Size = new System.Drawing.Size(60, 22);
+            this.buttonSaveScreen.Text = "Save...";
+            this.buttonSaveScreen.Click += new System.EventHandler(this.buttonSaveScreen_Click);
+            // 
+            // buttonLoadTileset
+            // 
+            this.buttonLoadTileset.Image = ((System.Drawing.Image)(resources.GetObject("buttonLoadTileset.Image")));
+            this.buttonLoadTileset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonLoadTileset.Name = "buttonLoadTileset";
+            this.buttonLoadTileset.Size = new System.Drawing.Size(62, 22);
+            this.buttonLoadTileset.Text = "Load...";
+            this.buttonLoadTileset.Click += new System.EventHandler(this.buttonLoadTileset_Click);
             // 
             // propertyGrid1
             // 
@@ -874,7 +908,7 @@ namespace sth1edwv
             // 
             // pictureBoxArtLayout
             // 
-            this.pictureBoxArtLayout.Location = new System.Drawing.Point(6, 6);
+            this.pictureBoxArtLayout.Location = new System.Drawing.Point(6, 31);
             this.pictureBoxArtLayout.Name = "pictureBoxArtLayout";
             this.pictureBoxArtLayout.Size = new System.Drawing.Size(317, 194);
             this.pictureBoxArtLayout.TabIndex = 0;
@@ -1020,6 +1054,9 @@ namespace sth1edwv
             this.splitContainer3.ResumeLayout(false);
             this.tabControlArt.ResumeLayout(false);
             this.tabPageArtLayout.ResumeLayout(false);
+            this.tabPageArtLayout.PerformLayout();
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxArtLayout)).EndInit();
             this.tabPageArtTiles.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
@@ -1108,6 +1145,9 @@ namespace sth1edwv
         private ToolStripStatusLabel spriteTileSetStatus;
         private TabPage tabPage2;
         private TextBox logTextBox;
+        private ToolStrip toolStrip2;
+        private ToolStripButton buttonSaveScreen;
+        private ToolStripButton buttonLoadTileset;
     }
 }
 

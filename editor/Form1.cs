@@ -741,5 +741,37 @@ namespace sth1edwv
                 logTextBox.AppendText("\r\n");
             }));
         }
+
+        private void buttonSaveScreen_Click(object sender, EventArgs e)
+        {
+            using var sfd = new SaveFileDialog { Filter = "*.png|*.png" };
+            if (sfd.ShowDialog(this) == DialogResult.OK)
+            {
+                pictureBoxArtLayout.Image.Save(sfd.FileName);
+            }
+        }
+
+        private void buttonLoadTileset_Click(object sender, EventArgs e)
+        {
+            if (listBoxArt.SelectedItem is not ArtItem artItem)
+            {
+                return;
+            }
+
+            try
+            {
+                using var ofd = new OpenFileDialog { Filter = "*.png|*.png" };
+                if (ofd.ShowDialog(this) == DialogResult.OK)
+                {
+                    using var image = (Bitmap)System.Drawing.Image.FromFile(ofd.FileName);
+                    artItem.TileMap.FromImage(image, artItem.TileSet);
+                    pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message);
+            }
+        }
     }
 }

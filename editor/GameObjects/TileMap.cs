@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace sth1edwv.GameObjects
 {
-    public class TileMap: IDataItem
+    public class TileMap: IDataItem, IDisposable
     {
-        private readonly List<ushort> _data;
+        private List<ushort> _data;
         private Bitmap _image;
 
         public TileMap(Memory memory, int offset, int size)
@@ -43,29 +45,52 @@ namespace sth1edwv.GameObjects
             {
                 return _image;
             }
-            _image = new Bitmap(256, 192);
-            using var g = Graphics.FromImage(_image);
-            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            // We work in 8bpp again...
+            _image = new Bitmap(256, 192, PixelFormat.Format8bppIndexed);
+            _image.Palette = palette.ImagePalette;
+            var data = _image.LockBits(new Rectangle(0, 0, _image.Width, _image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
             for (var i = 0; i < _data.Count; ++i)
             {
                 var x = i % 32 * 8;
                 var y = i / 32 * 8;
                 var index = _data[i];
+                // Tile 0xff is unusable
                 if (index != 0xff)
                 {
                     // Mask off high bits
                     index &= 0xff;
-                    g.DrawImageUnscaled(tileSet.Tiles[index].GetImage(palette), x, y);
+                    // TODO: this is kind of repetitive, similar code everywhere I am drawing tiles into images
+                    var tile = tileSet.Tiles[index];
+                    var sourceImage = tile.GetImage(palette);
+                    var sourceData = sourceImage.LockBits(
+                        new Rectangle(0, 0, 8, 8),
+                        ImageLockMode.ReadOnly,
+                        PixelFormat.Format8bppIndexed);
+                    var rowData = new byte[8];
+                    for (var row = 0; row < 8; ++row)
+                    {
+                        Marshal.Copy(
+                            sourceData.Scan0 + row * sourceData.Stride,
+                            rowData, 
+                            0, 
+                            8);
+                        Marshal.Copy(
+                            rowData, 
+                            0, 
+                            data.Scan0 + (row + y) * data.Stride + x,
+                            8);
+                    }
+                    sourceImage.UnlockBits(sourceData);
                 }
             }
-
+            _image.UnlockBits(data); 
             return _image;
         }
 
 
         public int Offset { get; set; }
-        public int TileMap1Size { get; private set; }
-        public int TileMap2Size { get; private set; }
+        public int ForegroundTileMapSize { get; private set; }
+        public int BackgroundTileMapSize { get; private set; }
 
         public IList<byte> GetData()
         {
@@ -73,20 +98,70 @@ namespace sth1edwv.GameObjects
             {
                 // Single tilemap mode
                 var tileMap = Compression.CompressRle(_data.Select(x => (byte)x).ToArray());
-                TileMap1Size = tileMap.Length;
+                BackgroundTileMapSize = tileMap.Length;
+                ForegroundTileMapSize = 0;
                 return tileMap;
             }
-            // Two tilemaps
-            var tileMap1 = Compression.CompressRle(_data.Select(x => x > 0xff ? (byte)(x & 0xff) : (byte)0xff).ToArray());
-            var tileMap2 = Compression.CompressRle(_data.Select(x => x > 0xff ? (byte)0xff : (byte)(x & 0xff)).ToArray());
-            TileMap1Size = tileMap1.Length;
-            TileMap2Size = tileMap2.Length;
-            return tileMap1.Concat(tileMap2).ToList();
+            // Two tilemaps, first is the foreground tiles
+            var foregroundTileMap = Compression.CompressRle(_data.Select(x => x > 0xff ? (byte)(x & 0xff) : (byte)0xff).ToArray());
+            var backgroundTileMap = Compression.CompressRle(_data.Select(x => x > 0xff ? (byte)0xff : (byte)(x & 0xff)).ToArray());
+            ForegroundTileMapSize = foregroundTileMap.Length;
+            BackgroundTileMapSize = backgroundTileMap.Length;
+            return foregroundTileMap.Concat(backgroundTileMap).ToList();
         }
 
         public bool IsOverlay()
         {
             return _data.Any(x => (x & 0xff) == 0xff);
+        }
+
+        public void FromImage(Bitmap image, TileSet tileSet)
+        {
+            // First check dimensions
+            if (image.Width != 256 || image.Height != 192)
+            {
+                throw new Exception($"Image is {image.Width}x{image.Height}, must be 256x192");
+            }
+
+            if (image.PixelFormat != PixelFormat.Format8bppIndexed)
+            {
+                throw new Exception($"Image must be 8bpp with no transparency");
+            }
+
+            // Next we need to get the data into tiles...
+            var data = image.LockBits(new Rectangle(0, 0, 256, 192), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
+            var indices = new List<ushort>();
+            for (var y = 0; y < 192; y += 8)
+            for (var x = 0; x < 256; x += 8)
+            {
+                var buffer = new byte[8 * 8];
+
+                for (var row = 0; row < 8; ++row)
+                {
+                    Marshal.Copy(
+                        data.Scan0 + (y + row) * data.Stride + x,
+                        buffer,
+                        row * 8,
+                        8);
+                }
+
+                var tileIndex = tileSet.Tiles.FindIndex(x => x.Matches(buffer));
+                if (tileIndex < 0)
+                {
+                    throw new Exception($"Image does not match tileset: tile at {x}, {y} not found");
+                }
+                indices.Add((ushort)tileIndex);
+            }
+
+            // If we get here then all is well
+            _data = indices;
+            _image?.Dispose();
+            _image = null;
+        }
+
+        public void Dispose()
+        {
+            _image?.Dispose();
         }
     }
 }
