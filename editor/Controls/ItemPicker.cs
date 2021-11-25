@@ -35,6 +35,8 @@ namespace sth1edwv.Controls
                 _transparentPalette = new Palette(data, 0, data.Length / 16);
             }
             _items = items?.ToList();
+            // reset these to trigger a recompute
+            _tileWidth = _tileHeight = ItemsPerRow = 0;
             CheckDrawingSettings();
             Invalidate();
         }
