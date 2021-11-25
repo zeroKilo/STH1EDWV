@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using sth1edwv.GameObjects;
 
 namespace sth1edwv
@@ -13,7 +14,7 @@ namespace sth1edwv
         /// <summary>
         /// Offset data was read from
         /// </summary>
-        int Offset { get; }
+        int Offset { get; set; }
 
         /// <summary>
         /// Get raw data from the item
@@ -52,17 +53,30 @@ namespace sth1edwv
                 }
             }
 
+            public class LocationRestriction
+            {
+                public int MinimumOffset { get; set; } = 0;
+                public int MaximumOffset { get; set; } = int.MaxValue;
+                public bool CanCrossBanks { get; set; } = false;
+                public string MustFollow { get; set; }
+            }
+
             public class Asset
             {
-                //public int Offset { get; set; }
-                public enum Types { TileSet, Palette, TileMap, SpriteTileSet, ForegroundTileMap }
+                public enum Types { TileSet, Palette, TileMap, SpriteTileSet, ForegroundTileMap,
+                    Unused
+                }
                 public Types Type { get; set; }
                 public List<Reference> References { get; set; }
+                public LocationRestriction Restrictions { get; set; } = new(); // Default to defaults...
                 public int FixedSize { get; set; }
                 public int BitPlanes { get; set; }
                 public List<Point> TileGrouping { get; set; }
                 public int TilesPerRow { get; set; } = 16; // 16 is often the best default
                 public bool Hidden { get; set; }
+                // These are in the original ROM, not where we loaded from
+                public int OriginalOffset { get; set; }
+                public int OriginalSize { get; set; }
 
                 public int GetOffset(Memory memory)
                 {
@@ -123,7 +137,8 @@ namespace sth1edwv
             Assets = new Dictionary<string, Game.Asset> {
                 {
                     "Monitor Art", new Game.Asset { 
-                        // Offset = 0x15180, 
+                        OriginalOffset = 0x15180, 
+                        OriginalSize = 0x400,
                         Type = Game.Asset.Types.SpriteTileSet, 
                         FixedSize = 0x400,
                         BitPlanes = 4,
@@ -143,11 +158,14 @@ namespace sth1edwv
                             new() { Offset = 0x5D7A + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5480 - 0x5180 }, // ld hl, $5480 ; 005D7A 21 80 54
                             new() { Offset = 0x5DA2 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5500 - 0x5180 }, // ld hl, $5500 ; 005DA2 21 00 55
                             new() { Offset = 0x0c1e + 1, Type = Game.Reference.Types.PageNumber } // ld a,$05 ; 000C1E 3E 05 
-                        }
+                        },
+                        Restrictions = new Game.LocationRestriction { MaximumOffset = 0x7fff, CanCrossBanks = true } // Lower 32KB
                     }
                 }, {
                     "Sonic (right)", new Game.Asset 
                     { 
+                        OriginalOffset = 0x20000, 
+                        OriginalSize = 0x3000, // Actually a bit over!
                         // Offset = 0x20000,
                         Type = Game.Asset.Types.SpriteTileSet, 
                         BitPlanes = 3,
@@ -159,12 +177,14 @@ namespace sth1edwv
                             new() { Offset = 0x4c84 + 1, Type = Game.Reference.Types.Slot1 }, // ld bc,$4000 ; 004C84 01 00 40 
                             new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
                             new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 } // ld a,$09 ; 000135 3E 09 
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = false } // We set this one to not cross banks so that the following one will start in the same bank
                     }
                 }, {
                     "Sonic (left)", new Game.Asset 
                     { 
-                        // Offset = 0x23000,
+                        OriginalOffset = 0x23000,
+                        OriginalSize = 0x3000, // Similarly this is padded with empty space
                         Type = Game.Asset.Types.SpriteTileSet, 
                         BitPlanes = 3,
                         TileGrouping = TileSet.Groupings.Sonic,
@@ -172,16 +192,17 @@ namespace sth1edwv
                         TilesPerRow = 8,
                         References = new List<Game.Reference> 
                         {
-                            // TODO this has to be in the same 32KB window as the above, how to express this?
                             new() { Offset = 0x4c8e, Type = Game.Reference.Types.Slot1 }, // ld bc,$7000 ; 004C8D 01 00 70
                             new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
                             new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 } // ld a,$09 ; 000135 3E 09 
-                        }
+                        },
+                        Restrictions = { MustFollow = "Sonic (right)", CanCrossBanks = true } // This has to be in the same 32KB window as the above
                     }
                 }, {
                     "Map screen 1 tileset", new Game.Asset 
                     { 
-                        // Offset = 0x30000,
+                        OriginalOffset = 0x30000,
+                        OriginalSize = 0x1801,
                         Type = Game.Asset.Types.TileSet, 
                         References = new List<Game.Reference> 
                         {
@@ -195,12 +216,14 @@ namespace sth1edwv
                             // ld a,$0c    ; 0025AF 3E 0C 
                             new() {Offset = 0x25a9+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
                             new() {Offset = 0x25af+1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true } // Compressed art may cross banks
                     }
                 }, {
                     "Map screen 1 tilemap 1", new Game.Asset 
                     { 
-                        // Offset = 0x1627E,
+                        OriginalOffset = 0x1627E,
+                        OriginalSize = 0x163F6 - 0x1627E,
                         Type = Game.Asset.Types.ForegroundTileMap, 
                         References = new List<Game.Reference>
                         {
@@ -216,20 +239,25 @@ namespace sth1edwv
                 }, {
                     "Map screen 1 tilemap 2", new Game.Asset 
                     { 
+                        OriginalOffset = 0x163F6,
+                        OriginalSize = 0x1653B - 0x163F6,
                         Type = Game.Asset.Types.TileMap, 
                         References = new List<Game.Reference>
                         {
                             // Shares page with the above
                             // ld hl,$63f6 ; 000CC3 21 F6 63 
                             // ld bc,$0145 ; 000CC6 01 45 01 
-                            new() {Offset = 0x0caa + 1, Type = Game.Reference.Types.PageNumber}, // TODO can this duplication act to make us know to tie them together?
+                            new() {Offset = 0x0caa + 1, Type = Game.Reference.Types.PageNumber}, // We duplicate this to read it in
                             new() {Offset = 0x0cc3 + 1, Type = Game.Reference.Types.Slot1},
                             new() {Offset = 0x0cc6 + 1, Type = Game.Reference.Types.Size}
-                        }
+                        },
+                        Restrictions = { MustFollow = "Map screen 1 tilemap 1" } // Same page as the above
                     }
                 }, {
                     "Map screen 1 palette", new Game.Asset 
                     { 
+                        OriginalOffset = 0x0f0e,
+                        OriginalSize = 32,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
                         References = new List<Game.Reference>
@@ -240,6 +268,8 @@ namespace sth1edwv
                 }, {
                     "Map screen 1 sprite tiles", new Game.Asset 
                     { 
+                        OriginalOffset = 0x2926b,
+                        OriginalSize = 0x29942 - 0x2926b,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -248,11 +278,14 @@ namespace sth1edwv
                             // ld a,$09    ; 000C9A 3E 09 
                             new() {Offset = 0x0c94 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x0c9a + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Map screen 2 tileset", new Game.Asset 
                     { 
+                        OriginalOffset = 0x31801,
+                        OriginalSize = 0x32fe6 - 0x31801,
                         Type = Game.Asset.Types.TileSet, 
                         References = new List<Game.Reference> 
                         {
@@ -266,11 +299,14 @@ namespace sth1edwv
                             // ld a,$0c    ; 0026B1 3E 0C 
                             new() {Offset = 0x26ab+1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, 
                             new() {Offset = 0x26b1+1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Map screen 2 tilemap 1", new Game.Asset 
                     { 
+                        OriginalOffset = 0x1653B,
+                        OriginalSize = 0x166AB - 0x1653B,
                         Type = Game.Asset.Types.ForegroundTileMap, 
                         References = new List<Game.Reference>
                         {
@@ -286,6 +322,8 @@ namespace sth1edwv
                 }, {
                     "Map screen 2 tilemap 2", new Game.Asset 
                     { 
+                        OriginalOffset = 0x166AB,
+                        OriginalSize = 0x167FE - 0x166AB,
                         Type = Game.Asset.Types.TileMap, 
                         References = new List<Game.Reference>
                         {
@@ -295,11 +333,14 @@ namespace sth1edwv
                             new() {Offset = 0x0d0c + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x0d25 + 1, Type = Game.Reference.Types.Slot1},
                             new() {Offset = 0x0d28 + 1, Type = Game.Reference.Types.Size}
-                        }
+                        },
+                        Restrictions = { MustFollow = "Map screen 1 tilemap 1" } // Same page as the above
                     }
                 }, {
                     "Map screen 2 palette", new Game.Asset 
                     { 
+                        OriginalOffset = 0xf2e,
+                        OriginalSize = 32,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
                         References = new List<Game.Reference>
@@ -310,6 +351,8 @@ namespace sth1edwv
                 }, {
                     "Map screen 2 sprite tiles", new Game.Asset 
                     { 
+                        OriginalOffset = 0x29942,
+                        OriginalSize = 0x2a12a - 0x29942,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -318,11 +361,14 @@ namespace sth1edwv
                             // ld a,$09    ; 000CFC 3E 09 
                             new() {Offset = 0x0cf6 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x0cfc + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "HUD sprite tiles", new Game.Asset 
                     { 
+                        OriginalOffset = 0x2f92e,
+                        OriginalSize = 0x2fcf0 - 0x2f92e,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -331,11 +377,14 @@ namespace sth1edwv
                             // ld a,$09    ; 000CA5 3E 09 
                             new() {Offset = 0x0c9f + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x0ca5 + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Title screen tiles", new Game.Asset 
                     { 
+                        OriginalOffset = 0x26000,
+                        OriginalSize = 0x2751f - 0x26000,
                         Type = Game.Asset.Types.TileSet,
                         References = new List<Game.Reference>
                         {
@@ -343,11 +392,14 @@ namespace sth1edwv
                             // ld a,$09    ; 00129C 3E 09 
                             new() {Offset = 0x1296 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x129c + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Title screen sprites", new Game.Asset 
                     { 
+                        OriginalOffset = 0x28b0a,
+                        OriginalSize = 0x2926b - 0x28b0a,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -356,11 +408,14 @@ namespace sth1edwv
                             // ld a,$09    ; 0012A7 3E 09 
                             new() {Offset = 0x12a1 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x12a7 + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Title screen tilemap", new Game.Asset 
                     { 
+                        OriginalOffset = 0x16000,
+                        OriginalSize = 0x1612E - 0x16000,
                         Type = Game.Asset.Types.TileMap,
                         References = new List<Game.Reference>
                         {
@@ -375,6 +430,8 @@ namespace sth1edwv
                 }, {
                     "Title screen palette", new Game.Asset 
                     { 
+                        OriginalOffset = 0x13e1,
+                        OriginalSize = 32,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
                         References = new List<Game.Reference>
@@ -386,6 +443,8 @@ namespace sth1edwv
                 }, {
                     "Act Complete tiles", new Game.Asset 
                     { 
+                        OriginalOffset = 0x2751f,
+                        OriginalSize = 0x28294 - 0x2751f,
                         Type = Game.Asset.Types.TileSet,
                         References = new List<Game.Reference>
                         {
@@ -399,11 +458,14 @@ namespace sth1edwv
                             // ld a,$09    ; 001586 3E 09 
                             new() {Offset = 0x1580 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x1586 + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Game Over tilemap", new Game.Asset 
                     { 
+                        OriginalOffset = 0x167FE,
+                        OriginalSize = 0x16830 - 0x167FE,
                         Type = Game.Asset.Types.TileMap,
                         References = new List<Game.Reference>
                         {
@@ -418,6 +480,8 @@ namespace sth1edwv
                 }, {
                     "Game Over palette", new Game.Asset 
                     { 
+                        OriginalOffset = 0x14fc,
+                        OriginalSize = 32,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
                         References = new List<Game.Reference>
@@ -429,6 +493,8 @@ namespace sth1edwv
                 }, {
                     "Act Complete tilemap", new Game.Asset 
                     { 
+                        OriginalOffset = 0x1612E,
+                        OriginalSize = 0x161E9 - 0x1612E,
                         Type = Game.Asset.Types.TileMap,
                         References = new List<Game.Reference>
                         {
@@ -443,6 +509,8 @@ namespace sth1edwv
                 }, {
                     "Special Stage Complete tilemap", new Game.Asset 
                     { 
+                        OriginalOffset = 0x161E9,
+                        OriginalSize = 0x1627E - 0x161E9,
                         Type = Game.Asset.Types.TileMap,
                         References = new List<Game.Reference>
                         {
@@ -457,6 +525,8 @@ namespace sth1edwv
                 }, {
                     "Act Complete palette", new Game.Asset 
                     { 
+                        OriginalOffset = 0x1b8d,
+                        OriginalSize = 32,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32, 
                         References = new List<Game.Reference>
@@ -468,6 +538,8 @@ namespace sth1edwv
                 }, {
                     "Ending palette", new Game.Asset
                     {
+                        OriginalOffset = 0x2828,
+                        OriginalSize = 32,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
                         References = new List<Game.Reference>
@@ -481,6 +553,8 @@ namespace sth1edwv
                 }, {
                     "Ending 1 tilemap", new Game.Asset
                     {
+                        OriginalOffset = 0x16830,
+                        OriginalSize = 0x169A9 - 0x16830,
                         Type = Game.Asset.Types.TileMap,
                         References = new List<Game.Reference>
                         {
@@ -495,6 +569,8 @@ namespace sth1edwv
                 }, {
                     "Ending 2 tilemap", new Game.Asset
                     {
+                        OriginalOffset = 0x169A9,
+                        OriginalSize = 0x16AED - 0x169A9,
                         Type = Game.Asset.Types.TileMap,
                         References = new List<Game.Reference>
                         {
@@ -509,6 +585,8 @@ namespace sth1edwv
                 }, {
                     "Credits tilemap", new Game.Asset
                     {
+                        OriginalOffset = 0x16c61,
+                        OriginalSize = 0x16dea - 0x16c61,
                         Type = Game.Asset.Types.TileMap,
                         References = new List<Game.Reference>
                         {
@@ -523,6 +601,8 @@ namespace sth1edwv
                 }, {
                     "Credits palette", new Game.Asset
                     {
+                        OriginalOffset = 0x2ad6,
+                        OriginalSize = 32,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
                         References = new List<Game.Reference>
@@ -534,6 +614,8 @@ namespace sth1edwv
                 }, {
                     "End sign tileset", new Game.Asset
                     {
+                        OriginalOffset = 0x28294,
+                        OriginalSize = 0x28b0a - 0x28294,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -542,11 +624,14 @@ namespace sth1edwv
                             // ld a,$09    ; 005F33 3E 09 
                             new() {Offset = 0x5f2d + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x5f33 + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "End sign palette", new Game.Asset
                     {
+                        OriginalOffset = 0x626c,
+                        OriginalSize = 16,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 16, // Sprite palette only
                         References = new List<Game.Reference>
@@ -558,6 +643,8 @@ namespace sth1edwv
                 }, {
                     "Rings", new Game.Asset
                     {
+                        OriginalOffset = 0x2fcf0,
+                        OriginalSize = 768,
                         Type = Game.Asset.Types.TileSet,
                         TileGrouping = TileSet.Groupings.Ring,
                         TilesPerRow = 6,
@@ -578,6 +665,8 @@ namespace sth1edwv
                 }, {
                     "Boss sprites palette", new Game.Asset
                     {
+                        OriginalOffset = 0x731c,
+                        OriginalSize = 16,
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 16,
                         References = new List<Game.Reference>
@@ -599,6 +688,8 @@ namespace sth1edwv
                 }, {
                     "Boss sprites 1", new Game.Asset
                     {
+                        OriginalOffset = 0x2eeb1,
+                        OriginalSize = 2685,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -611,11 +702,14 @@ namespace sth1edwv
                             // ld a,$09    ; 00807A 3E 09 
                             new() {Offset = 0x8074 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x807A + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Boss sprites 2", new Game.Asset
                     {
+                        OriginalOffset = 0x3E508,
+                        OriginalSize = 0x3ef3f - 0x3E508,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -628,11 +722,14 @@ namespace sth1edwv
                             // ld a,$0c    ; 009297 3E 0C 
                             new() {Offset = 0x9291 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x9297 + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Boss sprites 3", new Game.Asset
                     {
+                        OriginalOffset = 0x3ef3f,
+                        OriginalSize = 0x3e9fd - 0x3ef3f,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -645,11 +742,14 @@ namespace sth1edwv
                             // ld a,$0c    ; 00BB9A 3E 0C 
                             new() {Offset = 0xBB94 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0xBB9A + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
                 }, {
                     "Capsule sprites", new Game.Asset
                     {
+                        OriginalOffset = 0x3da28,
+                        OriginalSize = 2784,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference>
@@ -658,20 +758,40 @@ namespace sth1edwv
                             // ld a,$0c    ; 00791C 3E 0C 
                             new() {Offset = 0x7916 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
                             new() {Offset = 0x791C + 1, Type = Game.Reference.Types.PageNumber}
-                        }
+                        },
+                        Restrictions = { CanCrossBanks = true }
                     }
-                },
-                {
+                }, {
                     "Green Hill palette", new Game.Asset // We add this just so we can use it below
                     {
+                        // We omit the offset stuff to make this not get overwritten as a regular asset
+                        // TODO make level assets join these and remove this?
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
-                        Hidden = true,
+                        Hidden = true, // So we make it not editable
                         References = new List<Game.Reference>
                         {
                             new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute}
                         }
                     }
+                }, {
+                    "Unused credits screen tilemap", new Game.Asset
+                    {
+                        OriginalOffset = 0x16AED,
+                        OriginalSize = 0x16C61 - 0x16AED,
+                        Type = Game.Asset.Types.TileMap
+                        // Unused in-game, can be removed
+                    }
+                }, {
+                    "Unused space bank 3", new Game.Asset { OriginalOffset = 0x0ffb1, OriginalSize = 0x4f, Type = Game.Asset.Types.Unused }
+                }, {
+                    "Unused space bank 5", new Game.Asset { OriginalOffset = 0x15fc4, OriginalSize = 0x3c, Type = Game.Asset.Types.Unused }
+                }, {
+                    "Unused space bank 7", new Game.Asset { OriginalOffset = 0x1FBA1, OriginalSize = 0x45f, Type = Game.Asset.Types.Unused }
+                }, {
+                    "Unused space bank 9", new Game.Asset { OriginalOffset = 0x2fff0, OriginalSize = 0x10, Type = Game.Asset.Types.Unused }
+                }, {
+                    "Unused space bank 15", new Game.Asset { OriginalOffset = 0x3FF21, OriginalSize = 0xdf, Type = Game.Asset.Types.Unused }
                 }
             },
             // These all need to match strings above. This is a bit nasty but I don't see a better way.
@@ -772,9 +892,12 @@ namespace sth1edwv
             foreach (var kvp in Sonic1MasterSystem.AssetGroups)
             {
                 var item = new ArtItem{Name = kvp.Key};
-                foreach (var asset in kvp.Value.Select(x => Sonic1MasterSystem.Assets[x]))
+                foreach (var part in kvp.Value.Select(x => new { Name = x, Asset = Sonic1MasterSystem.Assets[x]}))
                 {
+                    var asset = part.Asset;
                     var offset = asset.GetOffset(Memory);
+
+                    _logger($"- Loading {asset.Type} \"{part.Name}\" from ${offset:X}");
 
                     switch (asset.Type)
                     {
@@ -900,12 +1023,167 @@ namespace sth1edwv
             collection.Clear();
         }
 
+        private class FreeSpace
+        {
+            private class Span
+            {
+                public int Start { get; set; }
+                public int End { get; set; } // Non-inclusive so the difference is the byte count
+                public int Size => End - Start;
+            }
+
+            private readonly List<Span> _spans = new();
+
+            public void Add(int start, int end)
+            {
+                if (start == 0 || end == 0)
+                {
+                    throw new Exception("Offset is not set");
+                }
+
+                // We add it at the right position
+                var insertionIndex = 0;
+                if (_spans.Count > 0)
+                {
+                    // Insert before the next bigger
+                    insertionIndex = _spans.FindIndex(x => x.Start > start);
+                    // Or at the end if none
+                    if (insertionIndex == -1)
+                    {
+                        insertionIndex = _spans.Count;
+                    }
+                }
+                // Check for overlap
+                if (insertionIndex > 0)
+                {
+                    if (_spans[insertionIndex - 1].End > start)
+                    {
+                        throw new Exception($"Can't add free space {start:X}..{end:X} because one already exists from {_spans[insertionIndex - 1].Start}..{_spans[insertionIndex - 1].End}");
+                    }
+                }
+
+                if (insertionIndex < _spans.Count && _spans[insertionIndex].Start < end)
+                {
+                    throw new Exception($"Can't add free space from {start:X}..{end:X} because one already exists from {_spans[insertionIndex].Start}..{_spans[insertionIndex].End}");
+
+                }
+                // Then insert
+                _spans.Insert(insertionIndex, new Span { Start = start, End = end });
+            }
+
+            public void Consolidate()
+            {
+                // We join any neighbouring spans together
+                for (var i = 0; i < _spans.Count - 1; )
+                {
+                    if (_spans[i].End == _spans[i + 1].Start)
+                    {
+                        _spans[i].End = _spans[i + 1].End;
+                        _spans.RemoveAt(i+1);
+                    }
+                    else
+                    {
+                        ++i;
+                    }
+                }
+            }
+
+            public override string ToString()
+            {
+                var sb = new StringBuilder();
+
+                sb.AppendLine($"{_spans.Sum(x => x.Size)} bytes in {_spans.Count} spans: ");
+                foreach (var span in _spans)
+                {
+                    sb.AppendLine($"{span.Start:X}..{span.End:X} = {span.Size}");
+                }
+
+                return sb.ToString();
+            }
+
+            public void Remove(int offset, int size)
+            {
+                // Find the span it affects
+                var indexOfSpan = _spans.FindLastIndex(x => x.Start <= offset);
+                if (indexOfSpan == -1)
+                {
+                    throw new Exception($"No free space contains the removed part at ${offset:X}");
+                }
+
+                var span = _spans[indexOfSpan];
+
+                if (span.End < offset + size)
+                {
+                    throw new Exception($"Span from {span.Start}..{span.End} is too small for {offset}..{offset + size}");
+                }
+
+                if (span.Start == offset)
+                {
+                    if (span.End == offset + size)
+                    {
+                        // If it is a full match, remove it
+                        _spans.RemoveAt(indexOfSpan);
+                    }
+                    else
+                    {
+                        // Else chop from the start
+                        span.Start += size;
+                    }
+                }
+                else if (span.End == offset + size)
+                {
+                    // Chop from the end
+                    span.End -= size;
+                }
+                else
+                {
+                    // Else we need to split the span
+                    var newSpan = new Span { Start = offset + size, End = span.End };
+                    span.End = offset;
+                    _spans.Insert(indexOfSpan + 1, newSpan);
+                }
+            }
+
+            public int FindSpace(int size)
+            {
+                /*
+                // We look for the first possible place it can fit. This is not efficient?
+                foreach (var span in _spans)
+                {
+                    if (span.End - span.Start >= size)
+                    {
+                        return span.Start;
+                    }
+                }
+                */
+                // We try to find the smallest span that will fit the data, to minimise waste.
+                var span = _spans.Where(x => x.Size >= size)
+                    .OrderBy(x => x.Size)
+                    .FirstOrDefault();
+                if (span != null)
+                {
+                    return span.Start;
+                }
+
+                // Neither of these can do a decent job. I guess it is one of those hard problems?
+
+                // If we get here then we failed
+                throw new Exception($"Unable to find free space big enough for {size} bytes");
+            }
+
+            public bool IsBlankAbove(int offset)
+            {
+                return _spans.FindIndex(x => x.Start > offset) == -1;
+            }
+        }
+
         public byte[] MakeRom()
         {
             _logger("Building ROM...");
             var sw = Stopwatch.StartNew();
             // We clone the memory to a memory stream
-            var memory = Memory.GetStream(0, Memory.Count).ToArray();
+            var memory = new byte[512 * 1024];
+            Memory.GetStream(0, Memory.Count).ToArray().CopyTo(memory, 0);
 
             // Data we read/write and what we can repack...
             // Start    End     Description                         Repacking?
@@ -965,9 +1243,125 @@ namespace sth1edwv
             // 32fe6    3da27   Level backgrounds                   Yes, level header pointers are rewritten. Can be in range 30000..3ffff
             // 3da28    3e507   Capsule art                         (compressed) TODO
             // 3e508    3ef3e   Underwater boss art                 (compressed) TODO
-            // 3ef3f    3ff21?  Running Robotnik art                (compressed) TODO
+            // 3ef3f    3f9ec   Running Robotnik art                (compressed) TODO
+            // 3f9ed            Solidity data start?                Not planning on moving this...
 
             // We work through the data types...
+
+            int offset;
+
+            // First pack the non-level assets.
+            // TODO handle the boss sprites referenced in the levels?
+            var assetsToPack = Sonic1MasterSystem.AssetGroups.Values
+                .SelectMany(x => x)
+                .Distinct()
+                .Select(x => new
+                {
+                    Name = x, 
+                    Asset = Sonic1MasterSystem.Assets[x], 
+                    DataItem = _assetsLookup[Sonic1MasterSystem.Assets[x]],
+                    Data = _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData()
+                })
+                .Where(x => x.Asset.OriginalOffset != 0)
+                .ToList();
+            // First we build a list of "free space" from these assets
+            var freeSpace = new FreeSpace();
+            foreach (var asset in Sonic1MasterSystem.Assets.Select(x => x.Value).Where(x => x.OriginalOffset != 0))
+            {
+                freeSpace.Add(asset.OriginalOffset, asset.OriginalOffset + asset.OriginalSize);
+            }
+            freeSpace.Add(256*1024,  512*1024);
+
+            freeSpace.Consolidate();
+
+            // Then log the state
+            _logger(freeSpace.ToString());
+
+            foreach (var item in assetsToPack.Where(x => x.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute)))
+            {
+                // First we do the ones with absolute positions. There's nothing to gain by relocating them, so we just copy the data.
+                offset = item.Asset.OriginalOffset;
+                item.Data.CopyTo(memory, offset);
+                _logger($"- Wrote data for asset {item.Name} at its original location {offset:X}, length {item.Data.Count} bytes");
+                freeSpace.Remove(offset, item.Data.Count);
+            }
+
+            // Then the ones that need to be packed...
+            // TODO restrictions
+            var writtenItems = new HashSet<IDataItem>();
+            try
+            {
+                foreach (var item in assetsToPack
+                    .Where(x => x.Asset.References.All(r => r.Type != Game.Reference.Types.Absolute))
+                    .OrderByDescending(x => x.Data.Count))
+                {
+                    var size = item.Data.Count;
+                    if (writtenItems.Contains(item.DataItem))
+                    {
+                        _logger($"- Data for asset {item.Name} was already written");
+                        offset = item.DataItem.Offset;
+                    }
+                    else
+                    {
+                        offset = freeSpace.FindSpace(size);
+                        item.DataItem.Offset = offset;
+                        item.Data.CopyTo(memory, offset);
+                        _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {item.Data.Count} bytes");
+                        freeSpace.Remove(offset, item.Data.Count);
+                        _logger(freeSpace.ToString());
+
+                        writtenItems.Add(item.DataItem);
+                    }
+
+                    // Tilemaps may have two parts. If so, the foreground data comes first and the background tiles second.
+                    // We fix up the offsets and sizes we write if this is the case.
+                    if (item.DataItem is TileMap tileMap)
+                    {
+                        switch (item.Asset.Type)
+                        {
+                            case Game.Asset.Types.TileMap:
+                                offset += tileMap.ForegroundTileMapSize;
+                                size = tileMap.BackgroundTileMapSize;
+                                break;
+                            case Game.Asset.Types.ForegroundTileMap:
+                                size = tileMap.ForegroundTileMapSize;
+                                break;
+                        }
+                    }
+
+                    // Then we fix up the references
+                    foreach (var reference in item.Asset.References)
+                    {
+                        switch (reference.Type)
+                        {
+                            case Game.Reference.Types.PageNumber:
+                                var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
+                                memory[reference.Offset] = pageNumber;
+                                _logger(
+                                    $" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                                break;
+                            case Game.Reference.Types.Size:
+                                memory[reference.Offset + 0] = (byte)(size & 0xff);
+                                memory[reference.Offset + 1] = (byte)(size >> 8);
+                                _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
+                                break;
+                            case Game.Reference.Types.Slot1:
+                                var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
+                                memory[reference.Offset + 0] = (byte)(value & 0xff);
+                                memory[reference.Offset + 1] = (byte)(value >> 8);
+                                _logger(
+                                    $" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                                break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger(ex.Message);
+                _logger(freeSpace.ToString());
+            }
+
             // - Game text (at original offsets)
             // 122d..1286 inclusive
             // 197e..19ad inclusive
@@ -988,7 +1382,7 @@ namespace sth1edwv
 
             // - Floors (filling space)
             // 16dea..1ffff inclusive
-            var offset = 0x16dea;
+            offset = 0x16dea;
             foreach (var group in Levels.GroupBy(l => l.Floor))
             {
                 var floor = group.Key;
@@ -1013,9 +1407,9 @@ namespace sth1edwv
             foreach (var group in Levels.GroupBy(l => l.SpriteTileSet))
             {
                 var tileSet = group.Key;
-                if (tileSet.Offset == 0x2EEB1)
+                if (writtenItems.Contains(tileSet))
                 {
-                     // Skip boss tiles TODO fix this
+                     // Skip boss tiles
                     continue;
                 }
                 var data = tileSet.GetData();
@@ -1047,70 +1441,6 @@ namespace sth1edwv
             if (offset > 0x3da28)
             {
                 throw new Exception("Level tile sets out of space");
-            }
-
-            // Next we pack the other assets.
-            var assetsToPack = Sonic1MasterSystem.AssetGroups.Values
-                .SelectMany(x => x)
-                .Distinct()
-                .Select(x => new { Name = x, Asset = Sonic1MasterSystem.Assets[x]})
-                .ToList();
-            foreach (var item in assetsToPack)
-            {
-                var dataItem = _assetsLookup[item.Asset];
-                var data = dataItem.GetData();
-                var size = data.Count;
-                offset = dataItem.Offset;
-                if (item.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute))
-                {
-                    // First we do the ones with absolute positions. There's nothing to gain by relocating them, so we just copy the data 
-                    data.CopyTo(memory, offset);
-                    _logger($"- Wrote data for asset {item.Name} at its original location {offset:X}, length {data.Count} bytes");
-                }
-                else
-                {
-                    data.CopyTo(memory, offset);
-                    _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {data.Count} bytes");
-
-                    // Tilemaps may have two parts. If so, the foreground data comes first and the background tiles second.
-                    // We fix up the offsets and sizes we write if this is the case.
-                    if (dataItem is TileMap tileMap)
-                    {
-                        switch (item.Asset.Type)
-                        {
-                            case Game.Asset.Types.TileMap:
-                                offset += tileMap.ForegroundTileMapSize;
-                                size = tileMap.BackgroundTileMapSize;
-                                break;
-                            case Game.Asset.Types.ForegroundTileMap:
-                                size = tileMap.ForegroundTileMapSize;
-                                break;
-                        }
-                    }
-
-                    foreach (var reference in item.Asset.References)
-                    {
-                        switch (reference.Type)
-                        {
-                            case Game.Reference.Types.PageNumber:
-                                var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
-                                memory[reference.Offset] = pageNumber;
-                                _logger($" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
-                                break;
-                            case Game.Reference.Types.Size:
-                                memory[reference.Offset + 0] = (byte)(size & 0xff);
-                                memory[reference.Offset + 1] = (byte)(size >> 8);
-                                _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
-                                break;
-                            case Game.Reference.Types.Slot1:
-                                var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
-                                memory[reference.Offset + 0] = (byte)(value & 0xff);
-                                memory[reference.Offset + 1] = (byte)(value >> 8);
-                                _logger($" - Wrote slot 1 location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
-                                break;
-                        }
-                    }
-                }
             }
 
             // - Block mappings (at original offsets)

@@ -103,7 +103,7 @@ namespace sth1edwv.GameObjects
             ResetImages();
         }
 
-        public int Offset { get; }
+        public int Offset { get; set; }
         public int UsageCount { get; set; }
         public int GlobalUsageCount { get; set; }
 

@@ -221,7 +221,7 @@ namespace sth1edwv.GameObjects
             _imagePalette = null;
         }
 
-        public int Offset { get; } = -1;
+        public int Offset { get; set; } = -1;
         public IList<byte> GetData()
         {
             // We truncate each colour to its top two bits and merge...

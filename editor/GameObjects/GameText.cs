@@ -134,7 +134,8 @@ namespace sth1edwv.GameObjects
 
         private readonly HashSet<char> _allowedChars;
 
-        public int Offset { get; }
+        public int Offset { get; set; }
+
         public IList<byte> GetData()
         {
             var reverseMap = _map.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);

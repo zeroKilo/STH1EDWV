@@ -17,7 +17,8 @@ namespace sth1edwv.GameObjects
             Y = memory[offset];
         }
 
-        public int Offset { get; }
+        public int Offset { get; set; }
+
         public IList<byte> GetData()
         {
             return new List<byte> { Type, X, Y };

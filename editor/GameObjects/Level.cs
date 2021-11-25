@@ -193,7 +193,7 @@ namespace sth1edwv.GameObjects
         // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper restore MemberCanBePrivate.Global
 
-        [Category("General")] public int Offset { get; }
+        [Category("General")] public int Offset { get; set; }
 
         private readonly string _label;
         private readonly int _floorAddress;
