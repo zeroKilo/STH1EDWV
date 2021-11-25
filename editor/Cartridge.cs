@@ -158,15 +158,13 @@ namespace sth1edwv
                             new() { Offset = 0x5D7A + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5480 - 0x5180 }, // ld hl, $5480 ; 005D7A 21 80 54
                             new() { Offset = 0x5DA2 + 1, Type = Game.Reference.Types.Slot1, Delta = 0x5500 - 0x5180 }, // ld hl, $5500 ; 005DA2 21 00 55
                             new() { Offset = 0x0c1e + 1, Type = Game.Reference.Types.PageNumber } // ld a,$05 ; 000C1E 3E 05 
-                        },
-                        Restrictions = new Game.LocationRestriction { MaximumOffset = 0x7fff, CanCrossBanks = true } // Lower 32KB
+                        }
                     }
                 }, {
                     "Sonic (right)", new Game.Asset 
                     { 
                         OriginalOffset = 0x20000, 
-                        OriginalSize = 0x3000, // Actually a bit over!
-                        // Offset = 0x20000,
+                        OriginalSize = 0x3000, // The original pads it, this allows us to reclaim it
                         Type = Game.Asset.Types.SpriteTileSet, 
                         BitPlanes = 3,
                         TileGrouping = TileSet.Groupings.Sonic,
@@ -176,15 +174,18 @@ namespace sth1edwv
                         {
                             new() { Offset = 0x4c84 + 1, Type = Game.Reference.Types.Slot1 }, // ld bc,$4000 ; 004C84 01 00 40 
                             new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
-                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 } // ld a,$09 ; 000135 3E 09 
+                            new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
+                            // We put this one at the end so it won't be used for reading but will be written.
+                            // This allows us to mae sure the left-facing art pointer is in the right place while removing the padding.
+                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8}, // ld bc,$7000 ; 004C8D 01 00 70
                         },
-                        Restrictions = { CanCrossBanks = false } // We set this one to not cross banks so that the following one will start in the same bank
+                        Restrictions = { CanCrossBanks = true, MinimumOffset = 0x20000 } // This minimum cajoles the code into picking a working location. It's a hack.
                     }
                 }, {
                     "Sonic (left)", new Game.Asset 
                     { 
                         OriginalOffset = 0x23000,
-                        OriginalSize = 0x3000, // Similarly this is padded with empty space
+                        OriginalSize = 0x3000, // Similarly this is padded
                         Type = Game.Asset.Types.SpriteTileSet, 
                         BitPlanes = 3,
                         TileGrouping = TileSet.Groupings.Sonic,
@@ -192,7 +193,7 @@ namespace sth1edwv
                         TilesPerRow = 8,
                         References = new List<Game.Reference> 
                         {
-                            new() { Offset = 0x4c8e, Type = Game.Reference.Types.Slot1 }, // ld bc,$7000 ; 004C8D 01 00 70
+                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1 }, // ld bc,$7000 ; 004C8D 01 00 70
                             new() { Offset = 0x012d + 1, Type = Game.Reference.Types.PageNumber }, // ld a,$08 ; 00012D 3E 08 
                             new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 } // ld a,$09 ; 000135 3E 09 
                         },
@@ -334,7 +335,7 @@ namespace sth1edwv
                             new() {Offset = 0x0d25 + 1, Type = Game.Reference.Types.Slot1},
                             new() {Offset = 0x0d28 + 1, Type = Game.Reference.Types.Size}
                         },
-                        Restrictions = { MustFollow = "Map screen 1 tilemap 1" } // Same page as the above
+                        Restrictions = { MustFollow = "Map screen 2 tilemap 1" } // Same page as the above
                     }
                 }, {
                     "Map screen 2 palette", new Game.Asset 
@@ -376,7 +377,19 @@ namespace sth1edwv
                             // ld hl,$b92e ; 000C9F 21 2E B9 
                             // ld a,$09    ; 000CA5 3E 09 
                             new() {Offset = 0x0c9f + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
-                            new() {Offset = 0x0ca5 + 1, Type = Game.Reference.Types.PageNumber}
+                            new() {Offset = 0x0ca5 + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld hl,$b92e ; 000D01 21 2E B9 
+                            // ld a,$09    ; 000D07 3E 09 
+                            new() {Offset = 0x0D01 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x0D07 + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld hl,$b92e ; 001575 21 2E B9 
+                            // ld a,$09    ; 00157B 3E 09 
+                            new() {Offset = 0x1575 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x157B + 1, Type = Game.Reference.Types.PageNumber},
+                            // ld hl,$b92e ; 002172 21 2E B9 
+                            // ld a,$09    ; 002178 3E 09 
+                            new() {Offset = 0x2172 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000},
+                            new() {Offset = 0x2178 + 1, Type = Game.Reference.Types.PageNumber}
                         },
                         Restrictions = { CanCrossBanks = true }
                     }
@@ -1030,6 +1043,10 @@ namespace sth1edwv
                 public int Start { get; set; }
                 public int End { get; set; } // Non-inclusive so the difference is the byte count
                 public int Size => End - Start;
+                public override string ToString()
+                {
+                    return $"{Start:X}..{End:X} = {Size}";
+                }
             }
 
             private readonly List<Span> _spans = new();
@@ -1095,7 +1112,7 @@ namespace sth1edwv
                 sb.AppendLine($"{_spans.Sum(x => x.Size)} bytes in {_spans.Count} spans: ");
                 foreach (var span in _spans)
                 {
-                    sb.AppendLine($"{span.Start:X}..{span.End:X} = {span.Size}");
+                    sb.AppendLine(span.ToString());
                 }
 
                 return sb.ToString();
@@ -1144,20 +1161,35 @@ namespace sth1edwv
                 }
             }
 
-            public int FindSpace(int size)
+            public int FindSpace(int size, Game.LocationRestriction restriction)
             {
-                /*
-                // We look for the first possible place it can fit. This is not efficient?
-                foreach (var span in _spans)
+                IEnumerable<Span> possibleSpans = _spans;
+                if (restriction.MinimumOffset > 0)
                 {
-                    if (span.End - span.Start >= size)
-                    {
-                        return span.Start;
-                    }
+                    // We filter out the ones too low, and split any crossing the boundary
+                    possibleSpans = possibleSpans
+                        .Where(x => x.End > restriction.MinimumOffset)
+                        .Select(x => new Span { Start = Math.Max(restriction.MinimumOffset, x.Start), End = x.End });
                 }
-                */
+
+                if (restriction.MaximumOffset < int.MaxValue)
+                {
+                    // Same for the max
+                    possibleSpans = possibleSpans
+                        .Where(x => x.Start < restriction.MaximumOffset)
+                        .Select(x => new Span { Start = x.Start, End = Math.Min(restriction.MaximumOffset, x.End) });
+                }
+
+                if (!restriction.CanCrossBanks)
+                {
+                    // We split all the spans at bank boundaries
+                    possibleSpans = possibleSpans.SelectMany(SplitToBanks);
+                }
+
+                // MustFollow restrictions should already be handled outside this method
+
                 // We try to find the smallest span that will fit the data, to minimise waste.
-                var span = _spans.Where(x => x.Size >= size)
+                var span = possibleSpans.Where(x => x.Size >= size)
                     .OrderBy(x => x.Size)
                     .FirstOrDefault();
                 if (span != null)
@@ -1171,9 +1203,42 @@ namespace sth1edwv
                 throw new Exception($"Unable to find free space big enough for {size} bytes");
             }
 
-            public bool IsBlankAbove(int offset)
+            private IEnumerable<Span> SplitToBanks(Span source)
             {
-                return _spans.FindIndex(x => x.Start > offset) == -1;
+                var startBank = source.Start / 0x4000;
+                var endBank = (source.End - 1) / 0x4000;
+                if (startBank == endBank)
+                {
+                    // Nothing to do
+                    yield return source;
+                    yield break;
+                }
+                // Else start to split...
+                var start = source.Start;
+                for (var i = startBank; i <= endBank; ++i)
+                {
+                    var end = Math.Min(source.End, (i + 1) * 0x4000);
+                    yield return new Span { Start = start, End = end };
+                    // Use this span's end as start for next one
+                    start = end;
+                }
+            }
+        }
+
+        // This holds the useful parts about an asset we want to pack, pre-serialised so we avoid doing that more than once.
+        private class AssetToPack
+        {
+            public string Name { get; }
+            public Game.Asset Asset { get; }
+            public IDataItem DataItem { get; }
+            public IList<byte> Data { get; }
+
+            public AssetToPack(string name, Game.Asset asset, IDataItem dataItem, IList<byte> data)
+            {
+                Name = name;
+                Asset = asset;
+                DataItem = dataItem;
+                Data = data;
             }
         }
 
@@ -1251,17 +1316,10 @@ namespace sth1edwv
             int offset;
 
             // First pack the non-level assets.
-            // TODO handle the boss sprites referenced in the levels?
             var assetsToPack = Sonic1MasterSystem.AssetGroups.Values
                 .SelectMany(x => x)
                 .Distinct()
-                .Select(x => new
-                {
-                    Name = x, 
-                    Asset = Sonic1MasterSystem.Assets[x], 
-                    DataItem = _assetsLookup[Sonic1MasterSystem.Assets[x]],
-                    Data = _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData()
-                })
+                .Select(x => new AssetToPack(x, Sonic1MasterSystem.Assets[x], _assetsLookup[Sonic1MasterSystem.Assets[x]], _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData()))
                 .Where(x => x.Asset.OriginalOffset != 0)
                 .ToList();
             // First we build a list of "free space" from these assets
@@ -1270,12 +1328,17 @@ namespace sth1edwv
             {
                 freeSpace.Add(asset.OriginalOffset, asset.OriginalOffset + asset.OriginalSize);
             }
-            freeSpace.Add(256*1024,  512*1024);
+            // Expand to 512KB here
+            freeSpace.Add(256*1024, 512*1024);
 
             freeSpace.Consolidate();
 
             // Then log the state
             _logger(freeSpace.ToString());
+
+            // We avoid writing the same item twice by different routes...
+            var writtenItems = new HashSet<IDataItem>();
+            var writtenReferences = new HashSet<int>();
 
             foreach (var item in assetsToPack.Where(x => x.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute)))
             {
@@ -1284,76 +1347,27 @@ namespace sth1edwv
                 item.Data.CopyTo(memory, offset);
                 _logger($"- Wrote data for asset {item.Name} at its original location {offset:X}, length {item.Data.Count} bytes");
                 freeSpace.Remove(offset, item.Data.Count);
+                writtenItems.Add(item.DataItem);
             }
 
             // Then the ones that need to be packed...
-            // TODO restrictions
-            var writtenItems = new HashSet<IDataItem>();
             try
             {
+                // We look for the ones that "must follow" each other
+                var followers = assetsToPack
+                    .Where(x => !string.IsNullOrEmpty(x.Asset.Restrictions.MustFollow))
+                    .ToDictionary(x => x.Asset.Restrictions.MustFollow);
+                // Then we remove them from the list as we will get to them inside the loop when we get to their "leader"
+                foreach (var follower in followers.Values)
+                {
+                    assetsToPack.Remove(follower);
+                }
+
                 foreach (var item in assetsToPack
                     .Where(x => x.Asset.References.All(r => r.Type != Game.Reference.Types.Absolute))
                     .OrderByDescending(x => x.Data.Count))
                 {
-                    var size = item.Data.Count;
-                    if (writtenItems.Contains(item.DataItem))
-                    {
-                        _logger($"- Data for asset {item.Name} was already written");
-                        offset = item.DataItem.Offset;
-                    }
-                    else
-                    {
-                        offset = freeSpace.FindSpace(size);
-                        item.DataItem.Offset = offset;
-                        item.Data.CopyTo(memory, offset);
-                        _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {item.Data.Count} bytes");
-                        freeSpace.Remove(offset, item.Data.Count);
-                        _logger(freeSpace.ToString());
-
-                        writtenItems.Add(item.DataItem);
-                    }
-
-                    // Tilemaps may have two parts. If so, the foreground data comes first and the background tiles second.
-                    // We fix up the offsets and sizes we write if this is the case.
-                    if (item.DataItem is TileMap tileMap)
-                    {
-                        switch (item.Asset.Type)
-                        {
-                            case Game.Asset.Types.TileMap:
-                                offset += tileMap.ForegroundTileMapSize;
-                                size = tileMap.BackgroundTileMapSize;
-                                break;
-                            case Game.Asset.Types.ForegroundTileMap:
-                                size = tileMap.ForegroundTileMapSize;
-                                break;
-                        }
-                    }
-
-                    // Then we fix up the references
-                    foreach (var reference in item.Asset.References)
-                    {
-                        switch (reference.Type)
-                        {
-                            case Game.Reference.Types.PageNumber:
-                                var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
-                                memory[reference.Offset] = pageNumber;
-                                _logger(
-                                    $" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
-                                break;
-                            case Game.Reference.Types.Size:
-                                memory[reference.Offset + 0] = (byte)(size & 0xff);
-                                memory[reference.Offset + 1] = (byte)(size >> 8);
-                                _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
-                                break;
-                            case Game.Reference.Types.Slot1:
-                                var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
-                                memory[reference.Offset + 0] = (byte)(value & 0xff);
-                                memory[reference.Offset + 1] = (byte)(value >> 8);
-                                _logger(
-                                    $" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
-                                break;
-                        }
-                    }
+                    writeAsset(item, writtenItems, writtenReferences, freeSpace, memory, followers);
                 }
             }
             catch (Exception ex)
@@ -1409,7 +1423,7 @@ namespace sth1edwv
                 var tileSet = group.Key;
                 if (writtenItems.Contains(tileSet))
                 {
-                     // Skip boss tiles
+                    // Skip anything already covered above (at first, this means the boss sprites)
                     continue;
                 }
                 var data = tileSet.GetData();
@@ -1476,6 +1490,106 @@ namespace sth1edwv
             _logger($"Built ROM image in {sw.Elapsed}");
 
             return memory;
+        }
+
+        private void writeAsset(AssetToPack item, ISet<IDataItem> writtenItems, HashSet<int> writtenReferences, FreeSpace freeSpace, byte[] memory, Dictionary<string, AssetToPack> followers)
+        {
+            int offset;
+
+            // This is a bit of a hack. We want to ensure that we find a space big enough to fit the followers, but we'd like each item to maintain its restrictions.
+            var sizeNeeded = GetSizeNeeded(item, followers);
+            if (sizeNeeded > 0x4000)
+            {
+                item.Asset.Restrictions.CanCrossBanks = true;
+            }
+
+            if (writtenItems.Contains(item.DataItem))
+            {
+                _logger($"- Data for asset {item.Name} was already written");
+                offset = item.DataItem.Offset;
+            }
+            else
+            {
+                offset = freeSpace.FindSpace(sizeNeeded, item.Asset.Restrictions);
+                item.DataItem.Offset = offset;
+                item.Data.CopyTo(memory, offset);
+                _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {item.Data.Count} bytes");
+                freeSpace.Remove(offset, item.Data.Count);
+                _logger(freeSpace.ToString());
+
+                writtenItems.Add(item.DataItem);
+            }
+
+            var size = item.Data.Count;
+
+            // Tilemaps may have two parts. If so, the foreground data comes first and the background tiles second.
+            // We fix up the offsets and sizes we write if this is the case.
+            if (item.DataItem is TileMap tileMap)
+            {
+                switch (item.Asset.Type)
+                {
+                    case Game.Asset.Types.TileMap:
+                        offset += tileMap.ForegroundTileMapSize;
+                        size = tileMap.BackgroundTileMapSize;
+                        break;
+                    case Game.Asset.Types.ForegroundTileMap:
+                        size = tileMap.ForegroundTileMapSize;
+                        break;
+                }
+            }
+
+            // Then we fix up the references
+            foreach (var reference in item.Asset.References)
+            {
+                if (writtenReferences.Contains(reference.Offset))
+                {
+                    _logger($" - Reference at {reference.Offset:X} was already written");
+                    continue;
+                }
+
+                writtenReferences.Add(reference.Offset);
+                switch (reference.Type)
+                {
+                    case Game.Reference.Types.PageNumber:
+                        var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
+                        memory[reference.Offset] = pageNumber;
+                        _logger($" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                        break;
+                    case Game.Reference.Types.Size:
+                        memory[reference.Offset + 0] = (byte)(size & 0xff);
+                        memory[reference.Offset + 1] = (byte)(size >> 8);
+                        _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
+                        break;
+                    case Game.Reference.Types.Slot1:
+                        var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
+                        memory[reference.Offset + 0] = (byte)(value & 0xff);
+                        memory[reference.Offset + 1] = (byte)(value >> 8);
+                        _logger($" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                        break;
+                }
+            }
+
+            // If there are any followers, write them now
+            if (followers.TryGetValue(item.Name, out var follower))
+            {
+                // We modify its restrictions to require it to be exactly after this one
+                follower.Asset.Restrictions.MinimumOffset = item.DataItem.Offset + item.Data.Count;
+                follower.Asset.Restrictions.MaximumOffset = follower.Asset.Restrictions.MinimumOffset + follower.Data.Count;
+                        ;
+                writeAsset(follower, writtenItems, writtenReferences, freeSpace, memory, followers);
+            }
+        }
+
+        private int GetSizeNeeded(AssetToPack item, Dictionary<string, AssetToPack> followers)
+        {
+            var size = item.Data.Count;
+            if (followers.TryGetValue(item.Name, out var follower))
+            {
+                // Recurse into followers
+                return size + GetSizeNeeded(follower, followers);
+            }
+
+            return size;
         }
 
         public class Space
