@@ -764,7 +764,29 @@ namespace sth1edwv
                 if (ofd.ShowDialog(this) == DialogResult.OK)
                 {
                     using var image = (Bitmap)System.Drawing.Image.FromFile(ofd.FileName);
-                    artItem.TileMap.FromImage(image, artItem.TileSet);
+                    if (!artItem.TileMap.FromImage(image, artItem.TileSet))
+                    {
+                        // Didn't work, offer a tileset replacement
+                        if (MessageBox.Show(
+                            this,
+                            "Failed to load image as tiles do not match. Do you want to replace the tileset with a new one derived from the image?",
+                            "Art mismatch", 
+                            MessageBoxButtons.YesNo, 
+                            MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                            // Make the tileset
+                            var tileSet = new TileSet(image);
+                            // Try to use it
+                            if (artItem.TileMap.FromImage(image, tileSet))
+                            {
+                                // Change the art item to use it
+                                artItem.TileSet = tileSet;
+                                // TODO this doesn't work because we don't save this. The asset info references the old one.
+                                // Send it to the relevant control
+                                otherArtTileSetViewer.SetData(tileSet, artItem.Palette);
+                            }
+                        }
+                    }
                     pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
                 }
             }

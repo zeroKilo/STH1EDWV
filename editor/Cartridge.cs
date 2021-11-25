@@ -1253,62 +1253,52 @@ namespace sth1edwv
             // Data we read/write and what we can repack...
             // Start    End     Description                         Repacking?
             // -----------------------------------------------------------------------------
-            // 00f0e    00f1d   Map screen 1 art palette            TODO
-            // 00f1e    00f2d   Map screen 1 sprites palette        TODO
-            //
-            // 00f3e    00f4d   Map screen 2 sprites palette        TODO
-            //
-            // 0122d    01286   Level titles text                   Original offset/size
-            //
-            // 013e1    013f0   Title screen art palette            TODO
-            //
-            // 014fc    0150b   "Game over" art palette             TODO
-            //
-            // 0197e    019ad   Ending text                         Original offset/size
-            //
-            // 01b8d    01b9c   "Sonic has passed" art palette      TODO
-            //
-            // 02ae6    02af5   Credits sprite palette              TODO
-            //
-            // 0626c    0627b   Sign palette                        TODO
-            // 0629e    065ed   Level palettes                      Original offset/size, Sky Base extra palettes not editable
-            //
-            // 0731c    0732b   Boss/capsule palette                TODO
-            //
-            // 15180    1557f   Monitor screens                     Original offset/size (uncompressed) TODO change?
+            // 00f0e    00f1d   Map screen 1 art palette            In-place
+            // 00f1e    00f2d   Map screen 1 sprites palette        In-place
+            // 00f3e    00f4d   Map screen 2 sprites palette        In-place
+            // 0122d    01286   Level titles text                   In-place
+            // 013e1    013f0   Title screen art palette            In-place
+            // 014fc    0150b   "Game over" art palette             In-place
+            // 0197e    019ad   Ending text                         In-place
+            // 01b8d    01b9c   "Sonic has passed" art palette      In-place
+            // 02ae6    02af5   Credits sprite palette              In-place
+            // 0626c    0627b   Sign palette                        In-place
+            // 0629e    065ed   Level palettes                      In-place, not in assets list
+            // 0731c    0732b   Boss/capsule palette                In-place
+            // 15180    1557f   Monitor screens                     Auto-packed
             // 15580    155c9   Level header pointers               Untouched
-            // 155ca    15ab3   Level headers                       Yes, original offset/size 
-            // 15ab4    15fff   Object layouts (+ unused)           Original offsets/sizes TODO change?
-            // 16000    1612D   Title screen tilemap
-            // 1612E    161E8   "Sonic Has Passed" tilemap
-            // 161E9    1627D   Special Stage complete tilemap
-            // 1627E    163F5   Map screen 1 high-priority tilemap
-            // 163F6    1653A   Map screen 1 low-priority tilemap
-            // 1653B    166AA   Map screen 2 high-priority tilemap
-            // 166AB    167FD   Map screen 3 low-priority tilemap
-            // 167FE    1682F   Game Over tilemap
-            // 16830    169A8   End screen polluted tilemap
-            // 169A9    16AED   End screen clean tilemap
-            // 16AED    16c60   Unused credits screen tilemap       Can be removed for some free space
-            // 16C61    16DE9   Credits screen tilemap
-            // 16dea    1ffff   Floors (+unused)                    Yes, level header pointers are rewritten. Can be in range 14000..23fff
-            // 20000    22fff   Sonic sprites (left) (+ unused)     Original offset/size (uncompressed) TODO change?
-            // 23000    25fff   Sonic sprites (right) (+ unused)    Original offset/size (uncompressed) TODO change?
-            // 26000    2751e   Title screen art                    (compressed) TODO
-            // 2751f    28293   "Sonic has passed", "game over" art (compressed) TODO
-            // 28294    28b09   Sign sprites                        (compressed) TODO
-            // 28b0a    2926a   Title screen/credits sprites        (compressed) TODO
-            // 2926b    29941   Map screen sprites 1                (compressed) TODO
-            // 29942    2a129   Map screen sprites 2                (compressed) TODO
-            // 2a12a    2f92d   Level sprites                       Yes, level header pointers are rewritten. Can be in range 24000..33fff TODO: boss sprites are in here but with a bad palette. Could exclude?
-            // 2f92e    2fcef   HUD sprites                         (compressed) TODO
-            // 2fcf0    2ffff   Rings (+ unused)                    TODO
-            // 30000    31800   Map screen 1/ending art             TODO
-            // 31801    32fe5   Map screen 2 art                    TODO
-            // 32fe6    3da27   Level backgrounds                   Yes, level header pointers are rewritten. Can be in range 30000..3ffff
-            // 3da28    3e507   Capsule art                         (compressed) TODO
-            // 3e508    3ef3e   Underwater boss art                 (compressed) TODO
-            // 3ef3f    3f9ec   Running Robotnik art                (compressed) TODO
+            // 155ca    15ab3   Level headers                       In-place
+            // 15ab4    15fff   Object layouts (+ unused)           In-place TODO
+            // 16000    1612D   Title screen tilemap                Auto-packed
+            // 1612E    161E8   "Sonic Has Passed" tilemap          Auto-packed
+            // 161E9    1627D   Special Stage complete tilemap      Auto-packed
+            // 1627E    163F5   Map screen 1 high-priority tilemap  Auto-packed
+            // 163F6    1653A   Map screen 1 low-priority tilemap   Auto-packed
+            // 1653B    166AA   Map screen 2 high-priority tilemap  Auto-packed
+            // 166AB    167FD   Map screen 3 low-priority tilemap   Auto-packed
+            // 167FE    1682F   Game Over tilemap                   Auto-packed
+            // 16830    169A8   End screen polluted tilemap         Auto-packed
+            // 169A9    16AED   End screen clean tilemap            Auto-packed
+            // 16AED    16c60   Unused credits screen tilemap       Discarded
+            // 16C61    16DE9   Credits screen tilemap              Auto-packed
+            // 16dea    1ffff   Floors (+unused)                    In-place TODO relocate? Defaults to 14000..23fff range
+            // 20000    22fff   Sonic sprites (left) (+ unused)     Forced here
+            // 23000    25fff   Sonic sprites (right) (+ unused)    Forced here, without original padding
+            // 26000    2751e   Title screen art                    Auto-packed
+            // 2751f    28293   "Sonic has passed", "game over" art Auto-packed
+            // 28294    28b09   Sign sprites                        Auto-packed
+            // 28b0a    2926a   Title screen/credits sprites        Auto-packed
+            // 2926b    29941   Map screen sprites 1                Auto-packed
+            // 29942    2a129   Map screen sprites 2                Auto-packed
+            // 2a12a    2f92d   Level sprites                       Auto-packed boss sprites. Rest is squeezed in. TODO relocate, can be in range 24000..33fff
+            // 2f92e    2fcef   HUD sprites                         Auto-packed
+            // 2fcf0    2ffff   Rings (+ unused)                    Auto-packed
+            // 30000    31800   Map screen 1/ending art             Auto-packed
+            // 31801    32fe5   Map screen 2 art                    Auto-packed
+            // 32fe6    3da27   Level backgrounds                   Squeezed in. TODO relocate. Can be in range 30000..3ffff
+            // 3da28    3e507   Capsule art                         Auto-packed
+            // 3e508    3ef3e   Underwater boss art                 Auto-packed
+            // 3ef3f    3f9ec   Running Robotnik art                Auto-packed
             // 3f9ed            Solidity data start?                Not planning on moving this...
 
             // We work through the data types...
@@ -1367,7 +1357,7 @@ namespace sth1edwv
                     .Where(x => x.Asset.References.All(r => r.Type != Game.Reference.Types.Absolute))
                     .OrderByDescending(x => x.Data.Count))
                 {
-                    writeAsset(item, writtenItems, writtenReferences, freeSpace, memory, followers);
+                    WriteAsset(item, writtenItems, writtenReferences, freeSpace, memory, followers);
                 }
             }
             catch (Exception ex)
@@ -1385,6 +1375,7 @@ namespace sth1edwv
                 data.CopyTo(memory, gameText.Offset);
                 _logger($"- Wrote game text \"{gameText.Text}\" at offset ${gameText.Offset:X}, length {data.Count} bytes");
             }
+
             // - Level palettes (at original offsets)
             // 629e..65ed inclusive, with Sky Base lightning not covered
             foreach (var palette in Levels.SelectMany(x => new[]{x.Palette, x.CyclingPalette}).Distinct())
@@ -1492,7 +1483,7 @@ namespace sth1edwv
             return memory;
         }
 
-        private void writeAsset(AssetToPack item, ISet<IDataItem> writtenItems, HashSet<int> writtenReferences, FreeSpace freeSpace, byte[] memory, Dictionary<string, AssetToPack> followers)
+        private void WriteAsset(AssetToPack item, ISet<IDataItem> writtenItems, HashSet<int> writtenReferences, FreeSpace freeSpace, byte[] memory, Dictionary<string, AssetToPack> followers)
         {
             int offset;
 
@@ -1576,7 +1567,7 @@ namespace sth1edwv
                 follower.Asset.Restrictions.MinimumOffset = item.DataItem.Offset + item.Data.Count;
                 follower.Asset.Restrictions.MaximumOffset = follower.Asset.Restrictions.MinimumOffset + follower.Data.Count;
                         ;
-                writeAsset(follower, writtenItems, writtenReferences, freeSpace, memory, followers);
+                WriteAsset(follower, writtenItems, writtenReferences, freeSpace, memory, followers);
             }
         }
 

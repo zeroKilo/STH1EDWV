@@ -114,6 +114,61 @@ namespace sth1edwv.GameObjects
                 .ToList();
         }
 
+        public TileSet(Bitmap image)
+        {
+            if (image.Width % 8 != 0 || image.Height % 8 != 0)
+            {
+                throw new Exception($"Image is {image.Width}x{image.Height}, both dimensions must be a multiple of 8");
+            }
+            if (image.PixelFormat != PixelFormat.Format8bppIndexed)
+            {
+                throw new Exception("Image is not 8bpp");
+            }
+
+            var tiles = new List<byte[]>();
+
+            // We split the image into 8x8 tiles and build the unique set
+            var data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
+
+            // We walk over the image and get one tile at a time
+            for (var y = 0; y < image.Height; y += 8)
+            for (var x = 0; x < image.Width; x += 8)
+            {
+                // Get the tile at x, y
+                var buffer = new byte[64];
+                for (var row = 0; row < 8; ++row)
+                {
+                    Marshal.Copy(data.Scan0 + (y + row) * data.Stride + x, buffer, row*8, 8);
+                }
+                // Check if we already have it
+                if (!tiles.Any(x => x.SequenceEqual(buffer)))
+                {
+                    // No, so add it
+                    tiles.Add(buffer);
+                }
+            }
+            image.UnlockBits(data);
+
+            // We have a maximum of 255 distinct tiles
+            if (tiles.Count > 255)
+            {
+                throw new Exception($"Image has {tiles.Count} unique tiles, the limit is 255");
+            }
+
+            // And they must all be in the range 0..15
+            if (tiles.SelectMany(x => x).Any(x => x > 15))
+            {
+                throw new Exception("Image has pixels with index higher than 15");
+            }
+
+            // If we get this far then we are good to go. 
+            Offset = -1;
+            TilesPerRow = 16;
+            Compressed = false;
+            _bitPlanes = 4;
+            Tiles = tiles.Select((x, index) => new Tile(x, TileSet.Groupings.Single, index)).ToList();
+        }
+
         public int Offset { get; set; }
         public int TilesPerRow { get; }
 

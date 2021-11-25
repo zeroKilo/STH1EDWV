@@ -115,7 +115,7 @@ namespace sth1edwv.GameObjects
             return _data.Any(x => (x & 0xff) == 0xff);
         }
 
-        public void FromImage(Bitmap image, TileSet tileSet)
+        public bool FromImage(Bitmap image, TileSet tileSet)
         {
             // First check dimensions
             if (image.Width != 256 || image.Height != 192)
@@ -148,15 +148,19 @@ namespace sth1edwv.GameObjects
                 var tileIndex = tileSet.Tiles.FindIndex(x => x.Matches(buffer));
                 if (tileIndex < 0)
                 {
-                    throw new Exception($"Image does not match tileset: tile at {x}, {y} not found");
+                    image.UnlockBits(data);
+                    return false;
                 }
                 indices.Add((ushort)tileIndex);
             }
+            image.UnlockBits(data);
 
             // If we get here then all is well
             _data = indices;
             _image?.Dispose();
             _image = null;
+
+            return true;
         }
 
         public void Dispose()

@@ -36,7 +36,14 @@ namespace sth1edwv.Controls
             }
             _items = items?.ToList();
             // reset these to trigger a recompute
-            _tileWidth = _tileHeight = ItemsPerRow = 0;
+            if (FixedItemsPerRow)
+            {
+                _tileWidth = _tileHeight = 0;
+            }
+            else
+            {
+                ItemsPerRow = 0;
+            }
             CheckDrawingSettings();
             Invalidate();
         }
