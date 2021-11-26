@@ -55,9 +55,9 @@ namespace sth1edwv
 
             public class LocationRestriction
             {
-                public int MinimumOffset { get; set; } = 0;
+                public int MinimumOffset { get; set; } = int.MinValue;
                 public int MaximumOffset { get; set; } = int.MaxValue;
-                public bool CanCrossBanks { get; set; } = false;
+                public bool CanCrossBanks { get; set; }
                 public string MustFollow { get; set; }
             }
 
@@ -68,7 +68,7 @@ namespace sth1edwv
                 }
                 public Types Type { get; set; }
                 public List<Reference> References { get; set; }
-                public LocationRestriction Restrictions { get; set; } = new(); // Default to defaults...
+                public LocationRestriction Restrictions { get; } = new(); // Default to defaults...
                 public int FixedSize { get; set; }
                 public int BitPlanes { get; set; }
                 public List<Point> TileGrouping { get; set; }
@@ -848,10 +848,10 @@ namespace sth1edwv
                 new() { Name = "Sky Base Act 3", Offset = 0x15580 + 0x3c2 },
                 new() { Name = "Ending Sequence", Offset = 0x15580 + 0xb9 },
                 new() { Name = "Scrap Brain Act 2 (Emerald Maze), from corridor", Offset = 0x15580 + 0x275 },
-                new() { Name = "Scrap Brain Act 2 (Ballhog Area)", Offset = 0x15580 + 0x29a },
+                new() { Name = "Scrap Brain Act 2 (Ball Hog Area)", Offset = 0x15580 + 0x29a },
                 new() { Name = "Scrap Brain Act 2, from transporter", Offset = 0x15580 + 0x32e },
                 new() { Name = "Scrap Brain Act 2, from Emerald Maze", Offset = 0x15580 + 0x2e4 },
-                new() { Name = "Scrap Brain Act 2, from Ballhog Area", Offset = 0x15580 + 0x309 },
+                new() { Name = "Scrap Brain Act 2, from Ball Hog Area", Offset = 0x15580 + 0x309 },
                 new() { Name = "Sky Base Act 2 (Interior)", Offset = 0x15580 + 0x3e7 },
                 new() { Name = "Special Stage 1", Offset = 0x15580 + 0x40c },
                 new() { Name = "Special Stage 2", Offset = 0x15580 + 0x431 },
@@ -873,7 +873,6 @@ namespace sth1edwv
         private readonly Dictionary<int, Floor> _floors = new();
         private readonly Dictionary<int, BlockMapping> _blockMappings = new();
         private readonly Dictionary<int, Palette> _palettes = new();
-        private TileSet _rings;
         private readonly Dictionary<Game.Asset, IDataItem> _assetsLookup = new();
 
         public Cartridge(string path, Action<string> logger)
@@ -886,10 +885,11 @@ namespace sth1edwv
             ReadGameText();
             ReadAssets();
 
-            // Apply rings to level tilesets
+            // Apply rings to level tile sets
+            var rings = Art.Find(x => x.Name == "Rings").TileSet;
             foreach (var tileSet in Levels.Select(x => x.TileSet).Distinct())
             {
-                tileSet.SetRings(_rings.Tiles[0]);
+                tileSet.SetRings(rings.Tiles[0]);
             }
 
             _logger($"Load complete in {sw.Elapsed}");
@@ -897,7 +897,6 @@ namespace sth1edwv
 
         private void ReadAssets()
         {
-            _rings = new TileSet(Memory, 0x2Fcf0, 24 * 32, 4, TileSet.Groupings.Ring, 8); // TODO this
             _assetsLookup.Clear();
 
             _logger("Loading art...");
@@ -908,6 +907,8 @@ namespace sth1edwv
                 foreach (var part in kvp.Value.Select(x => new { Name = x, Asset = Sonic1MasterSystem.Assets[x]}))
                 {
                     var asset = part.Asset;
+                    item.Assets.Add(asset);
+
                     var offset = asset.GetOffset(Memory);
 
                     _logger($"- Loading {asset.Type} \"{part.Name}\" from ${offset:X}");
@@ -1188,7 +1189,7 @@ namespace sth1edwv
 
                 // MustFollow restrictions should already be handled outside this method
 
-                // We try to find the smallest span that will fit the data, to minimise waste.
+                // We try to find the smallest span that will fit the data, to minimize waste.
                 var span = possibleSpans.Where(x => x.Size >= size)
                     .OrderBy(x => x.Size)
                     .FirstOrDefault();
@@ -1225,7 +1226,7 @@ namespace sth1edwv
             }
         }
 
-        // This holds the useful parts about an asset we want to pack, pre-serialised so we avoid doing that more than once.
+        // This holds the useful parts about an asset we want to pack, pre-serialized so we avoid doing that more than once.
         private class AssetToPack
         {
             public string Name { get; }
@@ -1303,24 +1304,25 @@ namespace sth1edwv
 
             // We work through the data types...
 
-            int offset;
-
             // First pack the non-level assets.
             var assetsToPack = Sonic1MasterSystem.AssetGroups.Values
-                .SelectMany(x => x)
-                .Distinct()
-                .Select(x => new AssetToPack(x, Sonic1MasterSystem.Assets[x], _assetsLookup[Sonic1MasterSystem.Assets[x]], _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData()))
-                .Where(x => x.Asset.OriginalOffset != 0)
-                .ToList();
+                .SelectMany(x => x) // Flatten all the groups
+                .Distinct() // Remove duplicates
+                .Select(x => new AssetToPack(x, Sonic1MasterSystem.Assets[x], _assetsLookup[Sonic1MasterSystem.Assets[x]], _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData())) // Select the asset name, details and serialized data
+                .Where(x => x.Asset.OriginalOffset != 0) // Exclude any not yet configured with a source location
+                .ToList(); // Materialize to get the serialization done up front
+
             // First we build a list of "free space" from these assets
             var freeSpace = new FreeSpace();
             foreach (var asset in Sonic1MasterSystem.Assets.Select(x => x.Value).Where(x => x.OriginalOffset != 0))
             {
                 freeSpace.Add(asset.OriginalOffset, asset.OriginalOffset + asset.OriginalSize);
             }
+            
             // Expand to 512KB here
             freeSpace.Add(256*1024, 512*1024);
 
+            // We do this after adding all the free space spans
             freeSpace.Consolidate();
 
             // Then log the state
@@ -1329,6 +1331,8 @@ namespace sth1edwv
             // We avoid writing the same item twice by different routes...
             var writtenItems = new HashSet<IDataItem>();
             var writtenReferences = new HashSet<int>();
+
+            int offset;
 
             foreach (var item in assetsToPack.Where(x => x.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute)))
             {
@@ -1340,6 +1344,9 @@ namespace sth1edwv
                 writtenItems.Add(item.DataItem);
             }
 
+            // Then filter down
+            assetsToPack = assetsToPack.Where(x => !writtenItems.Contains(x.DataItem)).ToList();
+
             // Then the ones that need to be packed...
             try
             {
@@ -1347,14 +1354,12 @@ namespace sth1edwv
                 var followers = assetsToPack
                     .Where(x => !string.IsNullOrEmpty(x.Asset.Restrictions.MustFollow))
                     .ToDictionary(x => x.Asset.Restrictions.MustFollow);
-                // Then we remove them from the list as we will get to them inside the loop when we get to their "leader"
-                foreach (var follower in followers.Values)
-                {
-                    assetsToPack.Remove(follower);
-                }
 
+                // Then we remove them from the list as we will get to them inside the loop when we get to their "leader"
+                assetsToPack = assetsToPack.Except(followers.Values).ToList();
+
+                // We write the assets in decreasing size order as this helps with the packing algorithm.
                 foreach (var item in assetsToPack
-                    .Where(x => x.Asset.References.All(r => r.Type != Game.Reference.Types.Absolute))
                     .OrderByDescending(x => x.Data.Count))
                 {
                     WriteAsset(item, writtenItems, writtenReferences, freeSpace, memory, followers);
@@ -1488,6 +1493,7 @@ namespace sth1edwv
             int offset;
 
             // This is a bit of a hack. We want to ensure that we find a space big enough to fit the followers, but we'd like each item to maintain its restrictions.
+            // Instead of doing that, we just flip this flag if needed.
             var sizeNeeded = GetSizeNeeded(item, followers);
             if (sizeNeeded > 0x4000)
             {
@@ -1566,12 +1572,11 @@ namespace sth1edwv
                 // We modify its restrictions to require it to be exactly after this one
                 follower.Asset.Restrictions.MinimumOffset = item.DataItem.Offset + item.Data.Count;
                 follower.Asset.Restrictions.MaximumOffset = follower.Asset.Restrictions.MinimumOffset + follower.Data.Count;
-                        ;
                 WriteAsset(follower, writtenItems, writtenReferences, freeSpace, memory, followers);
             }
         }
 
-        private int GetSizeNeeded(AssetToPack item, Dictionary<string, AssetToPack> followers)
+        private static int GetSizeNeeded(AssetToPack item, Dictionary<string, AssetToPack> followers)
         {
             var size = item.Data.Count;
             if (followers.TryGetValue(item.Name, out var follower))
@@ -1608,5 +1613,14 @@ namespace sth1edwv
                 Total = 0x2EEB1 - 0x2a12a,
                 Used = Levels.Select(x => x.SpriteTileSet).Distinct().Where(x => x.Offset != 0x2EEB1).Sum(x => x.GetData().Count)
             };
+
+        public void ChangeTileSet(ArtItem item, TileSet value)
+        {
+            // We want to replace the object only in the context of this art item.
+            item.TileSet = value;
+            // The tricky part is this lookup...
+            var asset = item.Assets.Find(x => x.Type == Game.Asset.Types.TileSet);
+            _assetsLookup[asset] = value;
+        }
     }
 }

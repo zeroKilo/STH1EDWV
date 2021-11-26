@@ -775,13 +775,12 @@ namespace sth1edwv
                             MessageBoxIcon.Question) == DialogResult.Yes)
                         {
                             // Make the tileset
-                            var tileSet = new TileSet(image);
+                            var tileSet = new TileSet(image, artItem.TileSet);
                             // Try to use it
                             if (artItem.TileMap.FromImage(image, tileSet))
                             {
                                 // Change the art item to use it
-                                artItem.TileSet = tileSet;
-                                // TODO this doesn't work because we don't save this. The asset info references the old one.
+                                _cartridge.ChangeTileSet(artItem, tileSet);
                                 // Send it to the relevant control
                                 otherArtTileSetViewer.SetData(tileSet, artItem.Palette);
                             }

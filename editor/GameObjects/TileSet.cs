@@ -114,7 +114,7 @@ namespace sth1edwv.GameObjects
                 .ToList();
         }
 
-        public TileSet(Bitmap image)
+        public TileSet(Bitmap image, TileSet baseTileSet)
         {
             if (image.Width % 8 != 0 || image.Height % 8 != 0)
             {
@@ -164,8 +164,9 @@ namespace sth1edwv.GameObjects
             // If we get this far then we are good to go. 
             Offset = -1;
             TilesPerRow = 16;
-            Compressed = false;
-            _bitPlanes = 4;
+            // We copy these from the base to ensure we match formats on serialization.
+            Compressed = baseTileSet.Compressed;
+            _bitPlanes = baseTileSet._bitPlanes;
             Tiles = tiles.Select((x, index) => new Tile(x, TileSet.Groupings.Single, index)).ToList();
         }
 
