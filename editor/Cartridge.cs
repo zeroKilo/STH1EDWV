@@ -1420,6 +1420,7 @@ namespace sth1edwv
                 if (writtenItems.Contains(tileSet))
                 {
                     // Skip anything already covered above (at first, this means the boss sprites)
+                    _logger($"- Sprite tileset for level(s) {string.Join(", ", group)} was already written");
                     continue;
                 }
                 var data = tileSet.GetData();
@@ -1607,12 +1608,16 @@ namespace sth1edwv
                 Total = 0x3da28 - 0x32FE6,
                 Used = Levels.Select(x => x.TileSet).Distinct().Sum(x => x.GetData().Count)
             };
-        public Space GetSpriteTileSetSpace() =>
-            new()
+        public Space GetSpriteTileSetSpace()
+        {
+            var artAssets = new HashSet<TileSet>(Art.SelectMany(x => x.SpriteTileSets));
+
+            return new()
             {
                 Total = 0x2EEB1 - 0x2a12a,
-                Used = Levels.Select(x => x.SpriteTileSet).Distinct().Where(x => x.Offset != 0x2EEB1).Sum(x => x.GetData().Count)
+                Used = Levels.Select(x => x.SpriteTileSet).Distinct().Except(artAssets).Sum(x => x.GetData().Count)
             };
+        }
 
         public void ChangeTileSet(ArtItem item, TileSet value)
         {
