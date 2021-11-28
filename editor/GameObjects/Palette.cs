@@ -150,7 +150,7 @@ namespace sth1edwv.GameObjects
 
             for (var i = 0; i < _colors.Count; ++i)
             {
-                var match = Regex.Match(lines[i + 3], "(?<R>\\d+) (?<G>\\d+) (?<G>\\d+)");
+                var match = Regex.Match(lines[i + 3], "(?<R>\\d+) (?<G>\\d+) (?<B>\\d+)");
                 if (!match.Success)
                 {
                     throw new Exception($"Failed to parse line: {lines[i + 3]}");
