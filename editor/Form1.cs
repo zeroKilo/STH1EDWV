@@ -647,6 +647,7 @@ namespace sth1edwv
 
             if (artItem.TileMap != null)
             {
+                pictureBoxArtLayout.Image?.Dispose();
                 pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
                 tabControlArt.TabPages.Add(tabPageArtLayout);
             }
@@ -794,6 +795,7 @@ namespace sth1edwv
                             }
                         }
                     }
+                    pictureBoxArtLayout.Image?.Dispose();
                     pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
                 }
             }

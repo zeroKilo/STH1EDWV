@@ -530,10 +530,11 @@ namespace sth1edwv
                             // ld a,$05    ; 00158B 3E 05 // Shared with Act Complete tilemap
                             // ld hl,$61e9 ; 0015A3 21 E9 61 
                             // ld bc,$0095 ; 0015A6 01 95 00 
-                            new() {Offset = 0x1588 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x158B + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x15A3 + 1, Type = Game.Reference.Types.Slot1},
                             new() {Offset = 0x15A6 + 1, Type = Game.Reference.Types.Size}
-                        }
+                        },
+                        Restrictions = { MustFollow = "Act Complete tilemap" }
                     }
                 }, {
                     "Act Complete palette", new Game.Asset 
@@ -1608,16 +1609,15 @@ namespace sth1edwv
                 Total = 0x3da28 - 0x32FE6,
                 Used = Levels.Select(x => x.TileSet).Distinct().Sum(x => x.GetData().Count)
             };
-        public Space GetSpriteTileSetSpace()
-        {
-            var artAssets = new HashSet<TileSet>(Art.SelectMany(x => x.SpriteTileSets));
-
-            return new()
+        public Space GetSpriteTileSetSpace() =>
+            new()
             {
                 Total = 0x2EEB1 - 0x2a12a,
-                Used = Levels.Select(x => x.SpriteTileSet).Distinct().Except(artAssets).Sum(x => x.GetData().Count)
+                Used = Levels.Select(x => x.SpriteTileSet)
+                    .Distinct()
+                    .Except(Art.SelectMany(x => x.SpriteTileSets))
+                    .Sum(x => x.GetData().Count)
             };
-        }
 
         public void ChangeTileSet(ArtItem item, TileSet value)
         {
