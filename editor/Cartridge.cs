@@ -514,7 +514,7 @@ namespace sth1edwv
                             // ld a,$05    ; 00158B 3E 05 
                             // ld hl,$612e ; 001593 21 2E 61 
                             // ld bc,$00bb ; 001596 01 BB 00 
-                            new() {Offset = 0x1588 + 1, Type = Game.Reference.Types.PageNumber},
+                            new() {Offset = 0x158B + 1, Type = Game.Reference.Types.PageNumber},
                             new() {Offset = 0x1593 + 1, Type = Game.Reference.Types.Slot1},
                             new() {Offset = 0x1596 + 1, Type = Game.Reference.Types.Size}
                         }
