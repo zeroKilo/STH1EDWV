@@ -10,14 +10,16 @@ Currently editable:
 - Level flags
 - Level blocks (32x32 blocks making up the levels)
 - Level names
+- Static screens
+- Palettes
+- Tile sets
+- Sprites
 
 Still to come (in no particular order):
 
 - Lots more UI improvements to make editing easier
-- Fully removing size restrictions (currently sticking to the original game's data arenas)
+- Fully removing size restrictions (currently sticking to the original game's data arenas for some parts)
 - Music/SFX editing/replacement
-- Palette editing (base palette and cycles)
-- Static screen editing
 - Adding a level select, sound test, game saves?
 - Ability to add any number of levels, tilesets, etc
 - Sonic 1 GG support
