@@ -11,7 +11,7 @@ namespace sth1edwv.GameObjects
     public class TileSet: IDataItem, IDisposable
     {
         private readonly int _bitPlanes;
-        public bool Compressed { get; }
+        private bool Compressed { get; }
         public List<Tile> Tiles { get; }
 
         public static class Groupings

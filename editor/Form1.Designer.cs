@@ -933,6 +933,7 @@ namespace sth1edwv
             this.otherArtTileSetViewer.Size = new System.Drawing.Size(1038, 499);
             this.otherArtTileSetViewer.TabIndex = 0;
             this.otherArtTileSetViewer.TilesPerRow = 4;
+            this.otherArtTileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.otherArtTileSetViewer_Changed);
             // 
             // tabPageArtPalette
             // 

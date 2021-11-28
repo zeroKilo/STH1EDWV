@@ -764,12 +764,16 @@ namespace sth1edwv
                 if (ofd.ShowDialog(this) == DialogResult.OK)
                 {
                     using var image = (Bitmap)System.Drawing.Image.FromFile(ofd.FileName);
-                    if (!artItem.TileMap.FromImage(image, artItem.TileSet))
+                    try
+                    {
+                        artItem.TileMap.FromImage(image, artItem.TileSet);
+                    }
+                    catch (Exception ex)
                     {
                         // Didn't work, offer a tileset replacement
                         if (MessageBox.Show(
                             this,
-                            "Failed to load image as tiles do not match. Do you want to replace the tileset with a new one derived from the image?",
+                            $"Failed to load image: {ex.Message}. Do you want to try again, replacing the tiles?",
                             "Art mismatch", 
                             MessageBoxButtons.YesNo, 
                             MessageBoxIcon.Question) == DialogResult.Yes)
@@ -777,12 +781,16 @@ namespace sth1edwv
                             // Make the tileset
                             var tileSet = new TileSet(image, artItem.TileSet);
                             // Try to use it
-                            if (artItem.TileMap.FromImage(image, tileSet))
+                            try
                             {
                                 // Change the art item to use it
                                 _cartridge.ChangeTileSet(artItem, tileSet);
                                 // Send it to the relevant control
                                 otherArtTileSetViewer.SetData(tileSet, artItem.Palette);
+                            }
+                            catch (Exception exception)
+                            {
+                                MessageBox.Show(this, $"Failed: {exception.Message}");
                             }
                         }
                     }
@@ -792,6 +800,20 @@ namespace sth1edwv
             catch (Exception ex)
             {
                 MessageBox.Show(this, ex.Message);
+            }
+        }
+
+        private void otherArtTileSetViewer_Changed(TileSet obj)
+        {
+            if (listBoxArt.SelectedItem is not ArtItem artItem)
+            {
+                return;
+            }
+
+            if (artItem.TileMap != null)
+            {
+                pictureBoxArtLayout.Image?.Dispose();
+                pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
             }
         }
     }

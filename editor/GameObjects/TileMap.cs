@@ -10,7 +10,6 @@ namespace sth1edwv.GameObjects
     public class TileMap: IDataItem, IDisposable
     {
         private List<ushort> _data;
-        private Bitmap _image;
 
         public TileMap(Memory memory, int offset, int size)
         {
@@ -41,14 +40,10 @@ namespace sth1edwv.GameObjects
 
         public Bitmap GetImage(TileSet tileSet, Palette palette)
         {
-            if (_image != null)
-            {
-                return _image;
-            }
             // We work in 8bpp again...
-            _image = new Bitmap(256, 192, PixelFormat.Format8bppIndexed);
-            _image.Palette = palette.ImagePalette;
-            var data = _image.LockBits(new Rectangle(0, 0, _image.Width, _image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
+            var image = new Bitmap(256, 192, PixelFormat.Format8bppIndexed);
+            image.Palette = palette.ImagePalette;
+            var data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
             for (var i = 0; i < _data.Count; ++i)
             {
                 var x = i % 32 * 8;
@@ -83,8 +78,8 @@ namespace sth1edwv.GameObjects
                     sourceImage.UnlockBits(sourceData);
                 }
             }
-            _image.UnlockBits(data); 
-            return _image;
+            image.UnlockBits(data); 
+            return image; // Caller must dispose
         }
 
 
@@ -115,7 +110,7 @@ namespace sth1edwv.GameObjects
             return _data.Any(x => (x & 0xff) == 0xff);
         }
 
-        public bool FromImage(Bitmap image, TileSet tileSet)
+        public void FromImage(Bitmap image, TileSet tileSet)
         {
             // First check dimensions
             if (image.Width != 256 || image.Height != 192)
@@ -130,42 +125,43 @@ namespace sth1edwv.GameObjects
 
             // Next we need to get the data into tiles...
             var data = image.LockBits(new Rectangle(0, 0, 256, 192), ImageLockMode.ReadOnly, PixelFormat.Format8bppIndexed);
-            var indices = new List<ushort>();
-            for (var y = 0; y < 192; y += 8)
-            for (var x = 0; x < 256; x += 8)
+            try
             {
-                var buffer = new byte[8 * 8];
-
-                for (var row = 0; row < 8; ++row)
+                var indices = new List<ushort>();
+                for (var y = 0; y < 192; y += 8)
+                for (var x = 0; x < 256; x += 8)
                 {
-                    Marshal.Copy(
-                        data.Scan0 + (y + row) * data.Stride + x,
-                        buffer,
-                        row * 8,
-                        8);
+                    var buffer = new byte[8 * 8];
+
+                    for (var row = 0; row < 8; ++row)
+                    {
+                        Marshal.Copy(
+                            data.Scan0 + (y + row) * data.Stride + x,
+                            buffer,
+                            row * 8,
+                            8);
+                    }
+
+                    var tileIndex = tileSet.Tiles.FindIndex(x => x.Matches(buffer));
+                    if (tileIndex < 0)
+                    {
+                        throw new Exception($"Tile mismatch: tile in source image at ({x}, {y}) not found in tiles");
+                    }
+
+                    indices.Add((ushort)tileIndex);
                 }
 
-                var tileIndex = tileSet.Tiles.FindIndex(x => x.Matches(buffer));
-                if (tileIndex < 0)
-                {
-                    image.UnlockBits(data);
-                    return false;
-                }
-                indices.Add((ushort)tileIndex);
+                // If we get here then all is well
+                _data = indices;
             }
-            image.UnlockBits(data);
-
-            // If we get here then all is well
-            _data = indices;
-            _image?.Dispose();
-            _image = null;
-
-            return true;
+            finally
+            {
+                image.UnlockBits(data);
+            }
         }
 
         public void Dispose()
         {
-            _image?.Dispose();
         }
     }
 }
