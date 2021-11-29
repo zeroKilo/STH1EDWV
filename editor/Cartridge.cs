@@ -43,7 +43,8 @@ namespace sth1edwv
                     Absolute,
                     Slot1,
                     PageNumber,
-                    Size
+                    Size,
+                    Size8
                 }
                 public Types Type { get; set; }
                 public int Delta { get; set; }
@@ -55,17 +56,20 @@ namespace sth1edwv
 
             public class LocationRestriction
             {
-                public int MinimumOffset { get; set; } = int.MinValue;
-                public int MaximumOffset { get; set; } = int.MaxValue;
+                public int MinimumOffset { get; set; } = 0;
+                public int MaximumOffset { get; set; } = 1024*1024;
                 public bool CanCrossBanks { get; set; }
                 public string MustFollow { get; set; }
             }
 
             public class Asset
             {
-                public enum Types { TileSet, Palette, TileMap, SpriteTileSet, ForegroundTileMap,
-                    Unused
+                public override string ToString()
+                {
+                    return $"{Type} from {OriginalOffset:X} ({OriginalSize}B)";
                 }
+
+                public enum Types { TileSet, Palette, TileMap, SpriteTileSet, ForegroundTileMap, Unused}
                 public Types Type { get; set; }
                 public List<Reference> References { get; set; }
                 public LocationRestriction Restrictions { get; } = new(); // Default to defaults...
@@ -101,12 +105,11 @@ namespace sth1edwv
 
                     var offset = memory.Word(pagedReference.Offset) - pagedReference.Delta;
                     var page = memory[pageNumberReference.Offset] - pageNumberReference.Delta;
-                    switch (pagedReference.Type)
+                    if (pagedReference.Type == Reference.Types.Slot1)
                     {
-                        case Reference.Types.Slot1:
-                            page -= 1;
-                            break;
+                        page -= 1;
                     }
+
                     return page * 0x4000 + offset;
                 }
 
@@ -776,19 +779,6 @@ namespace sth1edwv
                         Restrictions = { CanCrossBanks = true }
                     }
                 }, {
-                    "Green Hill palette", new Game.Asset // We add this just so we can use it below
-                    {
-                        // We omit the offset stuff to make this not get overwritten as a regular asset
-                        // TODO make level assets join these and remove this?
-                        Type = Game.Asset.Types.Palette,
-                        FixedSize = 32,
-                        Hidden = true, // So we make it not editable
-                        References = new List<Game.Reference>
-                        {
-                            new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute}
-                        }
-                    }
-                }, {
                     "Unused credits screen tilemap", new Game.Asset
                     {
                         OriginalOffset = 0x16AED,
@@ -806,6 +796,33 @@ namespace sth1edwv
                     "Unused space bank 9", new Game.Asset { OriginalOffset = 0x2fff0, OriginalSize = 0x10, Type = Game.Asset.Types.Unused }
                 }, {
                     "Unused space bank 15", new Game.Asset { OriginalOffset = 0x3FF21, OriginalSize = 0xdf, Type = Game.Asset.Types.Unused }
+                }, {
+                    "Green Hill palette", new Game.Asset // We add this just so we can use it below
+                    {
+                        // We omit the offset stuff to make this not get overwritten as a regular asset
+                        // TODO make level assets join these and remove this?
+                        // OriginalOffset = 0x629e,
+                        // OriginalSize = 32,
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        Hidden = true, // We make it not editable
+                        References = new List<Game.Reference>
+                        {
+                            new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute}
+                        }
+                    }
+                }, {
+                    "Green Hill cycling palette", new Game.Asset
+                    {
+                        Type = Game.Asset.Types.Palette,
+                        // OriginalOffset = 0x62be,
+                        // OriginalSize = 48,
+                        References = new List<Game.Reference>
+                        {
+                            new() { Offset = 0x628c, Type = Game.Reference.Types.Absolute},
+                            new() { Offset = 0x155CA + 28, Type = Game.Reference.Types.Size8}
+                        }
+                    }
                 }
             },
             // These all need to match strings above. This is a bit nasty but I don't see a better way.
@@ -1077,13 +1094,13 @@ namespace sth1edwv
                 {
                     if (_spans[insertionIndex - 1].End > start)
                     {
-                        throw new Exception($"Can't add free space {start:X}..{end:X} because one already exists from {_spans[insertionIndex - 1].Start}..{_spans[insertionIndex - 1].End}");
+                        throw new Exception($"Can't add free space {start:X}..{end:X} because one already exists from {_spans[insertionIndex - 1].Start:X}..{_spans[insertionIndex - 1].End:X}");
                     }
                 }
 
                 if (insertionIndex < _spans.Count && _spans[insertionIndex].Start < end)
                 {
-                    throw new Exception($"Can't add free space from {start:X}..{end:X} because one already exists from {_spans[insertionIndex].Start}..{_spans[insertionIndex].End}");
+                    throw new Exception($"Can't add free space from {start:X}..{end:X} because one already exists from {_spans[insertionIndex].Start:X}..{_spans[insertionIndex].End:X}");
 
                 }
                 // Then insert
@@ -1225,6 +1242,15 @@ namespace sth1edwv
                     start = end;
                 }
             }
+
+            public int GetEaseOfPlacing(int size, int minOffset, int maxOffset)
+            {
+                // We return the amount of free space we might fit it in
+                return _spans
+                    .Select(x => new Span { Start = Math.Max(minOffset, x.Start), End = Math.Min(maxOffset, x.End) }) // Trim to fit
+                    .Where(x => x.Size >= size) // Big enough
+                    .Sum(x => x.Size - size); // Count of "slack" bytes
+            }
         }
 
         // This holds the useful parts about an asset we want to pack, pre-serialized so we avoid doing that more than once.
@@ -1241,6 +1267,11 @@ namespace sth1edwv
                 Asset = asset;
                 DataItem = dataItem;
                 Data = data;
+            }
+
+            public override string ToString()
+            {
+                return $"{Name}: {Asset}";
             }
         }
 
@@ -1305,17 +1336,44 @@ namespace sth1edwv
 
             // We work through the data types...
 
-            // First pack the non-level assets.
-            var assetsToPack = Sonic1MasterSystem.AssetGroups.Values
-                .SelectMany(x => x) // Flatten all the groups
-                .Distinct() // Remove duplicates
-                .Select(x => new AssetToPack(x, Sonic1MasterSystem.Assets[x], _assetsLookup[Sonic1MasterSystem.Assets[x]], _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData())) // Select the asset name, details and serialized data
-                .Where(x => x.Asset.OriginalOffset != 0) // Exclude any not yet configured with a source location
-                .ToList(); // Materialize to get the serialization done up front
+            // We start from the asset groups here so we don't pick up any unused or blank parts
+            var assetsToPack = new HashSet<AssetToPack>(
+                Sonic1MasterSystem.AssetGroups.Values
+                    .SelectMany(x => x) // Flatten all the groups
+                    .Distinct() // Remove duplicates
+                    .Select(x => new AssetToPack(x, Sonic1MasterSystem.Assets[x], _assetsLookup[Sonic1MasterSystem.Assets[x]], _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData())) // Select the asset name, details and serialized data
+                    .Where(x => x.Asset.OriginalOffset != 0)); // Exclude any not yet configured with a source location
 
-            // First we build a list of "free space" from these assets
+            // Add in the level assets... we want to de-dupe these
+            // Palettes (excluding Sky Base lightning)
+            // TODO do I want to add these to the AssetGroups instead?
+            foreach (var group in Levels.GroupBy(x => x.Palette))
+            {
+                assetsToPack.Add(new AssetToPack($"{group.First()} palette", new Game.Asset
+                {
+                    Type = Game.Asset.Types.Palette,
+                    OriginalOffset = group.Key.Offset,
+                    OriginalSize = 32,
+                    Restrictions = { MaximumOffset = 0x7fff },
+                    References = new List<Game.Reference>{new(){Type = Game.Reference.Types.Absolute, Offset = 0}} // Tricks it into using original offsets
+                }, group.Key, group.Key.GetData()));
+            }
+            foreach (var group in Levels.GroupBy(x => x.CyclingPalette))
+            {
+                var data = @group.Key.GetData();
+                assetsToPack.Add(new AssetToPack($"{group.First()} cycling palette", new Game.Asset
+                {
+                    Type = Game.Asset.Types.Palette,
+                    OriginalOffset = group.Key.Offset,
+                    OriginalSize = data.Count,
+                    Restrictions = { MaximumOffset = 0x7fff },
+                    References = new List<Game.Reference>{new(){Type = Game.Reference.Types.Absolute, Offset = 0}} // Tricks it into using original offsets
+                }, group.Key, data));
+            }
+
+            // First we build a list of "free space". We include all the "assets" so we will overwrite unused space. Missing "original" data makes us ignore it.
             var freeSpace = new FreeSpace();
-            foreach (var asset in Sonic1MasterSystem.Assets.Select(x => x.Value).Where(x => x.OriginalOffset != 0))
+            foreach (var asset in Sonic1MasterSystem.Assets.Values.Where(x => x.OriginalOffset != 0).Union(assetsToPack.Select(x => x.Asset)))
             {
                 freeSpace.Add(asset.OriginalOffset, asset.OriginalOffset + asset.OriginalSize);
             }
@@ -1335,35 +1393,41 @@ namespace sth1edwv
 
             int offset;
 
-            foreach (var item in assetsToPack.Where(x => x.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute)))
+            // First we do the ones with absolute positions. There's generally nothing to gain by relocating them, so we just copy the data.
+            foreach (var item in assetsToPack.Where(x =>
+                             x.Asset.References != null &&
+                             x.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute))
+                         .ToList())
             {
-                // First we do the ones with absolute positions. There's nothing to gain by relocating them, so we just copy the data.
                 offset = item.Asset.OriginalOffset;
                 item.Data.CopyTo(memory, offset);
                 _logger($"- Wrote data for asset {item.Name} at its original location {offset:X}, length {item.Data.Count} bytes");
                 freeSpace.Remove(offset, item.Data.Count);
                 writtenItems.Add(item.DataItem);
+                assetsToPack.Remove(item);
             }
 
-            // Then filter down
-            assetsToPack = assetsToPack.Where(x => !writtenItems.Contains(x.DataItem)).ToList();
-
-            // Then the ones that need to be packed...
+            // Then the ones that need to be packed... with constrained ones first
             try
             {
-                // We look for the ones that "must follow" each other
+                // We look for the ones that "must follow" each other and combine them together
                 var followers = assetsToPack
                     .Where(x => !string.IsNullOrEmpty(x.Asset.Restrictions.MustFollow))
                     .ToDictionary(x => x.Asset.Restrictions.MustFollow);
 
-                // Then we remove them from the list as we will get to them inside the loop when we get to their "leader"
-                assetsToPack = assetsToPack.Except(followers.Values).ToList();
+                // Then we remove them from the list as we will get to them inside the loop when we get to their "precedent"
+                assetsToPack.ExceptWith(followers.Values);
 
-                // We write the assets in decreasing size order as this helps with the packing algorithm.
-                foreach (var item in assetsToPack
-                    .OrderByDescending(x => x.Data.Count))
+                // We write the assets ordered by urgency (in the restricted space) and then by size
+                while (assetsToPack.Count > 0)
                 {
+                    // We continuously re-order as the "urgency" changes over time
+                    var item = assetsToPack
+                        .OrderBy(x => freeSpace.GetEaseOfPlacing(x.Data.Count, x.Asset.Restrictions.MinimumOffset, x.Asset.Restrictions.MaximumOffset))
+                        .ThenByDescending(x => x.Data.Count)
+                        .First();
                     WriteAsset(item, writtenItems, writtenReferences, freeSpace, memory, followers);
+                    assetsToPack.Remove(item);
                 }
             }
             catch (Exception ex)
@@ -1382,6 +1446,7 @@ namespace sth1edwv
                 _logger($"- Wrote game text \"{gameText.Text}\" at offset ${gameText.Offset:X}, length {data.Count} bytes");
             }
 
+            /*
             // - Level palettes (at original offsets)
             // 629e..65ed inclusive, with Sky Base lightning not covered
             foreach (var palette in Levels.SelectMany(x => new[]{x.Palette, x.CyclingPalette}).Distinct())
@@ -1390,6 +1455,7 @@ namespace sth1edwv
                 data.CopyTo(memory, palette.Offset);
                 _logger($"- Wrote palette at offset ${palette.Offset:X}, length {data.Count} bytes");
             }
+            */
 
             // - Floors (filling space)
             // 16dea..1ffff inclusive
@@ -1538,33 +1604,46 @@ namespace sth1edwv
             }
 
             // Then we fix up the references
-            foreach (var reference in item.Asset.References)
+            if (item.Asset.References != null)
             {
-                if (writtenReferences.Contains(reference.Offset))
+                foreach (var reference in item.Asset.References)
                 {
-                    _logger($" - Reference at {reference.Offset:X} was already written");
-                    continue;
-                }
+                    if (writtenReferences.Contains(reference.Offset))
+                    {
+                        _logger($" - Reference at {reference.Offset:X} was already written");
+                        continue;
+                    }
 
-                writtenReferences.Add(reference.Offset);
-                switch (reference.Type)
-                {
-                    case Game.Reference.Types.PageNumber:
-                        var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
-                        memory[reference.Offset] = pageNumber;
-                        _logger($" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
-                        break;
-                    case Game.Reference.Types.Size:
-                        memory[reference.Offset + 0] = (byte)(size & 0xff);
-                        memory[reference.Offset + 1] = (byte)(size >> 8);
-                        _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
-                        break;
-                    case Game.Reference.Types.Slot1:
-                        var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
-                        memory[reference.Offset + 0] = (byte)(value & 0xff);
-                        memory[reference.Offset + 1] = (byte)(value >> 8);
-                        _logger($" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
-                        break;
+                    writtenReferences.Add(reference.Offset);
+                    switch (reference.Type)
+                    {
+                        case Game.Reference.Types.PageNumber:
+                            var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
+                            memory[reference.Offset] = pageNumber;
+                            _logger(
+                                $" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                            break;
+                        case Game.Reference.Types.Size:
+                            memory[reference.Offset + 0] = (byte)(size & 0xff);
+                            memory[reference.Offset + 1] = (byte)(size >> 8);
+                            _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
+                            break;
+                        case Game.Reference.Types.Size8:
+                            if (size > 255)
+                            {
+                                throw new Exception($"Cannot write size {size} because it exceeds 8 bits");
+                            }
+                            memory[reference.Offset] = (byte)(size & 0xff);
+                            _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
+                            break;
+                        case Game.Reference.Types.Slot1:
+                            var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
+                            memory[reference.Offset + 0] = (byte)(value & 0xff);
+                            memory[reference.Offset + 1] = (byte)(value >> 8);
+                            _logger(
+                                $" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                            break;
+                    }
                 }
             }
 

@@ -169,9 +169,9 @@ namespace sth1edwv.GameObjects
                 }
 
                 _colors[i] = Color.FromArgb(GetIndex("R"), GetIndex("G"), GetIndex("B"));
-                // Reset the image palette
-                _imagePalette = null;
             }
+            // Reset the image palette
+            _imagePalette = null;
         }
 
         public void LoadFromImage(string fileName)
