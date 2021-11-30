@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtItem.cs" />
+    <Compile Include="FreeSpace.cs" />
     <Compile Include="GameObjects\IDrawableBlock.cs" />
     <Compile Include="Controls\PaletteEditor.cs">
       <SubType>UserControl</SubType>
