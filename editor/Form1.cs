@@ -611,9 +611,9 @@ namespace sth1edwv
                 using var editor = new ObjectEditor(levelObject);
                 if (editor.ShowDialog(this) == DialogResult.OK)
                 {
-                    levelObject.X = Convert.ToByte(editor.textBoxX.Text);
-                    levelObject.Y = Convert.ToByte(editor.textBoxY.Text);
-                    levelObject.Type = Convert.ToByte(editor.textBoxType.Text);
+                    levelObject.X = editor.X;
+                    levelObject.Y = editor.Y;
+                    levelObject.Type = editor.Type;
 
                     // Refresh the level data
                     LoadLevelData();

@@ -156,9 +156,9 @@ namespace sth1edwv.Controls
                     DrawObject(
                         levelObject.X, 
                         levelObject.Y,
-                        LevelObject.Names.TryGetValue(levelObject.Type, out var name)
-                            ? name
-                            : levelObject.Type.ToString("X2"));
+                        LevelObject.NamesById.TryGetValue(levelObject.Type, out var obj)
+                            ? obj.Name
+                            : levelObject.Type.ToString("$X2"));
                 }
 
                 DrawObject(_level.StartX, _level.StartY, "Sonic");

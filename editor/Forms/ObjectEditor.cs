@@ -13,8 +13,8 @@ namespace sth1edwv.Forms
             InitializeComponent();
             Font = SystemFonts.MessageBoxFont;
 
-            comboBoxNames.Items.AddRange(LevelObject.Names.Values.ToArray<object>());
-            if (LevelObject.Names.TryGetValue(levelObject.Type, out var name))
+            comboBoxNames.Items.AddRange(LevelObject.Names.OrderBy(x => x.Name).ToArray<object>());
+            if (LevelObject.NamesById.TryGetValue(levelObject.Type, out var name))
             {
                 comboBoxNames.SelectedItem = name;
             }
@@ -26,10 +26,16 @@ namespace sth1edwv.Forms
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var n = comboBoxNames.SelectedIndex;
-            if (n == -1)
+            if (comboBoxNames.SelectedItem is not LevelObject.NamedObject obj)
+            {
                 return;
-            textBoxType.Text = LevelObject.Names.Keys.ToArray()[n].ToString();
+            }
+
+            textBoxType.Text = obj.Type.ToString();
         }
+
+        public byte X => Convert.ToByte(textBoxX.Text);
+        public byte Y => Convert.ToByte(textBoxY.Text);
+        public byte Type => Convert.ToByte(textBoxType.Text);
     }
 }
