@@ -307,7 +307,7 @@ namespace sth1edwv.GameObjects
             };
 
             BlockMapping = cartridge.GetBlockMapping(blockMappingOffset + 0x10000, blockCount, _solidityIndex, TileSet);
-            Objects = new LevelObjectSet(cartridge, 0x15580 + _offsetObjectLayout);
+            Objects = cartridge.GetLevelObjectSet(0x15580 + _offsetObjectLayout);
 
             // We generate sub-palettes for rendering
             UpdateRenderingPalettes();
@@ -377,7 +377,7 @@ namespace sth1edwv.GameObjects
             writer.Write((byte)PaletteCycleRate); // CS: Number of frames between palette cycles
             writer.Write((byte)_paletteCycleCount); // CC: Number of palette cycles in a loop
             writer.Write((byte)_paletteCycleIndex); // CP: Which cycling palette to use
-            writer.Write((ushort)_offsetObjectLayout); // OL OL: relative to 0x15580
+            writer.Write((ushort)(Objects.Offset - 0x15580)); // OL OL: relative to 0x15580
             var flags = 0;
             if (DemoMode) flags |= 1 << 1;
             if (ShowRings) flags |= 1 << 2;

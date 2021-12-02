@@ -5,10 +5,8 @@ using System.Windows.Forms;
 
 namespace sth1edwv.GameObjects
 {
-    public class LevelObjectSet: IEnumerable<LevelObject>
+    public class LevelObjectSet: IEnumerable<LevelObject>, IDataItem
     {
-        private readonly int _offset;
-
         // We thinly wrap a list
         public IEnumerator<LevelObject> GetEnumerator() => _objects.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => _objects.GetEnumerator();
@@ -17,7 +15,7 @@ namespace sth1edwv.GameObjects
 
         public LevelObjectSet(Cartridge cartridge, int offset)
         {
-            _offset = offset;
+            Offset = offset;
             var count = cartridge.Memory[offset] - 1;
             _objects = Enumerable.Range(0, count)
                 .Select(i => new LevelObject(cartridge.Memory, offset + i * 3 + 1))
@@ -33,7 +31,16 @@ namespace sth1edwv.GameObjects
 
         public override string ToString()
         {
-            return $"{_objects.Count} objects @ {_offset:X}";
+            return $"{_objects.Count} objects @ {Offset:X}";
+        }
+
+        public int Offset { get; set; }
+
+        public IList<byte> GetData()
+        {
+            return new[] { (byte)_objects.Count }
+                .Concat(_objects.SelectMany(x => x.GetData()))
+                .ToList();
         }
     }
 }
