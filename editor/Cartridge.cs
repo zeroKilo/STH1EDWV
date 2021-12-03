@@ -71,7 +71,7 @@ namespace sth1edwv
                 public enum Types { TileSet, Palette, TileMap, SpriteTileSet, ForegroundTileMap, Unused, Misc }
                 public Types Type { get; set; }
                 public List<Reference> References { get; set; }
-                public LocationRestriction Restrictions { get; } = new(); // Default to defaults...
+                public LocationRestriction Restrictions { get; set; } = new(); // Default to defaults...
                 public int FixedSize { get; set; }
                 public int BitPlanes { get; set; }
                 public List<Point> TileGrouping { get; set; }
@@ -148,7 +148,8 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x01C4 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$024b ; 0001C4 21 4B 02 
                             new() {Offset = 0x0223 + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$024b ; 000223 21 4B 02 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     // Palettes scattered in the low ROM area
@@ -160,7 +161,8 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x026b + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$026b ; 0001CD 21 6B 02 
                             new() {Offset = 0x022C + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$026b ; 00022C 21 6B 02 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     // Palettes scattered in the low ROM area
@@ -171,7 +173,8 @@ namespace sth1edwv
                         FixedSize = 32,
                         References = new List<Game.Reference> {
                             new() {Offset = 0x0cd4 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$0f0e ; 000CD4 21 0E 0F 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Map screen 2 palette", new Game.Asset { 
@@ -181,7 +184,8 @@ namespace sth1edwv
                         FixedSize = 32,
                         References = new List<Game.Reference> {
                             new() {Offset = 0x0d36 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$0f2e ; 000D36 21 2E 0F 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Title screen palette", new Game.Asset { 
@@ -191,7 +195,8 @@ namespace sth1edwv
                         FixedSize = 32,
                         References = new List<Game.Reference> {
                             new() {Offset = 0x12cc + 1, Type = Game.Reference.Types.Absolute} // ld hl,$13e1 ; 0012CC 21 E1 13 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Game Over palette", new Game.Asset { 
@@ -201,7 +206,8 @@ namespace sth1edwv
                         FixedSize = 32,
                         References = new List<Game.Reference> {
                             new() {Offset = 0x143c + 1, Type = Game.Reference.Types.Absolute} // ld hl,$14fc ; 00143C 21 FC 14 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Act Complete palette", new Game.Asset { 
@@ -211,7 +217,8 @@ namespace sth1edwv
                         FixedSize = 32, 
                         References = new List<Game.Reference> {
                             new() {Offset = 0x1604 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$1b8d ; 001604 21 8D 1B 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Ending palette", new Game.Asset {
@@ -222,7 +229,8 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() { Offset = 0x25a1 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$2828 ; 0025A1 21 28 28 
                             new() { Offset = 0x268d + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$2828 ; 00268D 21 28 28 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Credits palette", new Game.Asset {
@@ -232,7 +240,8 @@ namespace sth1edwv
                         FixedSize = 32,
                         References = new List<Game.Reference> {
                             new() {Offset = 0x2702 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$2ad6 ; 002702 21 D6 2A 
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "End sign palette", new Game.Asset {
@@ -242,73 +251,74 @@ namespace sth1edwv
                         FixedSize = 16, // Sprite palette only
                         References = new List<Game.Reference> {
                             new() {Offset = 0x5F38 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$626c ; 005F38 21 6C 62
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Green Hill palette", 
-                    new Game.Asset { OriginalOffset = 0x629e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x629e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Green Hill cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x62be, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x628C, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x62be, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x628C, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Bridge palette", 
-                    new Game.Asset { OriginalOffset = 0x62ee, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x627E, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x62ee, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x627E, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Bridge cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x630e, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x628E, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x630e, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x628E, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Jungle palette", 
-                    new Game.Asset { OriginalOffset = 0x633e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6280, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x633e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6280, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Jungle cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x635e, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x6290, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x635e, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x6290, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Labyrinth palette", 
                     new Game.Asset { OriginalOffset = 0x638e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference>
                     {
                         new() { Offset = 0x6282, Type = Game.Reference.Types.Absolute},
                         new() { Offset = 0x01e8, Type = Game.Reference.Types.Absolute, Delta = +16 } // ld hl,$639e ; 0001E9 21 9E 63 
-                    } }
+                    }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Labyrinth cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x63ae, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x6292, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x63ae, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x6292, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Scrap Brain palette", 
-                    new Game.Asset { OriginalOffset = 0x63de, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6284, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x63de, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6284, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Scrap Brain cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x63fe, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x6294, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x63fe, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x6294, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
-                    "Sky Base external palette", 
-                    new Game.Asset { OriginalOffset = 0x643e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6286, Type = Game.Reference.Types.Absolute} } }
+                    "Sky Base exterior palette", 
+                    new Game.Asset { OriginalOffset = 0x643e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6286, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Sky Base cycling palette", 
                     new Game.Asset { OriginalOffset = 0x645e, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference>
                     {
                         new() { Offset = 0x6294, Type = Game.Reference.Types.Absolute},
                         new() { Offset = 0x1f9f, Type = Game.Reference.Types.Absolute}
-                    } }
+                    }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
-                    "Sky Base lightning palette 1", new Game.Asset { OriginalOffset = 0x649E, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() {Offset = 0x1FA3, Type = Game.Reference.Types.Absolute} }
+                    "Sky Base lightning palette 1", new Game.Asset { OriginalOffset = 0x649E, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() {Offset = 0x1FA3, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
-                    "Sky Base lightning palette 2", new Game.Asset { OriginalOffset = 0x64DE, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() {Offset = 0x1FA7, Type = Game.Reference.Types.Absolute} }
+                    "Sky Base lightning palette 2", new Game.Asset { OriginalOffset = 0x64DE, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() {Offset = 0x1FA7, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Sky Base exterior cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x651e, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x629c, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x651e, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x629c, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Special stage palette", 
-                    new Game.Asset { OriginalOffset = 0x655e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, References = new List<Game.Reference> { new() { Offset = 0x628a, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x655e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, References = new List<Game.Reference> { new() { Offset = 0x628a, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Special stage cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x657e, OriginalSize = 16, Type = Game.Asset.Types.Palette, FixedSize = 16, References = new List<Game.Reference> { new() { Offset = 0x629a, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x657e, OriginalSize = 16, Type = Game.Asset.Types.Palette, FixedSize = 16, References = new List<Game.Reference> { new() { Offset = 0x629a, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Sky Base interior palette", 
-                    new Game.Asset { OriginalOffset = 0x658e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, References = new List<Game.Reference> { new() { Offset = 0x6288, Type = Game.Reference.Types.Absolute} } }
+                    new Game.Asset { OriginalOffset = 0x658e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, References = new List<Game.Reference> { new() { Offset = 0x6288, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Sky Base interior cycling palette", 
-                    new Game.Asset { OriginalOffset = 0x65ae, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x6298, Type = Game.Reference.Types.Absolute} } } // TODO: all these references etc
+                    new Game.Asset { OriginalOffset = 0x65ae, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x6298, Type = Game.Reference.Types.Absolute} }, Restrictions = { MaximumOffset = 0x8000 } } // TODO: all these references and addresses need to be checked
                 }, /*{
                     "Green Hill cycling palette", new Game.Asset {
                         Type = Game.Asset.Types.Palette,
@@ -332,7 +342,8 @@ namespace sth1edwv
                             new() {Offset = 0x929C + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$731c ; 00929C 21 1C 73
                             new() {Offset = 0xA821 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$731c ; 00A821 21 1C 73
                             new() {Offset = 0xBE07 + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$731c ; 00BE07 21 1C 73
-                        }
+                        }, 
+                        Restrictions = { MaximumOffset = 0x8000 }
                     }
                 }, {
                     "Unused space bank 3", new Game.Asset { OriginalOffset = 0x0ffb1, OriginalSize = 0x4f, Type = Game.Asset.Types.Unused }
@@ -772,8 +783,7 @@ namespace sth1edwv
                 { "End sign", new [] { "End sign tileset", "End sign palette" } },
                 { "Rings", new [] { "Rings", "Green Hill palette" } },
                 { "Dr. Robotnik", new [] { "Boss sprites 1", "Boss sprites 2", "Boss sprites 3", "Boss sprites palette" } },
-                { "Capsule", new [] { "Capsule sprites", "Boss sprites palette" } },
-                { "Extra palettes", new []{ "Underwater palette", "Underwater boss palette"}}
+                { "Capsule", new [] { "Capsule sprites", "Boss sprites palette" } }
             },
             Levels = new List<Game.LevelHeader>
             {
@@ -831,9 +841,12 @@ namespace sth1edwv
             logger($"Loading {path}...");
             var sw = Stopwatch.StartNew();
             Memory = new Memory(File.ReadAllBytes(path));
+            DisposeAll(_blockMappings);
+            DisposeAll(_tileSets);
+
+            ReadAssets();
             ReadLevels();
             ReadGameText();
-            ReadAssets();
 
             // Apply rings to level tile sets
             var rings = Art.Find(x => x.Name == "Rings").TileSet;
@@ -850,6 +863,12 @@ namespace sth1edwv
             _assetsLookup.Clear();
 
             _logger("Loading art...");
+
+            if (!Sonic1MasterSystem.AssetGroups.ContainsKey("All palettes"))
+            {
+                Sonic1MasterSystem.AssetGroups.Add("All palettes", Sonic1MasterSystem.Assets.Keys
+                    .Where(x => x.Contains("palette"))); // TODO something better with these. Maybe have the level loader write the palette tables?
+            }
 
             foreach (var kvp in Sonic1MasterSystem.AssetGroups)
             {
@@ -912,8 +931,6 @@ namespace sth1edwv
         private void ReadLevels()
         {
             _logger("Loading levels...");
-            DisposeAll(_blockMappings);
-            DisposeAll(_tileSets);
             Levels.Clear();
             foreach (var level in Sonic1MasterSystem.Levels)
             {
@@ -1023,15 +1040,12 @@ namespace sth1edwv
             var memory = new byte[512 * 1024];
             Memory.GetStream(0, Memory.Count).ToArray().CopyTo(memory, 0);
 
-            // Data we read/write and what we can repack...
+            // Here is what we do not relocate...
             // Start    End     Description                         Repacking?
             // -----------------------------------------------------------------------------
             // 0627c    0679d   Level palette lookups
-            // 0629e    065ed   Level palettes                      In-place, not in assets list
             // 15580    155c9   Level header pointers               Untouched
             // 155ca    15ab3   Level headers                       In-place
-            // 15ab4    15fff   Object layouts (+ unused)           In-place TODO
-            // 16dea    1ffff   Floors (+unused)                    In-place TODO relocate? Defaults to 14000..23fff range
             // 3e9fd            Solidity data start?                Not planning on moving this...
 
             // We work through the data types...
@@ -1070,64 +1084,21 @@ namespace sth1edwv
                 _logger($"- Wrote game text \"{gameText.Text}\" at offset ${gameText.Offset:X}, length {data.Count} bytes");
             }
 
-            /*
-            // - Level palettes (at original offsets)
-            // 629e..65ed inclusive, with Sky Base lightning not covered
-            foreach (var palette in Levels.SelectMany(x => new[]{x.Palette, x.CyclingPalette}).Distinct())
-            {
-                var data = palette.GetData();
-                data.CopyTo(memory, palette.Offset);
-                _logger($"- Wrote palette at offset ${palette.Offset:X}, length {data.Count} bytes");
-            }
-            */
-
+            // Add level data to assets list
+            // - Palettes
+            AddAssets(assetsToPack, Levels.GroupBy(l => l.Palette), "Palette", new Game.LocationRestriction { CanCrossBanks = true, MaximumOffset = 0x8000 });
+            AddAssets(assetsToPack, Levels.GroupBy(l => l.CyclingPalette), "Cycling palette", new Game.LocationRestriction { CanCrossBanks = true, MaximumOffset = 0x8000 });
             // - Floors
             // Must be in the range 14000..23fff
-            foreach (var group in Levels.GroupBy(l => l.Floor))
-            {
-                var floor = group.Key;
-                assetsToPack.Add(new AssetToPack(
-                    $"Floor data for {string.Join(", ", group)}",
-                    new Game.Asset
-                    {
-                        Type = Game.Asset.Types.Misc,
-                        Restrictions = { CanCrossBanks = true, MinimumOffset = 0x14000, MaximumOffset = 0x24000 }
-                    },
-                    floor,
-                    floor.GetData()));
-            }
+            AddAssets(assetsToPack, Levels.GroupBy(l => l.Floor), "Floor", new Game.LocationRestriction { CanCrossBanks = true, MinimumOffset = 0x14000, MaximumOffset = 0x24000 });
 
             // - Sprite tile sets
             // Game engine expects data in the range 24000..33fff
-            foreach (var group in Levels.GroupBy(l => l.SpriteTileSet))
-            {
-                var tileSet = group.Key;
-                assetsToPack.Add(new AssetToPack(
-                    $"Sprite tiles for {string.Join(", ", group)}",
-                    new Game.Asset
-                    {
-                        Type = Game.Asset.Types.SpriteTileSet,
-                        Restrictions = { CanCrossBanks = true, MinimumOffset = 0x24000, MaximumOffset = 0x34000 }
-                    },
-                    tileSet,
-                    tileSet.GetData()));
-            }
+            AddAssets(assetsToPack, Levels.GroupBy(l => l.SpriteTileSet), "Sprite tiles", new Game.LocationRestriction { CanCrossBanks = true, MinimumOffset = 0x24000, MaximumOffset = 0x34000 });
 
-            // - Lavel background art
+            // - Level background art
             // Game engine expects data in the range 30000..3ffff
-            foreach (var group in Levels.GroupBy(l => l.TileSet))
-            {
-                var tileSet = group.Key;
-                assetsToPack.Add(new AssetToPack(
-                    $"Background tiles for {string.Join(", ", group)}",
-                    new Game.Asset
-                    {
-                        Type = Game.Asset.Types.TileSet,
-                        Restrictions = { CanCrossBanks = true, MinimumOffset = 0x30000, MaximumOffset = 0x40000 }
-                    },
-                    tileSet,
-                    tileSet.GetData()));
-            }
+            AddAssets(assetsToPack, Levels.GroupBy(l => l.TileSet), "Sprite tiles", new Game.LocationRestriction { CanCrossBanks = true, MinimumOffset = 0x30000, MaximumOffset = 0x40000 });
 
             // - Block mappings (at original offsets)
             // TODO make these flexible and make UI to make the lengths flexible. Problem: how to determine the length?
@@ -1145,38 +1116,12 @@ namespace sth1edwv
             }
 
             // - Level objects
-            foreach (var group in Levels.GroupBy(l => l.Objects))
-            {
-                var levelObjects = group.Key;
-                assetsToPack.Add(new AssetToPack(
-                    $"Objects data for {string.Join(", ", group)}",
-                    new Game.Asset
-                    {
-                        Type = Game.Asset.Types.SpriteTileSet,
-                        Restrictions = { MinimumOffset = 0x15580, MaximumOffset = 0x16000 } // Object lists are in the same bank as the headers
-                    },
-                    levelObjects,
-                    levelObjects.GetData()));
-            }
+            AddAssets(assetsToPack, Levels.GroupBy(l => l.Objects), "Objects", new Game.LocationRestriction { MinimumOffset = 0x15580, MaximumOffset = 0x16000 }); // Object lists are in the same bank as the headers
 
             // We avoid writing the same item twice by different routes...
             var writtenItems = new HashSet<IDataItem>();
             var writtenReferences = new HashSet<int>();
 
-            // First we do the ones with absolute positions. There's generally nothing to gain by relocating them, so we just copy the data.
-            foreach (var item in assetsToPack
-                         .Where(x => x.Asset.References != null && x.Asset.References.Any(r => r.Type == Game.Reference.Types.Absolute))
-                         .ToList())
-            {
-                var offset = item.Asset.OriginalOffset;
-                item.Data.CopyTo(memory, offset);
-                _logger($"- Wrote data for asset {item.Name} at its original location {offset:X}, length {item.Data.Count} bytes");
-                freeSpace.Remove(offset, item.Data.Count);
-                writtenItems.Add(item.DataItem);
-                assetsToPack.Remove(item);
-            }
-
-            // Then the ones that need to be packed... with constrained ones first
             try
             {
                 // We look for the ones that "must follow" each other and combine them together
@@ -1215,6 +1160,19 @@ namespace sth1edwv
             _logger($"Built ROM image in {sw.Elapsed}");
 
             return memory;
+        }
+
+        private static void AddAssets(HashSet<AssetToPack> assetsToPack, IEnumerable<IGrouping<IDataItem, Level>> items, string prefix, Game.LocationRestriction restriction)
+        {
+            assetsToPack.UnionWith(items.Select(group => new AssetToPack(
+                $"{prefix} for {string.Join(", ", group)}",
+                new Game.Asset
+                {
+                    Type = Game.Asset.Types.Palette,
+                    Restrictions = restriction
+                },
+                group.Key,
+                group.Key.GetData())));
         }
 
         private void WriteAsset(AssetToPack item, ISet<IDataItem> writtenItems, HashSet<int> writtenReferences, FreeSpace freeSpace, byte[] memory, Dictionary<string, AssetToPack> followers)
@@ -1278,6 +1236,15 @@ namespace sth1edwv
                     writtenReferences.Add(reference.Offset);
                     switch (reference.Type)
                     {
+                        case Game.Reference.Types.Absolute:
+                            if (offset >= 0x8000)
+                            {
+                                throw new Exception($"Can't write absolute address for offset {offset:X}");
+                            }
+                            memory[reference.Offset + 0] = (byte)(offset & 0xff);
+                            memory[reference.Offset + 1] = (byte)(offset >> 8);
+                            _logger($" - Wrote location ${offset:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                            break;
                         case Game.Reference.Types.PageNumber:
                             var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
                             memory[reference.Offset] = pageNumber;
@@ -1301,8 +1268,7 @@ namespace sth1edwv
                             var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
                             memory[reference.Offset + 0] = (byte)(value & 0xff);
                             memory[reference.Offset + 1] = (byte)(value >> 8);
-                            _logger(
-                                $" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                            _logger($" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
                             break;
                     }
                 }
