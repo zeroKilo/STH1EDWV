@@ -140,6 +140,30 @@ namespace sth1edwv
             Assets = new Dictionary<string, Game.Asset> {
                 {
                     // Palettes scattered in the low ROM area
+                    "Underwater palette", new Game.Asset { 
+                        OriginalOffset = 0x024B,
+                        OriginalSize = 32,
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference> {
+                            new() {Offset = 0x01C4 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$024b ; 0001C4 21 4B 02 
+                            new() {Offset = 0x0223 + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$024b ; 000223 21 4B 02 
+                        }
+                    }
+                }, {
+                    // Palettes scattered in the low ROM area
+                    "Underwater boss palette", new Game.Asset { 
+                        OriginalOffset = 0x026B,
+                        OriginalSize = 32,
+                        Type = Game.Asset.Types.Palette,
+                        FixedSize = 32,
+                        References = new List<Game.Reference> {
+                            new() {Offset = 0x026b + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$026b ; 0001CD 21 6B 02 
+                            new() {Offset = 0x022C + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$026b ; 00022C 21 6B 02 
+                        }
+                    }
+                }, {
+                    // Palettes scattered in the low ROM area
                     "Map screen 1 palette", new Game.Asset { 
                         OriginalOffset = 0x0f0e,
                         OriginalSize = 32,
@@ -221,26 +245,70 @@ namespace sth1edwv
                         }
                     }
                 }, {
-                    // TODO level palettes here
-                    // This one marks it as free space for placement...
-                    "Level palettes area", new Game.Asset {
-                        Type = Game.Asset.Types.Palette,
-                        OriginalOffset = 0x629e,
-                        OriginalSize = 0x65ee-0x629e
-
+                    "Green Hill palette", 
+                    new Game.Asset { OriginalOffset = 0x629e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Green Hill cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x62be, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x628C, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Bridge palette", 
+                    new Game.Asset { OriginalOffset = 0x62ee, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x627E, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Bridge cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x630e, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x628E, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Jungle palette", 
+                    new Game.Asset { OriginalOffset = 0x633e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6280, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Jungle cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x635e, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x6290, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Labyrinth palette", 
+                    new Game.Asset { OriginalOffset = 0x638e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference>
+                    {
+                        new() { Offset = 0x6282, Type = Game.Reference.Types.Absolute},
+                        new() { Offset = 0x01e8, Type = Game.Reference.Types.Absolute, Delta = +16 } // ld hl,$639e ; 0001E9 21 9E 63 
+                    } }
+                }, {
+                    "Labyrinth cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x63ae, OriginalSize = 48, Type = Game.Asset.Types.Palette, FixedSize = 48, References = new List<Game.Reference> { new() { Offset = 0x6292, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Scrap Brain palette", 
+                    new Game.Asset { OriginalOffset = 0x63de, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6284, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Scrap Brain cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x63fe, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x6294, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Sky Base external palette", 
+                    new Game.Asset { OriginalOffset = 0x643e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference> { new() { Offset = 0x6286, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Sky Base cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x645e, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference>
+                    {
+                        new() { Offset = 0x6294, Type = Game.Reference.Types.Absolute},
+                        new() { Offset = 0x1f9f, Type = Game.Reference.Types.Absolute}
+                    } }
+                }, {
+                    "Sky Base lightning palette 1", new Game.Asset { OriginalOffset = 0x649E, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() {Offset = 0x1FA3, Type = Game.Reference.Types.Absolute} }
                     }
                 }, {
-                    "Green Hill palette", new Game.Asset {// We add this just so we can use it below
-                        // We omit the offset stuff to make this not get overwritten as a regular asset
-                        // TODO make level assets join these and remove this?
-                        // OriginalOffset = 0x629e,
-                        // OriginalSize = 32,
-                        Type = Game.Asset.Types.Palette,
-                        FixedSize = 32,
-                        References = new List<Game.Reference> {
-                            new() { Offset = 0x627C, Type = Game.Reference.Types.Absolute}
-                        }
+                    "Sky Base lightning palette 2", new Game.Asset { OriginalOffset = 0x64DE, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() {Offset = 0x1FA7, Type = Game.Reference.Types.Absolute} }
                     }
+                }, {
+                    "Sky Base exterior cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x651e, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x629c, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Special stage palette", 
+                    new Game.Asset { OriginalOffset = 0x655e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, References = new List<Game.Reference> { new() { Offset = 0x628a, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Special stage cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x657e, OriginalSize = 16, Type = Game.Asset.Types.Palette, FixedSize = 16, References = new List<Game.Reference> { new() { Offset = 0x629a, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Sky Base interior palette", 
+                    new Game.Asset { OriginalOffset = 0x658e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, References = new List<Game.Reference> { new() { Offset = 0x6288, Type = Game.Reference.Types.Absolute} } }
+                }, {
+                    "Sky Base interior cycling palette", 
+                    new Game.Asset { OriginalOffset = 0x65ae, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference> { new() { Offset = 0x6298, Type = Game.Reference.Types.Absolute} } } // TODO: all these references etc
                 }, /*{
                     "Green Hill cycling palette", new Game.Asset {
                         Type = Game.Asset.Types.Palette,
@@ -447,7 +515,7 @@ namespace sth1edwv
                             new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
                             // We put this one at the end so it won't be used for reading but will be written.
                             // This allows us to make sure the left-facing art pointer is in the right place while removing the padding.
-                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8}, // ld bc,$7000 ; 004C8D 01 00 70
+                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8} // ld bc,$7000 ; 004C8D 01 00 70
                         },
                         Restrictions = { CanCrossBanks = true, MinimumOffset = 0x20000 } // This minimum cajoles the code into picking a working location. It's a hack.
                     }
@@ -704,7 +772,8 @@ namespace sth1edwv
                 { "End sign", new [] { "End sign tileset", "End sign palette" } },
                 { "Rings", new [] { "Rings", "Green Hill palette" } },
                 { "Dr. Robotnik", new [] { "Boss sprites 1", "Boss sprites 2", "Boss sprites 3", "Boss sprites palette" } },
-                { "Capsule", new [] { "Capsule sprites", "Boss sprites palette" } }
+                { "Capsule", new [] { "Capsule sprites", "Boss sprites palette" } },
+                { "Extra palettes", new []{ "Underwater palette", "Underwater boss palette"}}
             },
             Levels = new List<Game.LevelHeader>
             {
@@ -974,33 +1043,6 @@ namespace sth1edwv
                     .Distinct() // Remove duplicates
                     .Select(x => new AssetToPack(x, Sonic1MasterSystem.Assets[x], _assetsLookup[Sonic1MasterSystem.Assets[x]], _assetsLookup[Sonic1MasterSystem.Assets[x]].GetData())) // Select the asset name, details and serialized data
                     .Where(x => x.Asset.OriginalOffset != 0)); // Exclude any not yet configured with a source location
-
-            // Add in the level assets... we want to de-dupe these
-            // Palettes (excluding Sky Base lightning)
-            // TODO do I want to add these to the AssetGroups instead?
-            foreach (var group in Levels.GroupBy(x => x.Palette))
-            {
-                assetsToPack.Add(new AssetToPack($"{group.First()} palette", new Game.Asset
-                {
-                    Type = Game.Asset.Types.Palette,
-                    OriginalOffset = group.Key.Offset,
-                    OriginalSize = 32,
-                    Restrictions = { MaximumOffset = 0x7fff },
-                    References = new List<Game.Reference>{new(){Type = Game.Reference.Types.Absolute, Offset = 0}} // Tricks it into using original offsets
-                }, group.Key, group.Key.GetData()));
-            }
-            foreach (var group in Levels.GroupBy(x => x.CyclingPalette))
-            {
-                var data = @group.Key.GetData();
-                assetsToPack.Add(new AssetToPack($"{group.First()} cycling palette", new Game.Asset
-                {
-                    Type = Game.Asset.Types.Palette,
-                    OriginalOffset = group.Key.Offset,
-                    OriginalSize = data.Count,
-                    Restrictions = { MaximumOffset = 0x7fff },
-                    References = new List<Game.Reference>{new(){Type = Game.Reference.Types.Absolute, Offset = 0}} // Tricks it into using original offsets
-                }, group.Key, data));
-            }
 
             // First we build a list of "free space". We include all the "original assets" so we will overwrite unused space. Missing "original" data makes us ignore it.
             var freeSpace = new FreeSpace();

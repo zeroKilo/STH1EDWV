@@ -71,10 +71,7 @@ namespace sth1edwv
             // Trigger the selected level changed event
             SelectedLevelChanged(null, null);
 
-            UpdateFloorSpace();
-            UpdateTileSetSpace();
-
-            // Take an image at the point of loading
+            // Take an image at the point of loading. This isn't what we loaded, but should be equivalent.
             _lastSaved = _cartridge.MakeRom();
         }
 
@@ -99,6 +96,7 @@ namespace sth1edwv
             {
                 PalettesLayout.Controls.Add(new PaletteEditor(level.Palette, "Base palette (only sprites part is used)", OnPaletteChanged));
                 PalettesLayout.Controls.Add(new PaletteEditor(level.CyclingPalette, "Colour cycling", OnPaletteChanged));
+                // TODO: extra palettes for some levels?
             }
 
             propertyGridLevel.SelectedObject = level;
@@ -472,11 +470,6 @@ namespace sth1edwv
             floorEditor1.Invalidate();
         }
 
-        private void UpdateFloorSpace()
-        {
-            UpdateSpace(floorStatus, "Floor/screen tile map", _cartridge.GetFloorSpace());
-        }
-
         private void DrawingButtonCheckedChanged(object sender, EventArgs e)
         {
             foreach (var button in new[]{buttonDraw, buttonSelect, buttonFloodFill})
@@ -487,30 +480,6 @@ namespace sth1edwv
             floorEditor1.DrawingMode = buttonDraw.Checked ? FloorEditor.Modes.Draw 
                 : buttonSelect.Checked ? FloorEditor.Modes.Select 
                 : FloorEditor.Modes.FloodFill;
-        }
-
-        private void floorEditor1_FloorChanged()
-        {
-            UpdateFloorSpace();
-        }
-
-        private void UpdateTileSetSpace()
-        {
-            UpdateSpace(tileSetStatus, "Tile set", _cartridge.GetFloorTileSetSpace());
-            UpdateSpace(spriteTileSetStatus, "Sprite tile set", _cartridge.GetSpriteTileSetSpace());
-        }
-
-        private void UpdateSpace(ToolStripStatusLabel label, string prefix, Cartridge.Space space)
-        {
-            label.Text = $"{prefix} space: {space.Used}/{space.Total} ({(double)space.Used/space.Total:P})";
-            label.ForeColor = space.Used > space.Total ? Color.White: SystemColors.ControlText;
-            label.BackColor = space.Used > space.Total ? Color.DarkRed : SystemColors.Control;
-        }
-
-
-        private void spriteTileSetViewer_Changed(TileSet tileSet)
-        {
-            UpdateTileSetSpace();
         }
 
         private void tileSetViewer_Changed(TileSet tileSet)
@@ -524,8 +493,6 @@ namespace sth1edwv
             {
                 block.ResetImages();
             }
-
-            UpdateTileSetSpace();
         }
 
         private void ResizeFloorButtonClick(object sender, EventArgs e)
@@ -566,8 +533,6 @@ namespace sth1edwv
 
             // Reset the floor editor so it picks up the new size
             floorEditor1.SetData(selectedLevel);
-            // Update space counts
-            UpdateFloorSpace();
         }
 
         private void SharingButton_Click(object sender, EventArgs e)
@@ -582,7 +547,6 @@ namespace sth1edwv
             {
                 // Invalidate stuff
                 floorEditor1.SetData(selectedLevel);
-                UpdateFloorSpace();
             }
         }
 

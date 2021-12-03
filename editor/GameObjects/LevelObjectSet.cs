@@ -38,7 +38,7 @@ namespace sth1edwv.GameObjects
 
         public IList<byte> GetData()
         {
-            return new[] { (byte)_objects.Count }
+            return new[] { (byte)(_objects.Count + 1) }
                 .Concat(_objects.SelectMany(x => x.GetData()))
                 .ToList();
         }
