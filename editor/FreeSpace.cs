@@ -76,15 +76,7 @@ namespace sth1edwv
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-
-            sb.AppendLine($"{_spans.Sum(x => x.Size)} bytes in {_spans.Count} spans: ");
-            foreach (var span in _spans)
-            {
-                sb.AppendLine(span.ToString());
-            }
-
-            return sb.ToString();
+            return $"{_spans.Sum(x => x.Size)} bytes in {_spans.Count} spans: {string.Join(" | ", _spans)}";
         }
 
         public void Remove(int offset, int size)

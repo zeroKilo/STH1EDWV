@@ -35,6 +35,9 @@ namespace sth1edwv.Controls
             this.buttonSaveTileset = new System.Windows.Forms.ToolStripButton();
             this.buttonLoadTileset = new System.Windows.Forms.ToolStripButton();
             this.buttonBlankUnusedTiles = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.buttonAddTile = new System.Windows.Forms.ToolStripButton();
+            this.buttonRemoveTile = new System.Windows.Forms.ToolStripButton();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.tilePicker = new sth1edwv.Controls.ItemPicker();
             this.splitContainer5 = new System.Windows.Forms.SplitContainer();
@@ -62,7 +65,10 @@ namespace sth1edwv.Controls
             this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buttonSaveTileset,
             this.buttonLoadTileset,
-            this.buttonBlankUnusedTiles});
+            this.buttonBlankUnusedTiles,
+            this.toolStripSeparator1,
+            this.buttonAddTile,
+            this.buttonRemoveTile});
             this.toolStrip2.Location = new System.Drawing.Point(0, 0);
             this.toolStrip2.Name = "toolStrip2";
             this.toolStrip2.Size = new System.Drawing.Size(825, 25);
@@ -95,6 +101,29 @@ namespace sth1edwv.Controls
             this.buttonBlankUnusedTiles.Size = new System.Drawing.Size(98, 22);
             this.buttonBlankUnusedTiles.Text = "Blank unused";
             this.buttonBlankUnusedTiles.Click += new System.EventHandler(this.buttonBlankUnusedTiles_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
+            // buttonAddTile
+            // 
+            this.buttonAddTile.Image = ((System.Drawing.Image)(resources.GetObject("buttonAddTile.Image")));
+            this.buttonAddTile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonAddTile.Name = "buttonAddTile";
+            this.buttonAddTile.Size = new System.Drawing.Size(77, 22);
+            this.buttonAddTile.Text = "Add a tile";
+            this.buttonAddTile.Click += new System.EventHandler(this.buttonAddTile_Click);
+            // 
+            // buttonRemoveTile
+            // 
+            this.buttonRemoveTile.Image = ((System.Drawing.Image)(resources.GetObject("buttonRemoveTile.Image")));
+            this.buttonRemoveTile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.buttonRemoveTile.Name = "buttonRemoveTile";
+            this.buttonRemoveTile.Size = new System.Drawing.Size(98, 22);
+            this.buttonRemoveTile.Text = "Remove a tile";
+            this.buttonRemoveTile.Click += new System.EventHandler(this.buttonRemoveTile_Click);
             // 
             // splitContainer2
             // 
@@ -190,7 +219,7 @@ namespace sth1edwv.Controls
             // checkBoxTransparency
             // 
             this.checkBoxTransparency.AutoSize = true;
-            this.checkBoxTransparency.Location = new System.Drawing.Point(301, 3);
+            this.checkBoxTransparency.Location = new System.Drawing.Point(527, 2);
             this.checkBoxTransparency.Name = "checkBoxTransparency";
             this.checkBoxTransparency.Size = new System.Drawing.Size(117, 17);
             this.checkBoxTransparency.TabIndex = 6;
@@ -241,5 +270,8 @@ namespace sth1edwv.Controls
         private System.Windows.Forms.PictureBox pictureBoxTileUsedIn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBoxTransparency;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton buttonAddTile;
+        private System.Windows.Forms.ToolStripButton buttonRemoveTile;
     }
 }

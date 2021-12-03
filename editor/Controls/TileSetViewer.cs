@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -160,6 +161,20 @@ namespace sth1edwv.Controls
         private void checkBoxTransparency_CheckedChanged(object sender, EventArgs e)
         {
             tilePicker.ShowTransparency = checkBoxTransparency.Checked;
+        }
+
+        private void buttonAddTile_Click(object sender, EventArgs e)
+        {
+            _tileSet.AddTile();
+            Changed?.Invoke(_tileSet);
+            tilePicker.SetData(_tileSet.Tiles, _palette);
+        }
+
+        private void buttonRemoveTile_Click(object sender, EventArgs e)
+        {
+            _tileSet.RemoveTile();
+            Changed?.Invoke(_tileSet);
+            tilePicker.SetData(_tileSet.Tiles, _palette);
         }
     }
 }

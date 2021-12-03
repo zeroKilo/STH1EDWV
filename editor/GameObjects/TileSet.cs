@@ -11,6 +11,8 @@ namespace sth1edwv.GameObjects
     public class TileSet: IDataItem, IDisposable
     {
         private readonly int _bitPlanes;
+        private readonly List<Point> _grouping;
+        private Tile _ringTile;
         private bool Compressed { get; }
         public List<Tile> Tiles { get; }
 
@@ -85,7 +87,7 @@ namespace sth1edwv.GameObjects
             _bitPlanes = bitPlanes;
 
             // Default grouping
-            grouping ??= Groupings.Single;
+            _grouping = grouping ?? Groupings.Single;
 
             // Read the data and convert to tiles
             Tiles = new EnumerableMemoryStream(memory.GetStream(offset, length))
@@ -320,10 +322,39 @@ namespace sth1edwv.GameObjects
 
         public void SetRings(Tile ring)
         {
-            Tiles[252].SetRingTile(ring, 0, 0);
-            Tiles[253].SetRingTile(ring, 8, 0);
-            Tiles[254].SetRingTile(ring, 0, 8);
-            Tiles[255].SetRingTile(ring, 8, 8);
+            _ringTile = ring;
+        }
+
+        public Image GetImageWithRings(int tileIndex, Palette palette)
+        {
+            if (_ringTile != null && tileIndex is >= 252 and <= 255)
+            {
+                Point location;
+                switch (tileIndex)
+                {
+                    case 252: location = new Point(0, 0); break;
+                    case 253: location = new Point(8, 0); break;
+                    case 254: location = new Point(0, 8); break;
+                    default: location = new Point(8, 8); break;
+                }
+                return _ringTile.GetImage(palette)
+                    .Clone(new Rectangle(location, new Size(8, 8)), PixelFormat.Format8bppIndexed);
+                // TODO this is a resource leak
+            }
+            return Tiles[tileIndex].GetImage(palette);
+        }
+
+        public void AddTile()
+        {
+            var size = (_grouping.Max(x => x.X) + 8) * (_grouping.Max(x => x.Y) + 8);
+            Tiles.Add(new Tile(new byte[size], _grouping, Tiles.Count));
+        }
+
+        public void RemoveTile()
+        {
+            var tile = Tiles[Tiles.Count - 1];
+            Tiles.RemoveAt(Tiles.Count - 1);
+            tile.Dispose();
         }
     }
 }

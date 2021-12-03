@@ -1072,7 +1072,7 @@ namespace sth1edwv
             freeSpace.Consolidate();
 
             // Then log the state
-            _logger(freeSpace.ToString());
+            _logger($"Initial free space: {freeSpace}");
 
             // - Game text (at original offsets)
             // 122d..1286 inclusive

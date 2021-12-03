@@ -197,10 +197,9 @@ namespace sth1edwv
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 for (var i = 0; i < 16; ++i)
                 {
-                    var tile = block.TileSet.Tiles[block.TileIndices[i]];
                     var x = i % 4 * _blockEditorTileSize - 1;
                     var y = i / 4 * _blockEditorTileSize - 1;
-                    g.DrawImage(tile.GetImageWithRings(level.TilePalette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
+                    g.DrawImage(block.TileSet.GetImageWithRings(block.TileIndices[i], level.TilePalette), x, y, _blockEditorTileSize - 1, _blockEditorTileSize - 1);
                 }
             }
 

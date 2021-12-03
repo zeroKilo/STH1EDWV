@@ -107,10 +107,9 @@ namespace sth1edwv.Controls
                         var tileIndex = block.TileIndices[tileX + tileY * 4];
                         if (tileIndex < _tileSet.Tiles.Count)
                         {
-                            var tile = _tileSet.Tiles[tileIndex];
                             var x = blockX * _blockSize + tileX * _tileSize;
                             var y = blockY * _blockSize + tileY * _tileSize;
-                            g.DrawImageUnscaled(tile.GetImageWithRings(_palette), x, y);
+                            g.DrawImageUnscaled(_tileSet.GetImageWithRings(tileIndex, _palette), x, y);
                         }
                     }
                 }
