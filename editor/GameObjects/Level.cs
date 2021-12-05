@@ -292,7 +292,7 @@ namespace sth1edwv.GameObjects
 
             // Hard-coded block counts. It's hard to avoid these...
             // we could imply them from the gaps but then we'd need to know all the offsets
-            // (and whatever comes after - the blinking items art by default) before loading anything.
+            // (and whatever comes after - the monitor items art by default) before loading anything.
             // If/when we support changing the mapping sizes, we will need to address this.
             var blockCount = blockMappingOffset switch
             {

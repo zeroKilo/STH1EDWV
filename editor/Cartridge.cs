@@ -55,7 +55,7 @@ namespace sth1edwv
 
             public class LocationRestriction
             {
-                public int MinimumOffset { get; set; } = 0;
+                public int MinimumOffset { get; set; }
                 public int MaximumOffset { get; set; } = 1024*1024;
                 public bool CanCrossBanks { get; set; }
                 public string MustFollow { get; set; }
@@ -295,7 +295,7 @@ namespace sth1edwv
                     "Sky Base cycling palette", 
                     new Game.Asset { OriginalOffset = 0x645e, OriginalSize = 64, Type = Game.Asset.Types.Palette, FixedSize = 64, References = new List<Game.Reference>
                     {
-                        new() { Offset = 0x6294, Type = Game.Reference.Types.Absolute},
+                        new() { Offset = 0x6296, Type = Game.Reference.Types.Absolute},
                         new() { Offset = 0x1f9f, Type = Game.Reference.Types.Absolute}
                     }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
@@ -827,6 +827,7 @@ namespace sth1edwv
         public List<Level> Levels { get; } = new();
         public List<GameText> GameText { get; } = new();
         public List<ArtItem> Art { get; } = new();
+        public FreeSpace LastFreeSpace { get; private set; }
 
         private readonly Dictionary<int, TileSet> _tileSets = new();
         private readonly Dictionary<int, Floor> _floors = new();
@@ -1067,6 +1068,7 @@ namespace sth1edwv
             
             // Expand to 512KB here
             freeSpace.Add(256*1024, 512*1024);
+            freeSpace.Maximum = 512 * 1024;
 
             // We do this after adding all the free space spans
             freeSpace.Consolidate();
@@ -1158,6 +1160,8 @@ namespace sth1edwv
             }
 
             _logger($"Built ROM image in {sw.Elapsed}");
+
+            LastFreeSpace = freeSpace;
 
             return memory;
         }
@@ -1295,35 +1299,6 @@ namespace sth1edwv
 
             return size;
         }
-
-        public class Space
-        {
-            public int Total { get; set; }
-            public int Used { get; set; }
-        }
-
-        // All the numbers in these need to match what's in MakeRom
-        public Space GetFloorSpace() =>
-            new()
-            {
-                Total = 0x20000 - 0x16dea,
-                Used = Levels.Select(x => x.Floor).Distinct().Sum(x => x.GetData().Count)
-            };
-        public Space GetFloorTileSetSpace() =>
-            new()
-            {
-                Total = 0x3da28 - 0x32FE6,
-                Used = Levels.Select(x => x.TileSet).Distinct().Sum(x => x.GetData().Count)
-            };
-        public Space GetSpriteTileSetSpace() =>
-            new()
-            {
-                Total = 0x2EEB1 - 0x2a12a,
-                Used = Levels.Select(x => x.SpriteTileSet)
-                    .Distinct()
-                    .Except(Art.SelectMany(x => x.SpriteTileSets))
-                    .Sum(x => x.GetData().Count)
-            };
 
         public void ChangeTileSet(ArtItem item, TileSet value)
         {

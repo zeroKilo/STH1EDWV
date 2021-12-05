@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace sth1edwv
 {
-    internal class FreeSpace
+    public class FreeSpace
     {
-        private class Span
+        public class Span
         {
             public int Start { get; set; }
             public int End { get; set; } // Non-inclusive so the difference is the byte count
@@ -19,6 +20,8 @@ namespace sth1edwv
         }
 
         private readonly List<Span> _spans = new();
+        public int Maximum { get; set; }
+        public IEnumerable<Span> Spans => _spans;
 
         public void Add(int start, int end)
         {

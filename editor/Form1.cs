@@ -73,6 +73,8 @@ namespace sth1edwv
 
             // Take an image at the point of loading. This isn't what we loaded, but should be equivalent.
             _lastSaved = _cartridge.MakeRom();
+
+            spaceVisualizer1.SetData(_cartridge.LastFreeSpace);
         }
 
         private void SelectedLevelChanged(object sender, EventArgs e)
@@ -492,6 +494,8 @@ namespace sth1edwv
             {
                 block.ResetImages();
             }
+
+            UpdateSpace();
         }
 
         private void ResizeFloorButtonClick(object sender, EventArgs e)
@@ -725,42 +729,45 @@ namespace sth1edwv
             try
             {
                 using var ofd = new OpenFileDialog { Filter = "*.png|*.png" };
-                if (ofd.ShowDialog(this) == DialogResult.OK)
+                if (ofd.ShowDialog(this) != DialogResult.OK)
                 {
-                    using var image = (Bitmap)System.Drawing.Image.FromFile(ofd.FileName);
-                    try
+                    return;
+                }
+                using var image = (Bitmap)System.Drawing.Image.FromFile(ofd.FileName);
+                try
+                {
+                    artItem.TileMap.FromImage(image, artItem.TileSet);
+                }
+                catch (Exception ex)
+                {
+                    // Didn't work, offer a tileset replacement
+                    if (MessageBox.Show(
+                        this,
+                        $"Failed to load image: {ex.Message}. Do you want to try again, replacing the tiles?",
+                        "Art mismatch", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Question) == DialogResult.Yes)
                     {
-                        artItem.TileMap.FromImage(image, artItem.TileSet);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Didn't work, offer a tileset replacement
-                        if (MessageBox.Show(
-                            this,
-                            $"Failed to load image: {ex.Message}. Do you want to try again, replacing the tiles?",
-                            "Art mismatch", 
-                            MessageBoxButtons.YesNo, 
-                            MessageBoxIcon.Question) == DialogResult.Yes)
+                        // Make the tileset
+                        var tileSet = new TileSet(image, artItem.TileSet);
+                        // Try to use it
+                        try
                         {
-                            // Make the tileset
-                            var tileSet = new TileSet(image, artItem.TileSet);
-                            // Try to use it
-                            try
-                            {
-                                // Change the art item to use it
-                                _cartridge.ChangeTileSet(artItem, tileSet);
-                                // Send it to the relevant control
-                                otherArtTileSetViewer.SetData(tileSet, artItem.Palette);
-                            }
-                            catch (Exception exception)
-                            {
-                                MessageBox.Show(this, $"Failed: {exception.Message}");
-                            }
+                            // Change the art item to use it
+                            _cartridge.ChangeTileSet(artItem, tileSet);
+                            // Send it to the relevant control
+                            otherArtTileSetViewer.SetData(tileSet, artItem.Palette);
+                        }
+                        catch (Exception exception)
+                        {
+                            MessageBox.Show(this, $"Failed: {exception.Message}");
                         }
                     }
-                    pictureBoxArtLayout.Image?.Dispose();
-                    pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
                 }
+                pictureBoxArtLayout.Image?.Dispose();
+                pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
+
+                UpdateSpace();
             }
             catch (Exception ex)
             {
@@ -779,6 +786,21 @@ namespace sth1edwv
             {
                 pictureBoxArtLayout.Image?.Dispose();
                 pictureBoxArtLayout.Image = artItem.TileMap.GetImage(artItem.TileSet, artItem.Palette);
+            }
+
+            UpdateSpace();
+        }
+
+        private void UpdateSpace()
+        {
+            try
+            {
+                _cartridge.MakeRom();
+                spaceVisualizer1.SetData(_cartridge.LastFreeSpace);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
     }

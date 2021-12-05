@@ -107,12 +107,12 @@ namespace sth1edwv.GameObjects
             Compressed = true;
 
             // Default grouping
-            grouping ??= Groupings.Single;
+            _grouping = grouping ?? Groupings.Single;
 
             var decompressed = Compression.DecompressArt(memory, offset, out _);
             Tiles = decompressed
-                .ToChunks(64 * grouping.Count)
-                .Select((x, index) => new Tile(x, grouping, index))
+                .ToChunks(64 * _grouping.Count)
+                .Select((x, index) => new Tile(x, _grouping, index))
                 .ToList();
         }
 

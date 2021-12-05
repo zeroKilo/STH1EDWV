@@ -40,46 +40,66 @@ namespace sth1edwv.GameObjects
 
         public Bitmap GetImage(TileSet tileSet, Palette palette)
         {
-            // We work in 8bpp again...
             var image = new Bitmap(256, 192, PixelFormat.Format8bppIndexed);
+            // We work in 8bpp again...
             image.Palette = palette.ImagePalette;
             var data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.WriteOnly, PixelFormat.Format8bppIndexed);
-            for (var i = 0; i < _data.Count; ++i)
+            try
             {
-                var x = i % 32 * 8;
-                var y = i / 32 * 8;
-                var index = _data[i];
-                // Tile 0xff is unusable
-                if (index != 0xff)
+                for (var i = 0; i < _data.Count; ++i)
                 {
-                    // Mask off high bits
-                    index &= 0xff;
-                    // TODO: this is kind of repetitive, similar code everywhere I am drawing tiles into images
-                    var tile = tileSet.Tiles[index];
-                    var sourceImage = tile.GetImage(palette);
-                    var sourceData = sourceImage.LockBits(
-                        new Rectangle(0, 0, 8, 8),
-                        ImageLockMode.ReadOnly,
-                        PixelFormat.Format8bppIndexed);
-                    var rowData = new byte[8];
-                    for (var row = 0; row < 8; ++row)
+                    var x = i % 32 * 8;
+                    var y = i / 32 * 8;
+                    var index = _data[i];
+                    // Tile 0xff is unusable
+                    if (index != 0xff)
                     {
-                        Marshal.Copy(
-                            sourceData.Scan0 + row * sourceData.Stride,
-                            rowData, 
-                            0, 
-                            8);
-                        Marshal.Copy(
-                            rowData, 
-                            0, 
-                            data.Scan0 + (row + y) * data.Stride + x,
-                            8);
+                        // Mask off high bits
+                        index &= 0xff;
+                        // TODO: this is kind of repetitive, similar code everywhere I am drawing tiles into images
+                        if (index < tileSet.Tiles.Count)
+                        {
+                            var tile = tileSet.Tiles[index];
+                            var sourceImage = tile.GetImage(palette);
+                            var sourceData = sourceImage.LockBits(
+                                new Rectangle(0, 0, 8, 8),
+                                ImageLockMode.ReadOnly,
+                                PixelFormat.Format8bppIndexed);
+                            try
+                            {
+                                var rowData = new byte[8];
+                                for (var row = 0; row < 8; ++row)
+                                {
+                                    Marshal.Copy(
+                                        sourceData.Scan0 + row * sourceData.Stride,
+                                        rowData,
+                                        0,
+                                        8);
+                                    Marshal.Copy(
+                                        rowData,
+                                        0,
+                                        data.Scan0 + (row + y) * data.Stride + x,
+                                        8);
+                                }
+                            }
+                            finally
+                            {
+                                sourceImage.UnlockBits(sourceData);
+                            }
+                        }
                     }
-                    sourceImage.UnlockBits(sourceData);
                 }
+
+                return image; // Caller must dispose
             }
-            image.UnlockBits(data); 
-            return image; // Caller must dispose
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                image.UnlockBits(data);
+            }
         }
 
 
