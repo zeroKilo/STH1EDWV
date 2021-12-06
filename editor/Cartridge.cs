@@ -526,7 +526,11 @@ namespace sth1edwv
                             new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
                             // We put this one at the end so it won't be used for reading but will be written.
                             // This allows us to make sure the left-facing art pointer is in the right place while removing the padding.
-                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8} // ld bc,$7000 ; 004C8D 01 00 70
+                            // TODO this then fails if we remove the unused blank sprites.
+                            // We want this sprite set plus the left-facing ones to be in the same 32KB window, and to have the two pointers
+                            // relative to the same base. This isn't currently explicitly handled.
+                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8}, // ld bc,$7000 ; 004C8D 01 00 70
+                            new() { Offset = 0x4E49 + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8}  // ld bc,$7000 ; 004E49 01 00 70 ; Needed for dropped rings
                         },
                         Restrictions = { CanCrossBanks = true, MinimumOffset = 0x20000 } // This minimum cajoles the code into picking a working location. It's a hack.
                     }
