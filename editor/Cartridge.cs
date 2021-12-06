@@ -149,7 +149,7 @@ namespace sth1edwv
                             new() {Offset = 0x01C4 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$024b ; 0001C4 21 4B 02 
                             new() {Offset = 0x0223 + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$024b ; 000223 21 4B 02 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 } // Must be in low 16KB
                     }
                 }, {
                     // Palettes scattered in the low ROM area
@@ -162,7 +162,7 @@ namespace sth1edwv
                             new() {Offset = 0x01cd + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$026b ; 0001CD 21 6B 02 
                             new() {Offset = 0x022C + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$026b ; 00022C 21 6B 02 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     // Palettes scattered in the low ROM area
@@ -174,7 +174,7 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x0cd4 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$0f0e ; 000CD4 21 0E 0F 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     "Map screen 2 palette", new Game.Asset { 
@@ -185,7 +185,7 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x0d36 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$0f2e ; 000D36 21 2E 0F 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     "Title screen palette", new Game.Asset { 
@@ -196,7 +196,7 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x12cc + 1, Type = Game.Reference.Types.Absolute} // ld hl,$13e1 ; 0012CC 21 E1 13 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     "Game Over palette", new Game.Asset { 
@@ -207,7 +207,7 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x143c + 1, Type = Game.Reference.Types.Absolute} // ld hl,$14fc ; 00143C 21 FC 14 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     "Act Complete palette", new Game.Asset { 
@@ -218,7 +218,7 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x1604 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$1b8d ; 001604 21 8D 1B 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     "Ending palette", new Game.Asset {
@@ -230,7 +230,7 @@ namespace sth1edwv
                             new() { Offset = 0x25a1 + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$2828 ; 0025A1 21 28 28 
                             new() { Offset = 0x268d + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$2828 ; 00268D 21 28 28 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     "Credits palette", new Game.Asset {
@@ -241,7 +241,7 @@ namespace sth1edwv
                         References = new List<Game.Reference> {
                             new() {Offset = 0x2702 + 1, Type = Game.Reference.Types.Absolute} // ld hl,$2ad6 ; 002702 21 D6 2A 
                         }, 
-                        Restrictions = { MaximumOffset = 0x8000 }
+                        Restrictions = { MaximumOffset = 0x4000 }
                     }
                 }, {
                     "End sign palette", new Game.Asset {
