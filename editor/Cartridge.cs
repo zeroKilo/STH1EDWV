@@ -159,7 +159,7 @@ namespace sth1edwv
                         Type = Game.Asset.Types.Palette,
                         FixedSize = 32,
                         References = new List<Game.Reference> {
-                            new() {Offset = 0x026b + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$026b ; 0001CD 21 6B 02 
+                            new() {Offset = 0x01cd + 1, Type = Game.Reference.Types.Absolute}, // ld hl,$026b ; 0001CD 21 6B 02 
                             new() {Offset = 0x022C + 1, Type = Game.Reference.Types.Absolute}  // ld hl,$026b ; 00022C 21 6B 02 
                         }, 
                         Restrictions = { MaximumOffset = 0x8000 }
@@ -277,7 +277,7 @@ namespace sth1edwv
                     new Game.Asset { OriginalOffset = 0x638e, OriginalSize = 32, Type = Game.Asset.Types.Palette, FixedSize = 32, Hidden = true, References = new List<Game.Reference>
                     {
                         new() { Offset = 0x6282, Type = Game.Reference.Types.Absolute},
-                        new() { Offset = 0x01e8, Type = Game.Reference.Types.Absolute, Delta = +16 } // ld hl,$639e ; 0001E9 21 9E 63 
+                        new() { Offset = 0x01e9 + 1, Type = Game.Reference.Types.Absolute, Delta = +16 } // ld hl,$639e ; 0001E9 21 9E 63 
                     }, Restrictions = { MaximumOffset = 0x8000 } }
                 }, {
                     "Labyrinth cycling palette", 
@@ -1245,39 +1245,52 @@ namespace sth1edwv
                     switch (reference.Type)
                     {
                         case Game.Reference.Types.Absolute:
-                            if (offset >= 0x8000)
+                        {
+                            var value = offset + reference.Delta;
+                            if (value >= 0x8000)
                             {
-                                throw new Exception($"Can't write absolute address for offset {offset:X}");
+                                throw new Exception($"Can't write absolute address for offset {offset:X}: {value:X} is >= 0x8000");
                             }
-                            memory[reference.Offset + 0] = (byte)(offset & 0xff);
-                            memory[reference.Offset + 1] = (byte)(offset >> 8);
-                            _logger($" - Wrote location ${offset:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                            memory[reference.Offset + 0] = (byte)(value & 0xff);
+                            memory[reference.Offset + 1] = (byte)(value >> 8);
+                            _logger($" - Wrote location ${value:X} for offset ${offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
+                        }
                         case Game.Reference.Types.PageNumber:
-                            var pageNumber = (byte)(offset / 0x4000 + reference.Delta);
-                            memory[reference.Offset] = pageNumber;
-                            _logger(
-                                $" - Wrote page number ${pageNumber:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                        {
+                            // Delta applies to the page number, not the offset
+                            var value = (byte)(offset / 0x4000 + reference.Delta);
+                            memory[reference.Offset] = value;
+                            _logger($" - Wrote page number ${value:X} for offset {offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
+                        }
                         case Game.Reference.Types.Size:
-                            memory[reference.Offset + 0] = (byte)(size & 0xff);
-                            memory[reference.Offset + 1] = (byte)(size >> 8);
-                            _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
+                        {
+                            var value = size + reference.Delta;
+                            memory[reference.Offset + 0] = (byte)(value & 0xff);
+                            memory[reference.Offset + 1] = (byte)(value >> 8);
+                            _logger($" - Wrote ${value:X} for size {size:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
+                        }
                         case Game.Reference.Types.Size8:
-                            if (size > 255)
+                        {
+                            var value = size + reference.Delta;
+                            if (value > 255)
                             {
-                                throw new Exception($"Cannot write size {size} because it exceeds 8 bits");
+                                throw new Exception($"Cannot write size {value} because it exceeds 8 bits");
                             }
-                            memory[reference.Offset] = (byte)(size & 0xff);
-                            _logger($" - Wrote size ${size:X} at reference at {reference.Offset:X}");
+                            memory[reference.Offset] = (byte)(value & 0xff);
+                            _logger($" - Wrote ${value:X} for size {size:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
+                        }
                         case Game.Reference.Types.Slot1:
+                        {
                             var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
                             memory[reference.Offset + 0] = (byte)(value & 0xff);
                             memory[reference.Offset + 1] = (byte)(value >> 8);
-                            _logger($" - Wrote location ${value:X} for offset {offset:X} at reference at {reference.Offset:X}");
+                            _logger($" - Wrote location ${value:X} for offset {offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
+                        }
                     }
                 }
             }
