@@ -600,8 +600,10 @@ namespace sth1edwv
                         References = new List<Game.Reference>
                         {
                             new() {Offset = 0x12a1 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, // ld hl,$4b0a ; 0012A1 21 0A 4B 
-                            new() {Offset = 0x12a7 + 1, Type = Game.Reference.Types.PageNumber}              // ld a,$09    ; 0012A7 3E 09 
-                        },
+                            new() {Offset = 0x12a7 + 1, Type = Game.Reference.Types.PageNumber},             // ld a,$09    ; 0012A7 3E 09 
+                            new() {Offset = 0x26B6 + 1, Type = Game.Reference.Types.Slot1, Delta = -0x4000}, // ld hl,$4b0a ; 0026B6 21 0A 4B 
+                            new() {Offset = 0x26BC + 1, Type = Game.Reference.Types.PageNumber}              // ld a,$09    ; 0026BC 3E 09 
+                    },
                         Restrictions = { CanCrossBanks = true }
                     }
                 }, {
