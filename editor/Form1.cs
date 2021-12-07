@@ -635,6 +635,7 @@ namespace sth1edwv
                     ? artItem.Palette.GetSubPalette(16, 16)
                     : artItem.Palette;
                 viewer.SetData(tileSet, palette, null, true);
+                viewer.Changed += _ => UpdateSpace();
                 tabControlArt.TabPages.Add(page);
             }
 
@@ -802,6 +803,11 @@ namespace sth1edwv
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void spriteTileSetViewer_Changed(TileSet obj)
+        {
+            UpdateSpace();
         }
     }
 }
