@@ -459,6 +459,7 @@ namespace sth1edwv
                 data.CopyTo(level.Floor.BlockIndices, 0);
                 // Need to redraw
                 floorEditor1.Invalidate();
+                UpdateSpace();
             }
             catch (Exception)
             {

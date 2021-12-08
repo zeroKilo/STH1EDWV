@@ -1168,14 +1168,15 @@ namespace sth1edwv
                 _logger($"- Wrote level header for {level} at offset ${level.Offset:X}");
             }
 
-            // If we get here and the upper 256KB is unused, trim it down again
-            if (freeSpace.MaximumUsed < 256 * 1024)
+            // Next we round to a multiple of 64KB. This is needed for Everdrive compatibility.
+            var trimmedSize = (int)Math.Ceiling(freeSpace.MaximumUsed / (64.0 * 1024)) * 64 * 1024;
+            if (trimmedSize < freeSpace.Maximum)
             {
-                var trimmed = new byte[256 * 1024];
-                Array.Copy(memory, 0, trimmed, 0, 256 * 1024);
+                var trimmed = new byte[trimmedSize];
+                Array.Copy(memory, 0, trimmed, 0, trimmedSize);
                 memory = trimmed;
-                freeSpace.Remove(256 * 1024, 256 * 1024);
-                freeSpace.Maximum = 256 * 1024;
+                freeSpace.Remove(trimmedSize, freeSpace.Maximum - trimmedSize);
+                freeSpace.Maximum = trimmedSize;
             }
 
             _logger($"Built ROM image in {sw.Elapsed}");
