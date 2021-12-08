@@ -75,7 +75,7 @@ namespace sth1edwv
             // Take an image at the point of loading. This isn't what we loaded, but should be equivalent.
             _lastSaved = _cartridge.MakeRom(false);
 
-            spaceVisualizer1.SetData(_cartridge.LastFreeSpace);
+            spaceVisualizer1.SetData(_cartridge.LastFreeSpace, _cartridge.InitialFreeSpace);
         }
 
         private void SelectedLevelChanged(object sender, EventArgs e)
@@ -810,7 +810,7 @@ namespace sth1edwv
                 try
                 {
                     _cartridge.MakeRom(false);
-                    BeginInvoke(new Action(() => { spaceVisualizer1.SetData(_cartridge.LastFreeSpace); }));
+                    BeginInvoke(new Action(() => { spaceVisualizer1.SetData(_cartridge.LastFreeSpace, _cartridge.InitialFreeSpace); }));
                 }
                 catch (Exception ex)
                 {

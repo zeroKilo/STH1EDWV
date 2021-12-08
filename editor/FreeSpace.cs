@@ -209,5 +209,12 @@ namespace sth1edwv
                 .Where(x => x.Size >= size) // Big enough
                 .Sum(x => x.Size - size); // Count of "slack" bytes
         }
+
+        public FreeSpace Clone()
+        {
+            var result = new FreeSpace { Maximum = Maximum };
+            result._spans.AddRange(_spans.Select(x => new Span { Start = x.Start, End = x.End }));
+            return result;
+        }
     }
 }

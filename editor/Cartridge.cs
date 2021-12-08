@@ -1082,6 +1082,8 @@ namespace sth1edwv
             // We do this after adding all the free space spans
             freeSpace.Consolidate();
 
+            InitialFreeSpace = freeSpace.Clone();
+
             // Then log the state
             if (log) _logger($"Initial free space: {freeSpace}");
 
@@ -1185,6 +1187,8 @@ namespace sth1edwv
 
             return memory;
         }
+
+        public FreeSpace InitialFreeSpace { get; set; }
 
         private static void AddAssets(HashSet<AssetToPack> assetsToPack, IEnumerable<IGrouping<IDataItem, Level>> items, string prefix, Game.LocationRestriction restriction)
         {

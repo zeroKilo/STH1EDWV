@@ -8,6 +8,7 @@ namespace sth1edwv.Controls
     public sealed partial class SpaceVisualizer : UserControl
     {
         private FreeSpace _space;
+        private FreeSpace _initialSpace;
 
         public SpaceVisualizer()
         {
@@ -15,9 +16,10 @@ namespace sth1edwv.Controls
             InitializeComponent();
         }
 
-        public void SetData(FreeSpace space)
+        public void SetData(FreeSpace space, FreeSpace initialSpace)
         {
             _space = space;
+            _initialSpace = initialSpace;
             Invalidate();
         }
 
@@ -48,11 +50,11 @@ namespace sth1edwv.Controls
             var textWidth = (int)e.Graphics.MeasureString(text, Font).Width + padding;
 
             // Add a border
-            e.Graphics.DrawRectangle(SystemPens.ControlDark, new Rectangle(padding + textWidth, padding, Width - textWidth - padding * 2 - 1, Height - padding * 2 - 1));
+            e.Graphics.DrawRectangle(SystemPens.ControlDarkDark, new Rectangle(padding + textWidth, padding, Width - textWidth - padding * 2 - 1, Height - padding * 2 - 1));
 
             // The pixel width of the area we want to fill
             var totalWidth = Width - textWidth - padding * 2 - 2;
-            var top = padding + 1;
+            const int top = padding + 1;
             var left = textWidth + padding + 1;
             var height = Height - padding * 2 - 2;
             var banks = _space.Maximum / (16 * 1024);
@@ -72,10 +74,18 @@ namespace sth1edwv.Controls
                 return bankLeft + offsetInBank * bankWidth / 0x4000;
             }
 
-            // Draw in the whole lot as "full"
-            e.Graphics.FillRectangle(SystemBrushes.Highlight, left, top, totalWidth, height);
+            // Draw in the whole lot as "fixed"
+            e.Graphics.FillRectangle(SystemBrushes.ControlDark, left, top, totalWidth, height);
 
-            // Draw free space over it
+            // Draw initial free space over it as "consumed"
+            foreach (var span in _initialSpace.Spans)
+            {
+                var x = OffsetToPixel(span.Start);
+                var width = OffsetToPixel(Math.Min(_space.Maximum, span.End) - 1) - x + 1;
+                e.Graphics.FillRectangle(SystemBrushes.Highlight, x, top, width, height);
+            }
+
+            // Draw free space over it as "unused"
             foreach (var span in _space.Spans)
             {
                 var x = OffsetToPixel(span.Start);
@@ -87,7 +97,7 @@ namespace sth1edwv.Controls
             for (var bank = 0; bank < banks; ++bank)
             {
                 var x = OffsetToPixel(0x4000 * bank);
-                e.Graphics.FillRectangle(SystemBrushes.ControlDark, x-banksGap, top, banksGap, height);
+                e.Graphics.FillRectangle(SystemBrushes.ControlDarkDark, x-banksGap, top, banksGap, height);
             }
         }
     }
