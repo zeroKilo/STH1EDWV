@@ -5,12 +5,13 @@ using System.Windows.Forms;
 
 namespace sth1edwv.Controls
 {
-    public partial class SpaceVisualizer : UserControl
+    public sealed partial class SpaceVisualizer : UserControl
     {
         private FreeSpace _space;
 
         public SpaceVisualizer()
         {
+            DoubleBuffered = true;
             InitializeComponent();
         }
 

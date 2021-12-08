@@ -1,6 +1,6 @@
 ﻿namespace sth1edwv.Controls
 {
-    partial class SpaceVisualizer
+    sealed partial class SpaceVisualizer
     {
         /// <summary> 
         /// Required designer variable.

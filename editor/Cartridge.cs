@@ -1039,9 +1039,12 @@ namespace sth1edwv
             }
         }
 
-        public byte[] MakeRom()
+        public byte[] MakeRom(bool log = true)
         {
-            _logger("Building ROM...");
+            if (log)
+            {
+                _logger("Building ROM...");
+            }
             var sw = Stopwatch.StartNew();
             // We clone the memory to a memory stream
             var memory = new byte[512 * 1024];
@@ -1067,11 +1070,9 @@ namespace sth1edwv
 
             // First we build a list of "free space". We include all the "original assets" so we will overwrite unused space. Missing "original" data makes us ignore it.
             var freeSpace = new FreeSpace();
-            foreach (var kvp in Sonic1MasterSystem.Assets.Where(x => x.Value.OriginalOffset != 0))
+            foreach (var asset in Sonic1MasterSystem.Assets.Values.Where(x => x.OriginalOffset != 0))
             {
-                var asset = kvp.Value;
                 freeSpace.Add(asset.OriginalOffset, asset.OriginalOffset + asset.OriginalSize);
-                _logger($"- Freeing space at {asset.OriginalOffset:X} = {asset.OriginalSize} bytes for {kvp.Key}");
             }
             
             // Expand to 512KB here
@@ -1082,7 +1083,7 @@ namespace sth1edwv
             freeSpace.Consolidate();
 
             // Then log the state
-            _logger($"Initial free space: {freeSpace}");
+            if (log) _logger($"Initial free space: {freeSpace}");
 
             // - Game text (at original offsets)
             // 122d..1286 inclusive
@@ -1091,7 +1092,7 @@ namespace sth1edwv
             {
                 var data = gameText.GetData();
                 data.CopyTo(memory, gameText.Offset);
-                _logger($"- Wrote game text \"{gameText.Text}\" at offset ${gameText.Offset:X}, length {data.Count} bytes");
+                if (log) _logger($"- Wrote game text \"{gameText.Text}\" at offset ${gameText.Offset:X}, length {data.Count} bytes");
             }
 
             // Add level data to assets list
@@ -1122,7 +1123,7 @@ namespace sth1edwv
                     memory[block.SolidityOffset] = block.Data;
                 }
 
-                _logger($"- Wrote block mapping for level(s) {string.Join(", ", group)} at offset ${group.Key.Blocks[0].Offset:X}");
+                if (log) _logger($"- Wrote block mapping for level(s) {string.Join(", ", group)} at offset ${group.Key.Blocks[0].Offset:X}");
             }
 
             // - Level objects
@@ -1150,7 +1151,7 @@ namespace sth1edwv
                         .OrderBy(x => freeSpace.GetEaseOfPlacing(x.Data.Count, x.Asset.Restrictions.MinimumOffset, x.Asset.Restrictions.MaximumOffset))
                         .ThenByDescending(x => x.Data.Count)
                         .First();
-                    WriteAsset(item, writtenItems, writtenReferences, freeSpace, memory, followers);
+                    WriteAsset(item, writtenItems, writtenReferences, freeSpace, memory, followers, log);
                     assetsToPack.Remove(item);
                 }
             }
@@ -1197,7 +1198,7 @@ namespace sth1edwv
                 group.Key.GetData())));
         }
 
-        private void WriteAsset(AssetToPack item, ISet<IDataItem> writtenItems, HashSet<int> writtenReferences, FreeSpace freeSpace, byte[] memory, Dictionary<string, AssetToPack> followers)
+        private void WriteAsset(AssetToPack item, ISet<IDataItem> writtenItems, HashSet<int> writtenReferences, FreeSpace freeSpace, byte[] memory, Dictionary<string, AssetToPack> followers, bool log)
         {
             int offset;
 
@@ -1211,7 +1212,7 @@ namespace sth1edwv
 
             if (writtenItems.Contains(item.DataItem))
             {
-                _logger($"- Data for asset {item.Name} was already written");
+                if (log) _logger($"- Data for asset {item.Name} was already written");
                 offset = item.DataItem.Offset;
             }
             else
@@ -1219,9 +1220,8 @@ namespace sth1edwv
                 offset = freeSpace.FindSpace(sizeNeeded, item.Asset.Restrictions);
                 item.DataItem.Offset = offset;
                 item.Data.CopyTo(memory, offset);
-                _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {item.Data.Count} bytes");
+                if (log) _logger($"- Wrote data for asset {item.Name} at {offset:X}, length {item.Data.Count} bytes");
                 freeSpace.Remove(offset, item.Data.Count);
-                _logger(freeSpace.ToString());
 
                 writtenItems.Add(item.DataItem);
             }
@@ -1251,7 +1251,7 @@ namespace sth1edwv
                 {
                     if (writtenReferences.Contains(reference.Offset))
                     {
-                        _logger($" - Reference at {reference.Offset:X} was already written");
+                        if (log) _logger($" - Reference at {reference.Offset:X} was already written");
                         continue;
                     }
 
@@ -1267,7 +1267,7 @@ namespace sth1edwv
                             }
                             memory[reference.Offset + 0] = (byte)(value & 0xff);
                             memory[reference.Offset + 1] = (byte)(value >> 8);
-                            _logger($" - Wrote location ${value:X} for offset ${offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
+                            if (log) _logger($" - Wrote location ${value:X} for offset ${offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
                         }
                         case Game.Reference.Types.PageNumber:
@@ -1275,7 +1275,7 @@ namespace sth1edwv
                             // Delta applies to the page number, not the offset
                             var value = (byte)(offset / 0x4000 + reference.Delta);
                             memory[reference.Offset] = value;
-                            _logger($" - Wrote page number ${value:X} for offset {offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
+                            if (log) _logger($" - Wrote page number ${value:X} for offset {offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
                         }
                         case Game.Reference.Types.Size:
@@ -1283,7 +1283,7 @@ namespace sth1edwv
                             var value = size + reference.Delta;
                             memory[reference.Offset + 0] = (byte)(value & 0xff);
                             memory[reference.Offset + 1] = (byte)(value >> 8);
-                            _logger($" - Wrote ${value:X} for size {size:X} + {reference.Delta} at reference at {reference.Offset:X}");
+                            if (log) _logger($" - Wrote ${value:X} for size {size:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
                         }
                         case Game.Reference.Types.Size8:
@@ -1294,7 +1294,7 @@ namespace sth1edwv
                                 throw new Exception($"Cannot write size {value} because it exceeds 8 bits");
                             }
                             memory[reference.Offset] = (byte)(value & 0xff);
-                            _logger($" - Wrote ${value:X} for size {size:X} + {reference.Delta} at reference at {reference.Offset:X}");
+                            if (log) _logger($" - Wrote ${value:X} for size {size:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
                         }
                         case Game.Reference.Types.Slot1:
@@ -1302,7 +1302,7 @@ namespace sth1edwv
                             var value = (uint)(offset % 0x4000 + 0x4000 + reference.Delta);
                             memory[reference.Offset + 0] = (byte)(value & 0xff);
                             memory[reference.Offset + 1] = (byte)(value >> 8);
-                            _logger($" - Wrote location ${value:X} for offset {offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
+                            if (log) _logger($" - Wrote location ${value:X} for offset {offset:X} + {reference.Delta} at reference at {reference.Offset:X}");
                             break;
                         }
                     }
@@ -1315,7 +1315,7 @@ namespace sth1edwv
                 // We modify its restrictions to require it to be exactly after this one
                 follower.Asset.Restrictions.MinimumOffset = item.DataItem.Offset + item.Data.Count;
                 follower.Asset.Restrictions.MaximumOffset = follower.Asset.Restrictions.MinimumOffset + follower.Data.Count;
-                WriteAsset(follower, writtenItems, writtenReferences, freeSpace, memory, followers);
+                WriteAsset(follower, writtenItems, writtenReferences, freeSpace, memory, followers, log);
             }
         }
 

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Equin.ApplicationFramework;
 using Microsoft.VisualBasic;
@@ -72,7 +73,7 @@ namespace sth1edwv
             SelectedLevelChanged(null, null);
 
             // Take an image at the point of loading. This isn't what we loaded, but should be equivalent.
-            _lastSaved = _cartridge.MakeRom();
+            _lastSaved = _cartridge.MakeRom(false);
 
             spaceVisualizer1.SetData(_cartridge.LastFreeSpace);
         }
@@ -671,7 +672,7 @@ namespace sth1edwv
             {
                 try
                 {
-                    var current = _cartridge.MakeRom();
+                    var current = _cartridge.MakeRom(false);
                     if (!current.SequenceEqual(_lastSaved))
                     {
                         if (MessageBox.Show(
@@ -793,29 +794,39 @@ namespace sth1edwv
         }
 
         private bool _awaitingUpdate;
+        private Task _updateTask;
+
         private void UpdateSpace()
         {
-            if (_awaitingUpdate)
+            if (_updateTask is { IsCompleted: false })
             {
+                _awaitingUpdate = true;
                 return;
             }
 
-            _awaitingUpdate = true;
-            BeginInvoke(new Action(() =>
+            _updateTask = Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    var sw = Stopwatch.StartNew();
-                    _cartridge.MakeRom();
-                    spaceVisualizer1.SetData(_cartridge.LastFreeSpace);
-                    Text = $"{sw.Elapsed}";
-                    _awaitingUpdate = false;
+                    _cartridge.MakeRom(false);
+                    BeginInvoke(new Action(() => { spaceVisualizer1.SetData(_cartridge.LastFreeSpace); }));
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    BeginInvoke(new Action(() => { MessageBox.Show(ex.Message); }));
                 }
-            }));
+                finally
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        if (_awaitingUpdate)
+                        {
+                            _awaitingUpdate = false;
+                            UpdateSpace();
+                        }
+                    }));
+                }
+            });
         }
 
         private void spriteTileSetViewer_Changed(TileSet obj)
