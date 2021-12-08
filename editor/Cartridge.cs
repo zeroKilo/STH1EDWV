@@ -518,7 +518,7 @@ namespace sth1edwv
                         Type = Game.Asset.Types.SpriteTileSet, 
                         BitPlanes = 3,
                         TileGrouping = TileSet.Groupings.Sonic,
-                        FixedSize = 42 * 24 * 32 * 3/8, // 42 frames, each 24x32, each pixel is 3 bits
+                        FixedSize = 39 * 24 * 32 * 3/8, // 42 frames, each 24x32, each pixel is 3 bits. The last 3 frames are unused so we ignore them.
                         TilesPerRow = 8,
                         References = new List<Game.Reference> {
                             new() { Offset = 0x4c84 + 1, Type = Game.Reference.Types.Slot1 }, // ld bc,$4000 ; 004C84 01 00 40 
@@ -526,11 +526,10 @@ namespace sth1edwv
                             new() { Offset = 0x0135 + 1, Type = Game.Reference.Types.PageNumber, Delta = 1 }, // ld a,$09 ; 000135 3E 09 
                             // We put this one at the end so it won't be used for reading but will be written.
                             // This allows us to make sure the left-facing art pointer is in the right place while removing the padding.
-                            // TODO this then fails if we remove the unused blank sprites.
                             // We want this sprite set plus the left-facing ones to be in the same 32KB window, and to have the two pointers
                             // relative to the same base. This isn't currently explicitly handled.
-                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8}, // ld bc,$7000 ; 004C8D 01 00 70
-                            new() { Offset = 0x4E49 + 1, Type = Game.Reference.Types.Slot1, Delta = 42 * 24 * 32 * 3/8}  // ld bc,$7000 ; 004E49 01 00 70 ; Needed for dropped rings
+                            new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1, Delta = 39 * 24 * 32 * 3/8}, // ld bc,$7000 ; 004C8D 01 00 70
+                            new() { Offset = 0x4E49 + 1, Type = Game.Reference.Types.Slot1, Delta = 39 * 24 * 32 * 3/8}  // ld bc,$7000 ; 004E49 01 00 70 ; Needed for dropped rings
                         },
                         Restrictions = { CanCrossBanks = true, MinimumOffset = 0x20000 } // This minimum cajoles the code into picking a working location. It's a hack.
                     }
@@ -541,7 +540,7 @@ namespace sth1edwv
                         Type = Game.Asset.Types.SpriteTileSet, 
                         BitPlanes = 3,
                         TileGrouping = TileSet.Groupings.Sonic,
-                        FixedSize = 42 * 24 * 32 * 3/8, // 42 frames, each 24x32, each pixel is 3 bits
+                        FixedSize = 39 * 24 * 32 * 3/8, // 39 frames, each 24x32, each pixel is 3 bits
                         TilesPerRow = 8,
                         References = new List<Game.Reference> {
                             new() { Offset = 0x4c8d + 1, Type = Game.Reference.Types.Slot1 }, // ld bc,$7000 ; 004C8D 01 00 70
@@ -757,7 +756,7 @@ namespace sth1edwv
                 }, {
                     "Boss sprites 3", new Game.Asset {
                         OriginalOffset = 0x3ef3f,
-                        OriginalSize = 0x3e9fd - 0x3ef3f,
+                        OriginalSize = 0x3f9ed - 0x3ef3f,
                         Type = Game.Asset.Types.SpriteTileSet,
                         TileGrouping = TileSet.Groupings.Sprite,
                         References = new List<Game.Reference> {
@@ -1068,9 +1067,11 @@ namespace sth1edwv
 
             // First we build a list of "free space". We include all the "original assets" so we will overwrite unused space. Missing "original" data makes us ignore it.
             var freeSpace = new FreeSpace();
-            foreach (var asset in Sonic1MasterSystem.Assets.Values.Where(x => x.OriginalOffset != 0))
+            foreach (var kvp in Sonic1MasterSystem.Assets.Where(x => x.Value.OriginalOffset != 0))
             {
+                var asset = kvp.Value;
                 freeSpace.Add(asset.OriginalOffset, asset.OriginalOffset + asset.OriginalSize);
+                _logger($"- Freeing space at {asset.OriginalOffset:X} = {asset.OriginalSize} bytes for {kvp.Key}");
             }
             
             // Expand to 512KB here
@@ -1164,6 +1165,16 @@ namespace sth1edwv
             {
                 level.GetData().CopyTo(memory, level.Offset);
                 _logger($"- Wrote level header for {level} at offset ${level.Offset:X}");
+            }
+
+            // If we get here and the upper 256KB is unused, trim it down again
+            if (freeSpace.MaximumUsed < 256 * 1024)
+            {
+                var trimmed = new byte[256 * 1024];
+                Array.Copy(memory, 0, trimmed, 0, 256 * 1024);
+                memory = trimmed;
+                freeSpace.Remove(256 * 1024, 256 * 1024);
+                freeSpace.Maximum = 256 * 1024;
             }
 
             _logger($"Built ROM image in {sw.Elapsed}");

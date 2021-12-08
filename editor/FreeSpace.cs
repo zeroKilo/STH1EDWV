@@ -22,6 +22,19 @@ namespace sth1edwv
         private readonly List<Span> _spans = new();
         public int Maximum { get; set; }
         public IEnumerable<Span> Spans => _spans;
+        public int MaximumUsed
+        {
+            get
+            {
+                var last = _spans.Last();
+                if (last.End == Maximum)
+                {
+                    return last.Start;
+                }
+
+                return Maximum;
+            }
+        }
 
         public void Add(int start, int end)
         {

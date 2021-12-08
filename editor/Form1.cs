@@ -792,20 +792,38 @@ namespace sth1edwv
             UpdateSpace();
         }
 
+        private bool _awaitingUpdate;
         private void UpdateSpace()
         {
-            try
+            if (_awaitingUpdate)
             {
-                _cartridge.MakeRom();
-                spaceVisualizer1.SetData(_cartridge.LastFreeSpace);
+                return;
             }
-            catch (Exception ex)
+
+            _awaitingUpdate = true;
+            BeginInvoke(new Action(() =>
             {
-                MessageBox.Show(ex.Message);
-            }
+                try
+                {
+                    var sw = Stopwatch.StartNew();
+                    _cartridge.MakeRom();
+                    spaceVisualizer1.SetData(_cartridge.LastFreeSpace);
+                    Text = $"{sw.Elapsed}";
+                    _awaitingUpdate = false;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }));
         }
 
         private void spriteTileSetViewer_Changed(TileSet obj)
+        {
+            UpdateSpace();
+        }
+
+        private void floorEditor1_FloorChanged()
         {
             UpdateSpace();
         }

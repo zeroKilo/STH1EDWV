@@ -40,19 +40,26 @@ namespace sth1edwv.Controls
             // Clear the background to the "control" colour
             e.Graphics.Clear(SystemColors.Control);
 
+            // Draw some text on the top
+            var freeBytes = _space.Spans.Sum(x => x.Size);
+            var text = $"{freeBytes} bytes ({freeBytes/1024.0:F1} KB) free of {_space.Maximum / 1024} KB";
+            e.Graphics.DrawString(text, Font, SystemBrushes.ControlText, new RectangleF(padding, 0, Width - padding * 2, Height), new StringFormat {Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center});
+            var textWidth = (int)e.Graphics.MeasureString(text, Font).Width + padding;
+
             // Add a border
-            e.Graphics.DrawRectangle(SystemPens.ControlDark, new Rectangle(padding, padding, Width - padding * 2 - 1, Height - padding * 2 - 1));
+            e.Graphics.DrawRectangle(SystemPens.ControlDark, new Rectangle(padding + textWidth, padding, Width - textWidth - padding * 2 - 1, Height - padding * 2 - 1));
 
             // The pixel width of the area we want to fill
-            var totalWidth = Width - padding * 2 - 2;
-            var topLeft = padding + 1;
+            var totalWidth = Width - textWidth - padding * 2 - 2;
+            var top = padding + 1;
+            var left = textWidth + padding + 1;
             var height = Height - padding * 2 - 2;
             var banks = _space.Maximum / (16 * 1024);
             var pixelsPerByte = (float)(totalWidth - (banks - 1) * banksGap) / _space.Maximum;
 
             int BankStart(int bank)
             {
-                return topLeft + banksGap * bank + (int)(bank * 0x4000 * pixelsPerByte);
+                return left + banksGap * bank + (int)(bank * 0x4000 * pixelsPerByte);
             }
             int OffsetToPixel(int offset)
             {
@@ -65,26 +72,22 @@ namespace sth1edwv.Controls
             }
 
             // Draw in the whole lot as "full"
-            e.Graphics.FillRectangle(SystemBrushes.Highlight, topLeft, topLeft, totalWidth, height);
+            e.Graphics.FillRectangle(SystemBrushes.Highlight, left, top, totalWidth, height);
 
             // Draw free space over it
             foreach (var span in _space.Spans)
             {
                 var x = OffsetToPixel(span.Start);
                 var width = OffsetToPixel(span.End - 1) - x + 1;
-                e.Graphics.FillRectangle(SystemBrushes.Control, x, topLeft, width, height);
+                e.Graphics.FillRectangle(SystemBrushes.Control, x, top, width, height);
             }
 
             // Draw in banks boundaries
             for (var bank = 0; bank < banks; ++bank)
             {
                 var x = OffsetToPixel(0x4000 * bank);
-                e.Graphics.FillRectangle(SystemBrushes.ControlDark, x-banksGap, topLeft, banksGap, height);
+                e.Graphics.FillRectangle(SystemBrushes.ControlDark, x-banksGap, top, banksGap, height);
             }
-
-            // Draw some text on the top
-            var freeBytes = _space.Spans.Sum(x => x.Size);
-            e.Graphics.DrawString($"{freeBytes} bytes ({freeBytes/1024.0:F1} KB) free of {_space.Maximum / 1024} KB", Font, SystemBrushes.ControlText, new RectangleF(padding, 0, totalWidth, Height), new StringFormat {Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Center});
         }
     }
 }

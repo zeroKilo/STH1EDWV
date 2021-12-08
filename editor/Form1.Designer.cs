@@ -37,9 +37,9 @@ namespace sth1edwv
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,9 +57,7 @@ namespace sth1edwv
             this.tabPagePalettes = new System.Windows.Forms.TabPage();
             this.PalettesLayout = new System.Windows.Forms.FlowLayoutPanel();
             this.tabPageTiles = new System.Windows.Forms.TabPage();
-            this.tileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.tabPageSprites = new System.Windows.Forms.TabPage();
-            this.spriteTileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.tabPageBlocks = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataGridViewBlocks = new System.Windows.Forms.DataGridView();
@@ -73,8 +71,6 @@ namespace sth1edwv
             this.tabPageLayout = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer7 = new System.Windows.Forms.SplitContainer();
-            this.floorEditor1 = new sth1edwv.Controls.FloorEditor();
-            this.layoutBlockChooser = new sth1edwv.Controls.ItemPicker();
             this.levelEditorContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.selectBlockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -111,10 +107,14 @@ namespace sth1edwv
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.pictureBoxArtLayout = new System.Windows.Forms.PictureBox();
             this.tabPageArtTiles = new System.Windows.Forms.TabPage();
-            this.otherArtTileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.tabPageArtPalette = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.logTextBox = new System.Windows.Forms.TextBox();
+            this.tileSetViewer = new sth1edwv.Controls.TileSetViewer();
+            this.spriteTileSetViewer = new sth1edwv.Controls.TileSetViewer();
+            this.floorEditor1 = new sth1edwv.Controls.FloorEditor();
+            this.layoutBlockChooser = new sth1edwv.Controls.ItemPicker();
+            this.otherArtTileSetViewer = new sth1edwv.Controls.TileSetViewer();
             this.spaceVisualizer1 = new sth1edwv.Controls.SpaceVisualizer();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
@@ -339,16 +339,6 @@ namespace sth1edwv
             this.tabPageTiles.Text = "Tiles";
             this.tabPageTiles.UseVisualStyleBackColor = true;
             // 
-            // tileSetViewer
-            // 
-            this.tileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tileSetViewer.Location = new System.Drawing.Point(3, 3);
-            this.tileSetViewer.Name = "tileSetViewer";
-            this.tileSetViewer.Size = new System.Drawing.Size(997, 497);
-            this.tileSetViewer.TabIndex = 1;
-            this.tileSetViewer.TilesPerRow = 16;
-            this.tileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.tileSetViewer_Changed);
-            // 
             // tabPageSprites
             // 
             this.tabPageSprites.Controls.Add(this.spriteTileSetViewer);
@@ -359,16 +349,6 @@ namespace sth1edwv
             this.tabPageSprites.TabIndex = 5;
             this.tabPageSprites.Text = "Sprite tiles";
             this.tabPageSprites.UseVisualStyleBackColor = true;
-            // 
-            // spriteTileSetViewer
-            // 
-            this.spriteTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.spriteTileSetViewer.Location = new System.Drawing.Point(3, 3);
-            this.spriteTileSetViewer.Name = "spriteTileSetViewer";
-            this.spriteTileSetViewer.Size = new System.Drawing.Size(997, 497);
-            this.spriteTileSetViewer.TabIndex = 0;
-            this.spriteTileSetViewer.TilesPerRow = 16;
-            this.spriteTileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.spriteTileSetViewer_Changed);
             // 
             // tabPageBlocks
             // 
@@ -437,8 +417,8 @@ namespace sth1edwv
             // Index
             // 
             this.Index.DataPropertyName = "Index";
-            dataGridViewCellStyle4.Format = "X2";
-            this.Index.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Format = "X2";
+            this.Index.DefaultCellStyle = dataGridViewCellStyle1;
             this.Index.HeaderText = "Index";
             this.Index.Name = "Index";
             this.Index.ReadOnly = true;
@@ -460,8 +440,8 @@ namespace sth1edwv
             // Used
             // 
             this.Used.DataPropertyName = "UsageCount";
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.Used.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.Used.DefaultCellStyle = dataGridViewCellStyle2;
             this.Used.HeaderText = "Used";
             this.Used.Name = "Used";
             this.Used.ReadOnly = true;
@@ -469,8 +449,8 @@ namespace sth1edwv
             // UsedGlobal
             // 
             this.UsedGlobal.DataPropertyName = "GlobalUsageCount";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.UsedGlobal.DefaultCellStyle = dataGridViewCellStyle3;
             this.UsedGlobal.HeaderText = "Total used";
             this.UsedGlobal.Name = "UsedGlobal";
             this.UsedGlobal.ReadOnly = true;
@@ -526,37 +506,6 @@ namespace sth1edwv
             this.splitContainer7.Size = new System.Drawing.Size(997, 451);
             this.splitContainer7.SplitterDistance = 705;
             this.splitContainer7.TabIndex = 3;
-            // 
-            // floorEditor1
-            // 
-            this.floorEditor1.BlockChooser = this.layoutBlockChooser;
-            this.floorEditor1.BlockGaps = false;
-            this.floorEditor1.BlockNumbers = true;
-            this.floorEditor1.ContextMenuStrip = this.levelEditorContextMenu;
-            this.floorEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.floorEditor1.DrawingMode = sth1edwv.Controls.FloorEditor.Modes.Draw;
-            this.floorEditor1.LastClickedBlockIndex = 0;
-            this.floorEditor1.LevelBounds = false;
-            this.floorEditor1.Location = new System.Drawing.Point(0, 0);
-            this.floorEditor1.Name = "floorEditor1";
-            this.floorEditor1.Size = new System.Drawing.Size(705, 451);
-            this.floorEditor1.TabIndex = 0;
-            this.floorEditor1.Text = "floorEditor1";
-            this.floorEditor1.TileGaps = false;
-            this.floorEditor1.WithObjects = true;
-            // 
-            // layoutBlockChooser
-            // 
-            this.layoutBlockChooser.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.layoutBlockChooser.FixedItemsPerRow = false;
-            this.layoutBlockChooser.ItemsPerRow = 0;
-            this.layoutBlockChooser.Location = new System.Drawing.Point(0, 0);
-            this.layoutBlockChooser.Name = "layoutBlockChooser";
-            this.layoutBlockChooser.Scaling = 1;
-            this.layoutBlockChooser.SelectedIndex = -1;
-            this.layoutBlockChooser.ShowTransparency = false;
-            this.layoutBlockChooser.Size = new System.Drawing.Size(288, 451);
-            this.layoutBlockChooser.TabIndex = 0;
             // 
             // levelEditorContextMenu
             // 
@@ -920,22 +869,12 @@ namespace sth1edwv
             this.tabPageArtTiles.Text = "Tiles";
             this.tabPageArtTiles.UseVisualStyleBackColor = true;
             // 
-            // otherArtTileSetViewer
-            // 
-            this.otherArtTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.otherArtTileSetViewer.Location = new System.Drawing.Point(3, 3);
-            this.otherArtTileSetViewer.Name = "otherArtTileSetViewer";
-            this.otherArtTileSetViewer.Size = new System.Drawing.Size(1038, 497);
-            this.otherArtTileSetViewer.TabIndex = 0;
-            this.otherArtTileSetViewer.TilesPerRow = 4;
-            this.otherArtTileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.otherArtTileSetViewer_Changed);
-            // 
             // tabPageArtPalette
             // 
             this.tabPageArtPalette.Location = new System.Drawing.Point(4, 22);
             this.tabPageArtPalette.Name = "tabPageArtPalette";
             this.tabPageArtPalette.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageArtPalette.Size = new System.Drawing.Size(1044, 507);
+            this.tabPageArtPalette.Size = new System.Drawing.Size(1044, 503);
             this.tabPageArtPalette.TabIndex = 1;
             this.tabPageArtPalette.Text = "Palette";
             this.tabPageArtPalette.UseVisualStyleBackColor = true;
@@ -961,6 +900,68 @@ namespace sth1edwv
             this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.logTextBox.Size = new System.Drawing.Size(1317, 529);
             this.logTextBox.TabIndex = 0;
+            // 
+            // tileSetViewer
+            // 
+            this.tileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tileSetViewer.Location = new System.Drawing.Point(3, 3);
+            this.tileSetViewer.Name = "tileSetViewer";
+            this.tileSetViewer.Size = new System.Drawing.Size(997, 497);
+            this.tileSetViewer.TabIndex = 1;
+            this.tileSetViewer.TilesPerRow = 16;
+            this.tileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.tileSetViewer_Changed);
+            // 
+            // spriteTileSetViewer
+            // 
+            this.spriteTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.spriteTileSetViewer.Location = new System.Drawing.Point(3, 3);
+            this.spriteTileSetViewer.Name = "spriteTileSetViewer";
+            this.spriteTileSetViewer.Size = new System.Drawing.Size(997, 497);
+            this.spriteTileSetViewer.TabIndex = 0;
+            this.spriteTileSetViewer.TilesPerRow = 16;
+            this.spriteTileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.spriteTileSetViewer_Changed);
+            // 
+            // floorEditor1
+            // 
+            this.floorEditor1.BlockChooser = this.layoutBlockChooser;
+            this.floorEditor1.BlockGaps = false;
+            this.floorEditor1.BlockNumbers = true;
+            this.floorEditor1.ContextMenuStrip = this.levelEditorContextMenu;
+            this.floorEditor1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.floorEditor1.DrawingMode = sth1edwv.Controls.FloorEditor.Modes.Draw;
+            this.floorEditor1.LastClickedBlockIndex = 0;
+            this.floorEditor1.LevelBounds = false;
+            this.floorEditor1.Location = new System.Drawing.Point(0, 0);
+            this.floorEditor1.Name = "floorEditor1";
+            this.floorEditor1.Size = new System.Drawing.Size(705, 451);
+            this.floorEditor1.TabIndex = 0;
+            this.floorEditor1.Text = "floorEditor1";
+            this.floorEditor1.TileGaps = false;
+            this.floorEditor1.WithObjects = true;
+            this.floorEditor1.FloorChanged += new System.Action(this.floorEditor1_FloorChanged);
+            // 
+            // layoutBlockChooser
+            // 
+            this.layoutBlockChooser.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.layoutBlockChooser.FixedItemsPerRow = false;
+            this.layoutBlockChooser.ItemsPerRow = 0;
+            this.layoutBlockChooser.Location = new System.Drawing.Point(0, 0);
+            this.layoutBlockChooser.Name = "layoutBlockChooser";
+            this.layoutBlockChooser.Scaling = 1;
+            this.layoutBlockChooser.SelectedIndex = -1;
+            this.layoutBlockChooser.ShowTransparency = false;
+            this.layoutBlockChooser.Size = new System.Drawing.Size(288, 451);
+            this.layoutBlockChooser.TabIndex = 0;
+            // 
+            // otherArtTileSetViewer
+            // 
+            this.otherArtTileSetViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.otherArtTileSetViewer.Location = new System.Drawing.Point(3, 3);
+            this.otherArtTileSetViewer.Name = "otherArtTileSetViewer";
+            this.otherArtTileSetViewer.Size = new System.Drawing.Size(1038, 497);
+            this.otherArtTileSetViewer.TabIndex = 0;
+            this.otherArtTileSetViewer.TilesPerRow = 4;
+            this.otherArtTileSetViewer.Changed += new System.Action<sth1edwv.GameObjects.TileSet>(this.otherArtTileSetViewer_Changed);
             // 
             // spaceVisualizer1
             // 

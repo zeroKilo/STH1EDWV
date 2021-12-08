@@ -109,7 +109,7 @@ namespace sth1edwv.GameObjects
             // Default grouping
             _grouping = grouping ?? Groupings.Single;
 
-            var decompressed = Compression.DecompressArt(memory, offset, out _);
+            var decompressed = Compression.DecompressArt(memory, offset, out var foo);
             Tiles = decompressed
                 .ToChunks(64 * _grouping.Count)
                 .Select((x, index) => new Tile(x, _grouping, index))
