@@ -118,6 +118,7 @@ namespace sth1edwv
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.logTextBox = new System.Windows.Forms.TextBox();
             this.spaceVisualizer1 = new sth1edwv.Controls.SpaceVisualizer();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer6)).BeginInit();
@@ -565,37 +566,42 @@ namespace sth1edwv
             // 
             this.levelEditorContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.selectBlockToolStripMenuItem,
+            this.toolStripMenuItem1,
             this.editObjectToolStripMenuItem,
             this.addObjectToolStripMenuItem,
             this.deleteObjectToolStripMenuItem});
             this.levelEditorContextMenu.Name = "levelEditorContextMenu";
-            this.levelEditorContextMenu.Size = new System.Drawing.Size(144, 92);
+            this.levelEditorContextMenu.Size = new System.Drawing.Size(181, 120);
             // 
             // selectBlockToolStripMenuItem
             // 
+            this.selectBlockToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("selectBlockToolStripMenuItem.Image")));
             this.selectBlockToolStripMenuItem.Name = "selectBlockToolStripMenuItem";
-            this.selectBlockToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.selectBlockToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectBlockToolStripMenuItem.Text = "Select block";
             this.selectBlockToolStripMenuItem.Click += new System.EventHandler(this.selectBlockToolStripMenuItem_Click);
             // 
             // editObjectToolStripMenuItem
             // 
+            this.editObjectToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("editObjectToolStripMenuItem.Image")));
             this.editObjectToolStripMenuItem.Name = "editObjectToolStripMenuItem";
-            this.editObjectToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.editObjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.editObjectToolStripMenuItem.Text = "Edit object...";
             this.editObjectToolStripMenuItem.Click += new System.EventHandler(this.editObjectToolStripMenuItem_Click);
             // 
             // addObjectToolStripMenuItem
             // 
+            this.addObjectToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("addObjectToolStripMenuItem.Image")));
             this.addObjectToolStripMenuItem.Name = "addObjectToolStripMenuItem";
-            this.addObjectToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.addObjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addObjectToolStripMenuItem.Text = "Add object...";
             this.addObjectToolStripMenuItem.Click += new System.EventHandler(this.addObjectToolStripMenuItem_Click);
             // 
             // deleteObjectToolStripMenuItem
             // 
+            this.deleteObjectToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("deleteObjectToolStripMenuItem.Image")));
             this.deleteObjectToolStripMenuItem.Name = "deleteObjectToolStripMenuItem";
-            this.deleteObjectToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.deleteObjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deleteObjectToolStripMenuItem.Text = "Delete object";
             this.deleteObjectToolStripMenuItem.Click += new System.EventHandler(this.deleteObjectToolStripMenuItem_Click);
             // 
@@ -989,6 +995,11 @@ namespace sth1edwv
             this.spaceVisualizer1.Size = new System.Drawing.Size(1331, 24);
             this.spaceVisualizer1.TabIndex = 2;
             // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1138,6 +1149,7 @@ namespace sth1edwv
         private SpaceVisualizer spaceVisualizer1;
         private ToolStripMenuItem addObjectToolStripMenuItem;
         private ToolStripMenuItem deleteObjectToolStripMenuItem;
+        private ToolStripSeparator toolStripMenuItem1;
     }
 }
 
