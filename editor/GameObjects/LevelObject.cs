@@ -6,9 +6,13 @@ namespace sth1edwv.GameObjects
 {
     public class LevelObject: IDataItem
     {
-        public byte Type { get; set; }
-        public byte X { get; set; }
-        public byte Y { get; set; }
+        public int Type { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public LevelObject()
+        {
+        }
 
         public LevelObject(IReadOnlyList<byte> memory, int offset)
         {
@@ -22,7 +26,7 @@ namespace sth1edwv.GameObjects
 
         public IList<byte> GetData()
         {
-            return new List<byte> { Type, X, Y };
+            return new List<byte> { (byte)Type, (byte)X, (byte)Y };
         }
 
         public TreeNode ToNode()

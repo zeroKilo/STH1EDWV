@@ -42,5 +42,15 @@ namespace sth1edwv.GameObjects
                 .Concat(_objects.SelectMany(x => x.GetData()))
                 .ToList();
         }
+
+        public void Add(LevelObject levelObject)
+        {
+            _objects.Add(levelObject);
+        }
+
+        public void Remove(LevelObject levelObject)
+        {
+            _objects.Remove(levelObject);
+        }
     }
 }

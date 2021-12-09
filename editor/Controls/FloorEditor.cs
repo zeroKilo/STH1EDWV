@@ -55,6 +55,7 @@ namespace sth1edwv.Controls
 
             UpdateSize();
             Invalidate();
+            FloorChanged?.Invoke();
         }
 
         private void UpdateSize()

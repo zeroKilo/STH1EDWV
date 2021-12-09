@@ -839,5 +839,66 @@ namespace sth1edwv
         {
             UpdateSpace();
         }
+
+        private void addObjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+            var index = floorEditor1.LastClickedBlockIndex;
+            var x = index % level.FloorWidth;
+            var y = index / level.FloorWidth;
+            // Make an object
+            var levelObject = new LevelObject { X = x, Y = y, Type = LevelObject.Names[0].Type };
+            using var editor = new ObjectEditor(levelObject);
+            if (editor.ShowDialog(this) == DialogResult.OK)
+            {
+                levelObject.X = editor.X;
+                levelObject.Y = editor.Y;
+                levelObject.Type = editor.Type;
+
+                level.Objects.Add(levelObject);
+
+                // Refresh the level data
+                LoadLevelData();
+
+                // And the level map
+                if (floorEditor1.WithObjects)
+                {
+                    floorEditor1.Invalidate();
+                }
+
+                UpdateSpace();
+            }
+        }
+
+        private void deleteObjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listBoxLevels.SelectedItem is not Level level)
+            {
+                return;
+            }
+            var index = floorEditor1.LastClickedBlockIndex;
+            var x = index % level.FloorWidth;
+            var y = index / level.FloorWidth;
+            // See if we have an object here
+            var levelObject = level.Objects.FirstOrDefault(o => o.X == x && o.Y == y);
+            if (levelObject != null)
+            {
+                level.Objects.Remove(levelObject);
+            }
+
+            // Refresh the level data
+            LoadLevelData();
+
+            // And the level map
+            if (floorEditor1.WithObjects)
+            {
+                floorEditor1.Invalidate();
+            }
+
+            UpdateSpace();
+        }
     }
 }
